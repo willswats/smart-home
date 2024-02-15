@@ -1,3 +1,3 @@
 # Smart Home
 
-A program for my first year programming coursework 2.
+A program created for my first year programming coursework.
