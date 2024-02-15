@@ -103,7 +103,8 @@ class SmartHome:
         return self.devices
 
     def get_device_at(self, index):
-        return self.devices[index]
+        if index < len(self.devices):
+            return self.devices[index]
 
     def add_device(self, device):
         if isinstance(device, SmartDevice):
@@ -112,7 +113,8 @@ class SmartHome:
             raise ValueError("Invalid device")
 
     def toggle_switch(self, index):
-        self.devices[index].toggle_switch()
+        if index < len(self.devices):
+            self.devices[index].toggle_switch()
 
     def turn_on_all(self):
         for device in self.devices:
@@ -137,7 +139,9 @@ def test_smart_home():
     smart_home.add_device(smart_plug_1)
     smart_home.add_device(smart_plug_2)
     smart_home.add_device(smart_air_fryer)
-    smart_home.toggle_switch(1)
+    smart_home.toggle_switch(2)
+    print(smart_home)
+    smart_home.turn_on_all()
     print(smart_home)
 
 
