@@ -1,4 +1,6 @@
 from enum import Enum
+from tkinter import Button, Frame, Label, Tk, StringVar
+
 from backend import SmartAirFryer, SmartHome, SmartPlug
 
 
@@ -54,15 +56,77 @@ def set_up_home():
     smart_devices = get_smart_devices()
     for smart_device in smart_devices:
         smart_home.add_device(smart_device)
-    print(smart_home)
+    return smart_home
 
 
 class SmartHomeSystem:
-    pass
+    def __init__(self, home: SmartHome):
+        self.win = Tk()
+        self.win.resizable(False, False)
+
+        self.main_frame = Frame(self.win)
+        # self.main_frame.grid(padx=10, pady=10)
+
+        self.devices_frame = Frame(self.win)
+        self.devices_frame.pack(padx=10, pady=10)
+
+        self.home = home
+
+    def run(self):
+        self.create_widgets()
+        self.win.mainloop()
+
+    def create_widgets_per_device(self):
+        smart_devices = self.home.get_devices()
+        for smart_device in smart_devices:
+            if isinstance(smart_device, SmartPlug):
+                label_smart_plug_text = StringVar(
+                    None,
+                    f"Smart Plug: {smart_device.get_switched_on()}, Consumption rate: {smart_device.get_consumption_rate()}",
+                )
+                label_smart_plug = Label(
+                    self.devices_frame, textvariable=label_smart_plug_text
+                )
+                label_smart_plug.pack()
+
+                button_toggle = Button(
+                    self.devices_frame,
+                    text="Toggle",
+                    command=smart_device.toggle_switch,
+                )
+                button_toggle.pack()
+
+            elif isinstance(smart_device, SmartAirFryer):
+                label_smart_plug_text = StringVar(
+                    None,
+                    f"Smart Air Fryer: {smart_device.get_switched_on()}, Cooking mode: {smart_device.get_cooking_mode()}",
+                )
+                label_smart_plug = Label(
+                    self.devices_frame, textvariable=label_smart_plug_text
+                )
+                label_smart_plug.pack()
+
+    def create_widgets(self):
+        # button_turn_on_all = Button(
+        #     self.main_frame, text="Turn on all", command=self.home.turn_off_all
+        # )
+        # button_turn_on_all.grid(column=0, row=0)
+
+        # button_turn_off_all = Button(
+        #     self.main_frame, text="Turn off all", command=self.home.turn_off_all
+        # )
+        # button_turn_off_all.grid(column=2, row=0)
+
+        self.create_widgets_per_device()
+
+        # button_add = Button(self.main_frame, text="Add")
+        # button_add.grid(column=0, row=2)
 
 
 def main():
-    set_up_home()
+    home = set_up_home()
+    smart_home_system = SmartHomeSystem(home)
+    smart_home_system.run()
 
 
 main()
