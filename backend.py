@@ -13,10 +13,9 @@ class SmartDevice:
 
 
 class SmartPlug(SmartDevice):
-    error_message = "Invalid consumption rate (>= 0 and <= 150)."
-
     def __init__(self, consumption_rate):
         super().__init__()
+        self.error_message = "Invalid consumption rate (>= 0 and <= 150)."
         if consumption_rate >= 0 and consumption_rate <= 150:
             self.consumption_rate = consumption_rate
         else:
