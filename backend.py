@@ -13,12 +13,14 @@ class SmartDevice:
 
 
 class SmartPlug(SmartDevice):
+    error_message = "Invalid consumption rate (>= 0 and <= 150)."
+
     def __init__(self, consumption_rate):
         super().__init__()
         if consumption_rate >= 0 and consumption_rate <= 150:
             self.consumption_rate = consumption_rate
         else:
-            raise ValueError("Invalid consumption rate")
+            raise ValueError(self.error_message)
 
     def __str__(self):
         output = "- Smart Plug:\n"
@@ -33,7 +35,7 @@ class SmartPlug(SmartDevice):
         if rate >= 0 and rate <= 150:
             self.consumption_rate = rate
         else:
-            raise ValueError("Invalid consumption rate")
+            raise ValueError(self.error_message)
 
 
 def test_smart_plug():
@@ -73,7 +75,7 @@ class SmartAirFryer(SmartDevice):
         if isinstance(cooking_mode, CookingModes):
             self.cooking_mode = cooking_mode.value
         else:
-            raise ValueError("Invalid cooking mode")
+            raise ValueError("Invalid cooking mode.")
 
 
 def test_smart_air_fryer():
@@ -110,7 +112,7 @@ class SmartHome:
         if isinstance(device, SmartDevice):
             self.devices.append(device)
         else:
-            raise ValueError("Invalid device")
+            raise ValueError("Invalid device.")
 
     def toggle_switch(self, index):
         if index < len(self.devices):
