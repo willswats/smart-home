@@ -145,4 +145,4 @@ def test_smart_home():
     print(smart_home)
 
 
-test_smart_home()
+# test_smart_home()
