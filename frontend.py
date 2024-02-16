@@ -12,9 +12,9 @@ def check_valid_device_num(device_num):
 def get_smart_devices():
     device_nums = []
     print("Add 5 devices to your smart home:")
+    print("  1. Smart Plug")
+    print("  2. Smart Air Fryer")
     while len(device_nums) < 5:
-        print("  1. Smart Plug")
-        print("  2. Smart Air Fryer")
         device_num = input("Enter device number: ")
         if check_valid_device_num(device_num):
             print("Added device.")
