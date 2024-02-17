@@ -151,9 +151,70 @@ class SmartHomeSystem:
 
     ## Add buttons
     def button_add(self):
-        pass
+        add_window = Toplevel(self.win)
+        add_window.title("Add")
+        add_window.resizable(False, False)
+        add_window.geometry("200x250")
+
+        add_window_frame = Frame(add_window)
+        add_window_frame.pack(padx=10, pady=10)
+
+        self.create_widgets_add(add_window_frame)
+
+    def button_add_submit(self, frame: Frame, text_options_menu_pick_smart_device):
+        if text_options_menu_pick_smart_device.get() == "Smart Plug":
+            smart_plug = SmartPlug(150)
+            text_options_menu_switched_on = StringVar(
+                frame,
+                f"{'On' if smart_plug.get_switched_on() else 'Off'}",
+            )
+            self.create_widgets_add_edit_smart_device(frame, smart_plug)
+            self.create_widgets_add_edit_smart_plug(
+                frame, smart_plug, text_options_menu_switched_on
+            )
+            self.home.add_device(smart_plug)
+            self.create_widgets_smart_device(smart_plug)
+        elif text_options_menu_pick_smart_device.get() == "Smart Air Fryer":
+            smart_air_fryer = SmartAirFryer()
+            text_options_menu_switched_on = StringVar(
+                frame,
+                f"{'On' if smart_air_fryer.get_switched_on() else 'Off'}",
+            )
+            self.create_widgets_add_edit_smart_device(frame, smart_air_fryer)
+            self.create_widgets_add_edit_smart_air_fryer(
+                frame, smart_air_fryer, text_options_menu_switched_on
+            )
+            self.home.add_device(smart_air_fryer)
+            self.create_widgets_smart_device(smart_air_fryer)
 
     # Create widgets
+    ## Add widgets
+    def create_widgets_add(self, frame: Frame):
+        label_pick_smart_device = Label(frame, text="Pick device: ")
+
+        pick_smart_device_options = ["Smart Plug", "Smart Air Fryer"]
+        text_options_menu_pick_smart_device = StringVar(
+            frame,
+            "Smart Plug",
+        )
+        options_menu_pick_smart_device = OptionMenu(
+            frame,
+            text_options_menu_pick_smart_device,
+            *pick_smart_device_options,
+        )
+
+        button_add_submit = Button(
+            frame,
+            text="Submit",
+            command=lambda: self.button_add_submit(
+                frame, text_options_menu_pick_smart_device
+            ),
+        )
+
+        label_pick_smart_device.pack()
+        options_menu_pick_smart_device.pack()
+        button_add_submit.pack()
+
     ## Add and edit widgets
     def create_widgets_add_edit_smart_device(self, frame: Frame, smart_device):
         label_switched_on = Label(frame, text="Switched on: ")
@@ -229,48 +290,41 @@ class SmartHomeSystem:
         button_edit_submit.pack()
 
     ## Home widgets
-    def create_widgets_per_device(self):
-        for smart_device in self.smart_devices:
-            text_label_smart_device = StringVar(self.main_frame, f"{smart_device}")
-            smart_device.set_string_var(text_label_smart_device)
+    def create_widgets_smart_device(self, smart_device):
+        text_label_smart_device = StringVar(self.main_frame, f"{smart_device}")
+        smart_device.set_string_var(text_label_smart_device)
 
-            label_smart_device = Label(
-                self.main_frame, textvariable=text_label_smart_device
-            )
-            button_toggle_smart_device = Button(
-                self.main_frame,
-                text="Toggle",
-                command=lambda smart_device=smart_device: self.button_toggle(
-                    smart_device
-                ),
-            )
-            button_edit_smart_device = Button(
-                self.main_frame,
-                text="Edit",
-                command=lambda smart_device=smart_device: self.button_edit(
-                    smart_device
-                ),
-            )
-            button_delete_smart_device = Button(
-                self.main_frame,
-                text="Delete",
-                command=lambda smart_device=smart_device: self.button_delete(
-                    smart_device
-                ),
-            )
+        label_smart_device = Label(
+            self.main_frame, textvariable=text_label_smart_device
+        )
+        button_toggle_smart_device = Button(
+            self.main_frame,
+            text="Toggle",
+            command=lambda smart_device=smart_device: self.button_toggle(smart_device),
+        )
+        button_edit_smart_device = Button(
+            self.main_frame,
+            text="Edit",
+            command=lambda smart_device=smart_device: self.button_edit(smart_device),
+        )
+        button_delete_smart_device = Button(
+            self.main_frame,
+            text="Delete",
+            command=lambda smart_device=smart_device: self.button_delete(smart_device),
+        )
 
-            label_smart_device.pack()
-            button_toggle_smart_device.pack()
-            button_edit_smart_device.pack()
-            button_delete_smart_device.pack()
+        label_smart_device.pack()
+        button_toggle_smart_device.pack()
+        button_edit_smart_device.pack()
+        button_delete_smart_device.pack()
 
-            smart_device.add_gui_objects(
-                [
-                    label_smart_device,
-                    button_toggle_smart_device,
-                    button_delete_smart_device,
-                ]
-            )
+        smart_device.add_gui_objects(
+            [
+                label_smart_device,
+                button_toggle_smart_device,
+                button_delete_smart_device,
+            ]
+        )
 
     def create_widgets(self):
         button_turn_on_all = Button(
@@ -283,7 +337,8 @@ class SmartHomeSystem:
         )
         button_turn_off_all.pack()
 
-        self.create_widgets_per_device()
+        for smart_device in self.smart_devices:
+            self.create_widgets_smart_device(smart_device)
 
         button_add = Button(self.main_frame, text="Add", command=self.button_add)
         button_add.pack()
