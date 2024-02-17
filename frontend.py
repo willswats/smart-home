@@ -81,9 +81,13 @@ class SmartHomeSystem:
         for smart_device in self.smart_devices:
             smart_device.set_string_var_text(f"{smart_device}")
 
-    def button_toggle_switch(self, smart_device):
+    def button_toggle(self, smart_device):
         smart_device.toggle_switch()
         self.update_text_label_smart_device(smart_device)
+
+    def button_delete(self, smart_device):
+        self.smart_devices.remove(smart_device)
+        smart_device.delete_gui_objects()
 
     def button_turn_on_all(self):
         self.home.turn_on_all()
@@ -95,22 +99,38 @@ class SmartHomeSystem:
 
     def create_widgets_per_device(self):
         for smart_device in self.smart_devices:
-            text_label_smart_plug = StringVar(self.main_frame, f"{smart_device}")
-            smart_device.set_string_var(text_label_smart_plug)
+            text_label_smart_device = StringVar(self.main_frame, f"{smart_device}")
+            smart_device.set_string_var(text_label_smart_device)
 
-            label_smart_plug = Label(
-                self.main_frame, textvariable=text_label_smart_plug
+            label_smart_device = Label(
+                self.main_frame, textvariable=text_label_smart_device
             )
-            button_toggle_smart_plug = Button(
+            button_toggle_smart_device = Button(
                 self.main_frame,
                 text="Toggle",
-                command=lambda smart_device=smart_device: self.button_toggle_switch(
+                command=lambda smart_device=smart_device: self.button_toggle(
+                    smart_device
+                ),
+            )
+            button_delete_smart_device = Button(
+                self.main_frame,
+                text="Delete",
+                command=lambda smart_device=smart_device: self.button_delete(
                     smart_device
                 ),
             )
 
-            label_smart_plug.pack()
-            button_toggle_smart_plug.pack()
+            label_smart_device.pack()
+            button_toggle_smart_device.pack()
+            button_delete_smart_device.pack()
+
+            smart_device.add_gui_objects(
+                [
+                    label_smart_device,
+                    button_toggle_smart_device,
+                    button_delete_smart_device,
+                ]
+            )
 
     def create_widgets(self):
         button_turn_on_all = Button(

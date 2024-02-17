@@ -6,6 +6,7 @@ class SmartDevice:
     def __init__(self):
         self.switched_on = False
         self.string_var: StringVar | None = None
+        self.gui_objects = []
 
     def get_switched_on(self):
         return self.switched_on
@@ -22,6 +23,14 @@ class SmartDevice:
     def set_string_var_text(self, text):
         if self.string_var is not None:
             self.string_var.set(text)
+
+    def add_gui_objects(self, gui_objects):
+        for gui_object in gui_objects:
+            self.gui_objects.append(gui_object)
+
+    def delete_gui_objects(self):
+        for gui_object in self.gui_objects:
+            gui_object.destroy()
 
 
 class SmartPlug(SmartDevice):
