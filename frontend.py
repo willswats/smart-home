@@ -132,15 +132,29 @@ class SmartHomeSystem:
         edit_window_frame = Frame(edit_window)
         edit_window_frame.pack(padx=10, pady=10)
 
-        label_switched_on = Label(edit_window_frame, text="Switched on: ")
+        text_options_menu_switched_on = self.create_widgets_add_edit_smart_device(
+            edit_window_frame, smart_device
+        )
+
+        if isinstance(smart_device, SmartPlug):
+            self.create_widgets_add_edit_smart_plug(
+                edit_window_frame, smart_device, text_options_menu_switched_on
+            )
+        elif isinstance(smart_device, SmartAirFryer):
+            self.create_widgets_add_edit_smart_air_fryer(
+                edit_window_frame, smart_device, text_options_menu_switched_on
+            )
+
+    def create_widgets_add_edit_smart_device(self, frame: Frame, smart_device):
+        label_switched_on = Label(frame, text="Switched on: ")
 
         switched_on_options = ["On", "Off"]
         text_options_menu_switched_on = StringVar(
-            edit_window_frame,
+            frame,
             f"{'On' if smart_device.get_switched_on() else 'Off'}",
         )
         options_menu_switched_on = OptionMenu(
-            edit_window_frame,
+            frame,
             text_options_menu_switched_on,
             *switched_on_options,
         )
@@ -148,56 +162,61 @@ class SmartHomeSystem:
         label_switched_on.pack()
         options_menu_switched_on.pack()
 
-        if isinstance(smart_device, SmartPlug):
-            label_consumption_rate = Label(edit_window_frame, text="Consumption rate: ")
+        return text_options_menu_switched_on
 
-            text_entry_consumption_rate = StringVar(
-                edit_window_frame,
-                f"{smart_device.get_consumption_rate()}",
-            )
-            entry_consumption_rate = Entry(
-                edit_window_frame, textvariable=text_entry_consumption_rate
-            )
-            button_edit_submit = Button(
-                edit_window_frame,
-                text="Submit",
-                command=lambda: self.button_edit_submit_smart_plug(
-                    smart_device,
-                    text_options_menu_switched_on,
-                    text_entry_consumption_rate,
-                ),
-            )
+    def create_widgets_add_edit_smart_plug(
+        self, frame: Frame, smart_device, text_options_menu_switched_on
+    ):
+        label_consumption_rate = Label(frame, text="Consumption rate: ")
 
-            label_consumption_rate.pack()
-            entry_consumption_rate.pack()
-            button_edit_submit.pack()
-        elif isinstance(smart_device, SmartAirFryer):
-            label_cooking_modes = Label(edit_window_frame, text="Cooking modes: ")
+        text_entry_consumption_rate = StringVar(
+            frame,
+            f"{smart_device.get_consumption_rate()}",
+        )
+        entry_consumption_rate = Entry(frame, textvariable=text_entry_consumption_rate)
+        button_edit_submit = Button(
+            frame,
+            text="Submit",
+            command=lambda: self.button_edit_submit_smart_plug(
+                smart_device,
+                text_options_menu_switched_on,
+                text_entry_consumption_rate,
+            ),
+        )
 
-            cooking_mode_options = [cooking_mode.value for cooking_mode in CookingModes]
-            text_options_menu_cooking_mode = StringVar(
-                edit_window_frame,
-                f"{smart_device.get_cooking_mode()}",
-            )
-            options_menu_cooking_mode = OptionMenu(
-                edit_window_frame,
+        label_consumption_rate.pack()
+        entry_consumption_rate.pack()
+        button_edit_submit.pack()
+
+    def create_widgets_add_edit_smart_air_fryer(
+        self, frame: Frame, smart_device, text_options_menu_switched_on
+    ):
+        label_cooking_modes = Label(frame, text="Cooking modes: ")
+
+        cooking_mode_options = [cooking_mode.value for cooking_mode in CookingModes]
+        text_options_menu_cooking_mode = StringVar(
+            frame,
+            f"{smart_device.get_cooking_mode()}",
+        )
+        options_menu_cooking_mode = OptionMenu(
+            frame,
+            text_options_menu_cooking_mode,
+            *cooking_mode_options,
+        )
+
+        button_edit_submit = Button(
+            frame,
+            text="Submit",
+            command=lambda: self.button_edit_submit_smart_air_fryer(
+                smart_device,
+                text_options_menu_switched_on,
                 text_options_menu_cooking_mode,
-                *cooking_mode_options,
-            )
+            ),
+        )
 
-            button_edit_submit = Button(
-                edit_window_frame,
-                text="Submit",
-                command=lambda: self.button_edit_submit_smart_air_fryer(
-                    smart_device,
-                    text_options_menu_switched_on,
-                    text_options_menu_cooking_mode,
-                ),
-            )
-
-            label_cooking_modes.pack()
-            options_menu_cooking_mode.pack()
-            button_edit_submit.pack()
+        label_cooking_modes.pack()
+        options_menu_cooking_mode.pack()
+        button_edit_submit.pack()
 
     def create_widgets_per_device(self):
         for smart_device in self.smart_devices:
