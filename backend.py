@@ -83,7 +83,9 @@ class SmartAirFryer(SmartDevice):
         self.cooking_mode = CookingModes.HEALTHY.value
 
     def __str__(self):
-        output = f"Smart Air Fryer: Switched on: {self.switched_on}, Cooking mode: {self.cooking_mode}"
+        output = (
+            f"Smart Air Fryer: {self.switched_on}, Cooking mode: {self.cooking_mode}"
+        )
         return output
 
     def get_cooking_mode(self):
@@ -114,9 +116,10 @@ class SmartHome:
         self.devices = []
 
     def __str__(self):
-        output = "Smart Home Devices:\n"
+        output = "Smart Home Devices: ["
         for device in self.devices:
-            output += f"{device}"
+            output += f"[{device}]"
+        output += "]"
         return output
 
     def get_devices(self):
