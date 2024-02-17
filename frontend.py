@@ -75,6 +75,7 @@ class SmartHomeSystem:
         self.create_widgets()
         self.win.mainloop()
 
+    # Update methods
     def update_text_label_smart_device(self, smart_device):
         smart_device.set_string_var_text(f"{smart_device}")
 
@@ -82,6 +83,8 @@ class SmartHomeSystem:
         for smart_device in self.smart_devices:
             smart_device.set_string_var_text(f"{smart_device}")
 
+    # Button methods
+    ## Home buttons
     def button_toggle(self, smart_device):
         smart_device.toggle_switch()
         self.update_text_label_smart_device(smart_device)
@@ -98,6 +101,7 @@ class SmartHomeSystem:
         self.home.turn_off_all()
         self.update_all_text_label_smart_device()
 
+    ## Edit buttons
     def button_edit_submit_smart_plug(
         self, smart_plug, text_options_menu_switched_on, text_entry_consumption_rate
     ):
@@ -145,6 +149,12 @@ class SmartHomeSystem:
                 edit_window_frame, smart_device, text_options_menu_switched_on
             )
 
+    ## Add buttons
+    def button_add(self):
+        pass
+
+    # Create widgets
+    ## Add and edit widgets
     def create_widgets_add_edit_smart_device(self, frame: Frame, smart_device):
         label_switched_on = Label(frame, text="Switched on: ")
 
@@ -218,6 +228,7 @@ class SmartHomeSystem:
         options_menu_cooking_mode.pack()
         button_edit_submit.pack()
 
+    ## Home widgets
     def create_widgets_per_device(self):
         for smart_device in self.smart_devices:
             text_label_smart_device = StringVar(self.main_frame, f"{smart_device}")
@@ -274,7 +285,7 @@ class SmartHomeSystem:
 
         self.create_widgets_per_device()
 
-        button_add = Button(self.main_frame, text="Add")
+        button_add = Button(self.main_frame, text="Add", command=self.button_add)
         button_add.pack()
 
 
