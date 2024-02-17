@@ -65,87 +65,68 @@ class SmartHomeSystem:
         self.win.resizable(False, False)
 
         self.main_frame = Frame(self.win)
-        # self.main_frame.grid(padx=10, pady=10)
-
-        self.devices_frame = Frame(self.win)
-        self.devices_frame.pack(padx=10, pady=10)
-
-        self.smart_plug_string_vars = []
-        self.smart_air_fryer_string_vars = []
+        self.main_frame.pack(padx=10, pady=10)
 
         self.home = home
+        self.smart_devices = self.home.get_devices()
 
     def run(self):
         self.create_widgets()
         self.win.mainloop()
 
-    def update_string_vars(self, smart_device):
-        if isinstance(smart_device, SmartPlug):
-            for string_var in self.smart_plug_string_vars:
-                string_var.set(
-                    f"Smart Plug: {smart_device.get_switched_on()}, Consumption rate: {smart_device.get_consumption_rate()}"
-                )
-        elif isinstance(smart_device, SmartAirFryer):
-            for string_var in self.smart_air_fryer_string_vars:
-                string_var.set(
-                    f"Smart Air Fryer: {smart_device.get_switched_on()}, Cooking mode: {smart_device.get_cooking_mode()}",
-                )
+    def update_text_label_smart_device(self, smart_device):
+        smart_device.set_string_var_text(f"{smart_device}")
+
+    def update_all_text_label_smart_device(self):
+        for smart_device in self.smart_devices:
+            smart_device.set_string_var_text(f"{smart_device}")
 
     def button_toggle_switch(self, smart_device):
         smart_device.toggle_switch()
-        self.update_string_vars(smart_device)
+        self.update_text_label_smart_device(smart_device)
+
+    def button_turn_on_all(self):
+        self.home.turn_on_all()
+        self.update_all_text_label_smart_device()
+
+    def button_turn_off_all(self):
+        self.home.turn_off_all()
+        self.update_all_text_label_smart_device()
 
     def create_widgets_per_device(self):
-        smart_devices = self.home.get_devices()
-        for smart_device in smart_devices:
-            if isinstance(smart_device, SmartPlug):
-                label_smart_plug_text = StringVar(
-                    self.devices_frame,
-                    f"Smart Plug: {smart_device.get_switched_on()}, Consumption rate: {smart_device.get_consumption_rate()}",
-                )
-                self.smart_plug_string_vars.append(label_smart_plug_text)
+        for smart_device in self.smart_devices:
+            text_label_smart_plug = StringVar(self.main_frame, f"{smart_device}")
+            smart_device.set_string_var(text_label_smart_plug)
 
-                label_smart_plug = Label(
-                    self.devices_frame, textvariable=label_smart_plug_text
-                )
-                label_smart_plug.pack()
+            label_smart_plug = Label(
+                self.main_frame, textvariable=text_label_smart_plug
+            )
+            button_toggle_smart_plug = Button(
+                self.main_frame,
+                text="Toggle",
+                command=lambda smart_device=smart_device: self.button_toggle_switch(
+                    smart_device
+                ),
+            )
 
-                button_toggle = Button(
-                    self.devices_frame,
-                    text="Toggle",
-                    command=lambda smart_device=smart_device: self.button_toggle_switch(
-                        smart_device
-                    ),
-                )
-                button_toggle.pack()
-
-            elif isinstance(smart_device, SmartAirFryer):
-                label_smart_air_fryer_text = StringVar(
-                    self.devices_frame,
-                    f"Smart Air Fryer: {smart_device.get_switched_on()}, Cooking mode: {smart_device.get_cooking_mode()}",
-                )
-                self.smart_air_fryer_string_vars.append(label_smart_air_fryer_text)
-
-                label_smart_air_fryer = Label(
-                    self.devices_frame, textvariable=label_smart_air_fryer_text
-                )
-                label_smart_air_fryer.pack()
+            label_smart_plug.pack()
+            button_toggle_smart_plug.pack()
 
     def create_widgets(self):
-        # button_turn_on_all = Button(
-        #     self.main_frame, text="Turn on all", command=self.home.turn_off_all
-        # )
-        # button_turn_on_all.grid(column=0, row=0)
+        button_turn_on_all = Button(
+            self.main_frame, text="Turn on all", command=self.button_turn_on_all
+        )
+        button_turn_on_all.pack()
 
-        # button_turn_off_all = Button(
-        #     self.main_frame, text="Turn off all", command=self.home.turn_off_all
-        # )
-        # button_turn_off_all.grid(column=2, row=0)
+        button_turn_off_all = Button(
+            self.main_frame, text="Turn off all", command=self.button_turn_off_all
+        )
+        button_turn_off_all.pack()
 
         self.create_widgets_per_device()
 
-        # button_add = Button(self.main_frame, text="Add")
-        # button_add.grid(column=0, row=2)
+        button_add = Button(self.main_frame, text="Add")
+        button_add.pack()
 
 
 def main():

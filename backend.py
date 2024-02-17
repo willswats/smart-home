@@ -1,15 +1,27 @@
 from enum import Enum
+from tkinter import StringVar
 
 
 class SmartDevice:
     def __init__(self):
         self.switched_on = False
+        self.string_var: StringVar | None = None
 
     def get_switched_on(self):
         return self.switched_on
 
     def toggle_switch(self):
         self.switched_on = not self.switched_on
+
+    def get_string_var(self):
+        return self.string_var
+
+    def set_string_var(self, string_var):
+        self.string_var = string_var
+
+    def set_string_var_text(self, text):
+        if self.string_var is not None:
+            self.string_var.set(text)
 
 
 class SmartPlug(SmartDevice):
@@ -22,9 +34,9 @@ class SmartPlug(SmartDevice):
             raise ValueError(self.error_message)
 
     def __str__(self):
-        output = "- Smart Plug:\n"
-        output += f"  - Switched on: {self.switched_on}\n"
-        output += f"  - Consumption rate: {self.consumption_rate}\n"
+        output = (
+            f"Smart Plug: {self.switched_on}, Consumption rate: {self.consumption_rate}"
+        )
         return output
 
     def get_consumption_rate(self):
@@ -62,9 +74,7 @@ class SmartAirFryer(SmartDevice):
         self.cooking_mode = CookingModes.HEALTHY.value
 
     def __str__(self):
-        output = "- Smart Air Fryer:\n"
-        output += f"  - Switched on: {self.switched_on}\n"
-        output += f"  - Cooking mode: {self.cooking_mode}\n"
+        output = f"Smart Air Fryer: Switched on: {self.switched_on}, Cooking mode: {self.cooking_mode}"
         return output
 
     def get_cooking_mode(self):
