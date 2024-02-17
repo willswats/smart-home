@@ -98,15 +98,28 @@ class SmartHomeSystem:
         self.home.turn_off_all()
         self.update_all_text_label_smart_device()
 
-    def button_edit_submit_smart_plug(self, smart_plug, text_entry_consumption_rate):
+    def button_edit_submit_smart_plug(
+        self, smart_plug, text_options_menu_switched_on, text_entry_consumption_rate
+    ):
         # TODO: error check and provide feedback to user (try, except)
+        switched_on = True if text_options_menu_switched_on.get() == "On" else False
+        if switched_on != smart_plug.get_switched_on():
+            smart_plug.toggle_switch()
+
         consumption_rate = text_entry_consumption_rate.get()
         smart_plug.set_consumption_rate(int(consumption_rate))
         self.update_text_label_smart_device(smart_plug)
 
     def button_edit_submit_smart_air_fryer(
-        self, smart_air_fryer, text_options_menu_cooking_mode
+        self,
+        smart_air_fryer,
+        text_options_menu_switched_on,
+        text_options_menu_cooking_mode,
     ):
+        switched_on = True if text_options_menu_switched_on.get() == "On" else False
+        if switched_on != smart_air_fryer.get_switched_on():
+            smart_air_fryer.toggle_switch()
+
         cooking_mode = text_options_menu_cooking_mode.get()
         smart_air_fryer.set_cooking_mode(cooking_mode)
         self.update_text_label_smart_device(smart_air_fryer)
@@ -118,6 +131,22 @@ class SmartHomeSystem:
 
         edit_window_frame = Frame(edit_window)
         edit_window_frame.pack(padx=10, pady=10)
+
+        label_switched_on = Label(edit_window_frame, text="Switched on: ")
+
+        switched_on_options = ["On", "Off"]
+        text_options_menu_switched_on = StringVar(
+            edit_window_frame,
+            f"{'On' if smart_device.get_switched_on() else 'Off'}",
+        )
+        options_menu_switched_on = OptionMenu(
+            edit_window_frame,
+            text_options_menu_switched_on,
+            *switched_on_options,
+        )
+
+        label_switched_on.pack()
+        options_menu_switched_on.pack()
 
         if isinstance(smart_device, SmartPlug):
             label_consumption_rate = Label(edit_window_frame, text="Consumption rate: ")
@@ -133,7 +162,9 @@ class SmartHomeSystem:
                 edit_window_frame,
                 text="Submit",
                 command=lambda: self.button_edit_submit_smart_plug(
-                    smart_device, text_entry_consumption_rate
+                    smart_device,
+                    text_options_menu_switched_on,
+                    text_entry_consumption_rate,
                 ),
             )
 
@@ -143,7 +174,7 @@ class SmartHomeSystem:
         elif isinstance(smart_device, SmartAirFryer):
             label_cooking_modes = Label(edit_window_frame, text="Cooking modes: ")
 
-            cooking_modes = [cooking_mode.value for cooking_mode in CookingModes]
+            cooking_mode_options = [cooking_mode.value for cooking_mode in CookingModes]
             text_options_menu_cooking_mode = StringVar(
                 edit_window_frame,
                 f"{smart_device.get_cooking_mode()}",
@@ -151,14 +182,16 @@ class SmartHomeSystem:
             options_menu_cooking_mode = OptionMenu(
                 edit_window_frame,
                 text_options_menu_cooking_mode,
-                *cooking_modes,
+                *cooking_mode_options,
             )
 
             button_edit_submit = Button(
                 edit_window_frame,
                 text="Submit",
                 command=lambda: self.button_edit_submit_smart_air_fryer(
-                    smart_device, text_options_menu_cooking_mode
+                    smart_device,
+                    text_options_menu_switched_on,
+                    text_options_menu_cooking_mode,
                 ),
             )
 
