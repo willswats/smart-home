@@ -98,6 +98,12 @@ class SmartHomeSystem:
         self.home.turn_off_all()
         self.update_all_text_label_smart_device()
 
+    def button_edit_submit_smart_plug(self, smart_plug, text_entry_consumption_rate):
+        # TODO: error check and provide feedback to user (try, except)
+        consumption_rate = text_entry_consumption_rate.get()
+        smart_plug.set_consumption_rate(int(consumption_rate))
+        self.update_text_label_smart_device(smart_plug)
+
     def button_edit_submit_smart_air_fryer(
         self, smart_air_fryer, text_options_menu_cooking_mode
     ):
@@ -123,9 +129,17 @@ class SmartHomeSystem:
             entry_consumption_rate = Entry(
                 edit_window_frame, textvariable=text_entry_consumption_rate
             )
+            button_edit_submit = Button(
+                edit_window_frame,
+                text="Submit",
+                command=lambda: self.button_edit_submit_smart_plug(
+                    smart_device, text_entry_consumption_rate
+                ),
+            )
 
             label_consumption_rate.pack()
             entry_consumption_rate.pack()
+            button_edit_submit.pack()
         elif isinstance(smart_device, SmartAirFryer):
             label_cooking_modes = Label(edit_window_frame, text="Cooking modes: ")
 
@@ -143,8 +157,8 @@ class SmartHomeSystem:
             button_edit_submit = Button(
                 edit_window_frame,
                 text="Submit",
-                command=lambda smart_air_fryer=smart_device: self.button_edit_submit_smart_air_fryer(
-                    smart_air_fryer, text_options_menu_cooking_mode
+                command=lambda: self.button_edit_submit_smart_air_fryer(
+                    smart_device, text_options_menu_cooking_mode
                 ),
             )
 
