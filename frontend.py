@@ -1,5 +1,5 @@
 from enum import Enum
-from tkinter import Button, Frame, Label, Tk, StringVar
+from tkinter import Button, Frame, Label, Tk, StringVar, Toplevel
 
 from backend import SmartAirFryer, SmartHome, SmartPlug
 
@@ -62,6 +62,7 @@ def set_up_home():
 class SmartHomeSystem:
     def __init__(self, home: SmartHome):
         self.win = Tk()
+        self.win.title("Smart Home System")
         self.win.resizable(False, False)
 
         self.main_frame = Frame(self.win)
@@ -97,6 +98,14 @@ class SmartHomeSystem:
         self.home.turn_off_all()
         self.update_all_text_label_smart_device()
 
+    def button_edit(self, smart_device):
+        edit_window = Toplevel()
+        edit_window.title("Edit")
+        edit_window.resizable(False, False)
+
+        edit_window_frame = Frame(self.win)
+        edit_window_frame.pack(padx=10, pady=10)
+
     def create_widgets_per_device(self):
         for smart_device in self.smart_devices:
             text_label_smart_device = StringVar(self.main_frame, f"{smart_device}")
@@ -112,6 +121,13 @@ class SmartHomeSystem:
                     smart_device
                 ),
             )
+            button_edit_smart_device = Button(
+                self.main_frame,
+                text="Edit",
+                command=lambda smart_device=smart_device: self.button_edit(
+                    smart_device
+                ),
+            )
             button_delete_smart_device = Button(
                 self.main_frame,
                 text="Delete",
@@ -122,6 +138,7 @@ class SmartHomeSystem:
 
             label_smart_device.pack()
             button_toggle_smart_device.pack()
+            button_edit_smart_device.pack()
             button_delete_smart_device.pack()
 
             smart_device.add_gui_objects(
