@@ -1,7 +1,7 @@
 from enum import Enum
-from tkinter import Button, Frame, Label, Tk, StringVar, Toplevel
+from tkinter import Button, Entry, Frame, Label, Tk, StringVar, Toplevel, OptionMenu
 
-from backend import SmartAirFryer, SmartHome, SmartPlug
+from backend import CookingModes, SmartAirFryer, SmartHome, SmartPlug
 
 
 class SmartDeviceNums(Enum):
@@ -98,13 +98,59 @@ class SmartHomeSystem:
         self.home.turn_off_all()
         self.update_all_text_label_smart_device()
 
+    def button_edit_submit_smart_air_fryer(
+        self, smart_air_fryer, text_options_menu_cooking_mode
+    ):
+        cooking_mode = text_options_menu_cooking_mode.get()
+        smart_air_fryer.set_cooking_mode(cooking_mode)
+        self.update_text_label_smart_device(smart_air_fryer)
+
     def button_edit(self, smart_device):
-        edit_window = Toplevel()
+        edit_window = Toplevel(self.win)
         edit_window.title("Edit")
         edit_window.resizable(False, False)
 
-        edit_window_frame = Frame(self.win)
+        edit_window_frame = Frame(edit_window)
         edit_window_frame.pack(padx=10, pady=10)
+
+        if isinstance(smart_device, SmartPlug):
+            label_consumption_rate = Label(edit_window_frame, text="Consumption rate: ")
+
+            text_entry_consumption_rate = StringVar(
+                edit_window_frame,
+                f"{smart_device.get_consumption_rate()}",
+            )
+            entry_consumption_rate = Entry(
+                edit_window_frame, textvariable=text_entry_consumption_rate
+            )
+
+            label_consumption_rate.pack()
+            entry_consumption_rate.pack()
+        elif isinstance(smart_device, SmartAirFryer):
+            label_cooking_modes = Label(edit_window_frame, text="Cooking modes: ")
+
+            cooking_modes = [cooking_mode.value for cooking_mode in CookingModes]
+            text_options_menu_cooking_mode = StringVar(
+                edit_window_frame,
+                f"{smart_device.get_cooking_mode()}",
+            )
+            options_menu_cooking_mode = OptionMenu(
+                edit_window_frame,
+                text_options_menu_cooking_mode,
+                *cooking_modes,
+            )
+
+            button_edit_submit = Button(
+                edit_window_frame,
+                text="Submit",
+                command=lambda smart_air_fryer=smart_device: self.button_edit_submit_smart_air_fryer(
+                    smart_air_fryer, text_options_menu_cooking_mode
+                ),
+            )
+
+            label_cooking_modes.pack()
+            options_menu_cooking_mode.pack()
+            button_edit_submit.pack()
 
     def create_widgets_per_device(self):
         for smart_device in self.smart_devices:

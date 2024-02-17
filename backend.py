@@ -92,8 +92,9 @@ class SmartAirFryer(SmartDevice):
         return self.cooking_mode
 
     def set_cooking_mode(self, cooking_mode):
-        if isinstance(cooking_mode, CookingModes):
-            self.cooking_mode = cooking_mode.value
+        cooking_modes = [cooking_mode.value for cooking_mode in CookingModes]
+        if cooking_mode in cooking_modes:
+            self.cooking_mode = cooking_mode
         else:
             raise ValueError("Invalid cooking mode.")
 
@@ -103,7 +104,7 @@ def test_smart_air_fryer():
     smart_air_fryer.toggle_switch()
     print(smart_air_fryer.get_switched_on())
     print(smart_air_fryer.get_cooking_mode())
-    smart_air_fryer.set_cooking_mode(CookingModes.DEFROST)
+    smart_air_fryer.set_cooking_mode(CookingModes.DEFROST.value)
     print(smart_air_fryer.get_cooking_mode())
     print(smart_air_fryer)
 
@@ -158,7 +159,7 @@ def test_smart_home():
     smart_plug_1.toggle_switch()
     smart_plug_1.set_consumption_rate(150)
     smart_plug_2.set_consumption_rate(25)
-    smart_air_fryer.set_cooking_mode(CookingModes.CRISPY)
+    smart_air_fryer.set_cooking_mode(CookingModes.CRISPY.value)
     smart_home.add_device(smart_plug_1)
     smart_home.add_device(smart_plug_2)
     smart_home.add_device(smart_air_fryer)
