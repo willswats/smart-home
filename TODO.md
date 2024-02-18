@@ -9,10 +9,6 @@
 - [ ] Add error label for consumption rate entry
 - [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time)
 
-## Fix
-
-- [ ] Fix GUI resizing and not using all space
-
 ## Check
 
 - [ ] If we are allowed to define more classes than the ones in the document

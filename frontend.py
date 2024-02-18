@@ -341,7 +341,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self.edit_window.resizable(False, False)
 
         self.edit_window_frame = Frame(self.edit_window)
-        self.edit_window_frame.pack(padx=10, pady=10)
+        self.edit_window_frame.pack(padx=10, pady=10, fill="both")
 
     # Button methods
     def edit_button_submit_smart_plug(
@@ -429,10 +429,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
         self.add_window.resizable(False, False)
-        self.add_window.geometry("300x200")
+        self.add_window.geometry("300x150")
 
         self.add_window_frame = Frame(self.add_window)
-        self.add_window_frame.pack(padx=10, pady=10)
+        self.add_window_frame.pack(padx=10, pady=10, fill="both")
 
         self.selected_smart_device = "Smart Plug"
         self.selected_switched_on = "Off"
