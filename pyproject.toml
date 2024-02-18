@@ -1,0 +1,11 @@
+[tool.ruff]
+select = [
+  "E",   # pycodestyle (Error)
+  "W",   # pycodestyle (Warning)
+  "N",   # pep8-naming
+  "I",   # isort
+  "A",   # flake8-builtins
+  "B",   # flake8-bugbear
+  "RUF", # Ruf-specific rules
+]
+line-length = 79
