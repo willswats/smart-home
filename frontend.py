@@ -1,9 +1,9 @@
 from enum import Enum
 from tkinter import (
-    E,
     LEFT,
     RIGHT,
     Button,
+    E,
     Entry,
     Frame,
     Label,
@@ -113,75 +113,94 @@ class SmartHomeSystemUtilities:
     @staticmethod
     def add_edit_create_widgets_smart_device(
         frame: Frame, smart_device: SmartDevice
-    ) -> tuple[StringVar, list[Label | OptionMenu]]:
-        label_switched_on = Label(frame, text="Switched on: ")
+    ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
+        frame_switched_on = Frame(frame)
+
+        label_switched_on = Label(frame_switched_on, text="Switched on: ")
 
         switched_on_options = ["On", "Off"]
         text_options_menu_switched_on = StringVar(
-            frame,
+            frame_switched_on,
             f"{'On' if smart_device.get_switched_on() else 'Off'}",
         )
         options_menu_switched_on = OptionMenu(
-            frame,
+            frame_switched_on,
             text_options_menu_switched_on,
             *switched_on_options,
         )
 
-        label_switched_on.pack()
-        options_menu_switched_on.pack()
+        label_switched_on.pack(side=LEFT, anchor=W)
+        options_menu_switched_on.pack(side=RIGHT, anchor=E)
+        frame_switched_on.pack(fill="both")
 
         return (
             text_options_menu_switched_on,
-            [label_switched_on, options_menu_switched_on],
+            [frame_switched_on, label_switched_on, options_menu_switched_on],
         )
 
     @staticmethod
     def add_edit_create_widgets_smart_plug(
         frame: Frame, smart_plug: SmartPlug
-    ) -> tuple[StringVar, list[Label | Entry]]:
-        label_consumption_rate = Label(frame, text="Consumption rate: ")
+    ) -> tuple[StringVar, list[Frame | Label | Entry]]:
+        frame_consumption_rate = Frame(frame)
+
+        label_consumption_rate = Label(
+            frame_consumption_rate, text="Consumption rate: "
+        )
 
         text_entry_consumption_rate = StringVar(
-            frame,
+            frame_consumption_rate,
             f"{smart_plug.get_consumption_rate()}",
         )
         entry_consumption_rate = Entry(
-            frame, textvariable=text_entry_consumption_rate
+            frame_consumption_rate, textvariable=text_entry_consumption_rate
         )
 
-        label_consumption_rate.pack()
-        entry_consumption_rate.pack()
+        label_consumption_rate.pack(side=LEFT, anchor=W)
+        entry_consumption_rate.pack(side=RIGHT, anchor=E)
+        frame_consumption_rate.pack(fill="both")
 
         return (
             text_entry_consumption_rate,
-            [label_consumption_rate, entry_consumption_rate],
+            [
+                frame_consumption_rate,
+                label_consumption_rate,
+                entry_consumption_rate,
+            ],
         )
 
     @staticmethod
     def add_edit_create_widgets_smart_air_fryer(
         frame: Frame, smart_air_fryer: SmartAirFryer
-    ) -> tuple[StringVar, list[Label | OptionMenu]]:
-        label_cooking_modes = Label(frame, text="Cooking modes: ")
+    ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
+        frame_cooking_mode = Frame(frame)
+
+        label_cooking_modes = Label(frame_cooking_mode, text="Cooking modes: ")
 
         cooking_mode_options = [
             cooking_mode.value for cooking_mode in CookingModes
         ]
         text_options_menu_cooking_mode = StringVar(
-            frame,
+            frame_cooking_mode,
             f"{smart_air_fryer.get_cooking_mode()}",
         )
         options_menu_cooking_mode = OptionMenu(
-            frame,
+            frame_cooking_mode,
             text_options_menu_cooking_mode,
             *cooking_mode_options,
         )
 
-        label_cooking_modes.pack()
-        options_menu_cooking_mode.pack()
+        label_cooking_modes.pack(side=LEFT, anchor=W)
+        options_menu_cooking_mode.pack(side=RIGHT, anchor=E)
+        frame_cooking_mode.pack(fill="both")
 
         return (
             text_options_menu_cooking_mode,
-            [label_cooking_modes, options_menu_cooking_mode],
+            [
+                frame_cooking_mode,
+                label_cooking_modes,
+                options_menu_cooking_mode,
+            ],
         )
 
 
@@ -374,7 +393,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
                     text_entry_consumption_rate,
                 ),
             )
-            edit_button_submit.pack()
+            edit_button_submit.pack(side=LEFT, anchor=W)
         elif isinstance(smart_device, SmartAirFryer):
             text_options_menu_cooking_mode = (
                 SmartHomeSystemUtilities.add_edit_create_widgets_smart_air_fryer(
@@ -390,7 +409,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
                     text_options_menu_cooking_mode,
                 ),
             )
-            edit_button_submit.pack()
+            edit_button_submit.pack(side=LEFT, anchor=W)
 
 
 class SmartHomeSystemAdd(SmartHomeSystem):
@@ -410,7 +429,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
         self.add_window.resizable(False, False)
-        self.add_window.geometry("200x250")
+        self.add_window.geometry("300x200")
 
         self.add_window_frame = Frame(self.add_window)
         self.add_window_frame.pack(padx=10, pady=10)
@@ -480,7 +499,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                         text_entry_consumption_rate,
                     ),
                 )
-                button_add_submit_smart_plug.pack()
+                button_add_submit_smart_plug.pack(side=LEFT, anchor=W, pady=5)
 
                 self.add_gui_objects(
                     [
@@ -526,7 +545,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                         text_options_menu_cooking_mode,
                     ),
                 )
-                button_add_submit_smart_air_fryer.pack()
+                button_add_submit_smart_air_fryer.pack(
+                    side=LEFT, anchor=W, pady=5
+                )
 
                 self.add_gui_objects(
                     [
@@ -588,17 +609,19 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
     # Create widgets methods
     def add_create_widgets(self):
+        frame_pick_smart_device = Frame(self.add_window_frame)
+
         label_pick_smart_device = Label(
-            self.add_window_frame, text="Pick device: "
+            frame_pick_smart_device, text="Pick device: "
         )
 
         pick_smart_device_options = ["Smart Plug", "Smart Air Fryer"]
         text_options_menu_pick_smart_device = StringVar(
-            self.add_window_frame,
+            frame_pick_smart_device,
             "Select a device",
         )
         options_menu_pick_smart_device = OptionMenu(
-            self.add_window_frame,
+            frame_pick_smart_device,
             text_options_menu_pick_smart_device,
             *pick_smart_device_options,
             command=lambda selected_smart_device: self.add_options_menu_submit(
@@ -606,8 +629,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             ),
         )
 
-        label_pick_smart_device.pack()
-        options_menu_pick_smart_device.pack()
+        label_pick_smart_device.pack(side=LEFT, anchor=W)
+        options_menu_pick_smart_device.pack(side=RIGHT, anchor=E)
+        frame_pick_smart_device.pack(fill="both")
 
 
 def main():
