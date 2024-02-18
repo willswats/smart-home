@@ -208,29 +208,22 @@ class SmartHomeSystem:
 
         self.create_widgets_add(add_window_frame)
 
-    def button_add_submit(self, frame: Frame, text_options_menu_pick_smart_device):
-        text_smart_device = text_options_menu_pick_smart_device.get()
-
+    def options_menu_selected(self, frame: Frame, selected_smart_device):
         if len(self.add_submit_gui_objects) > 0:
             for gui_object in self.add_submit_gui_objects:
                 gui_object.destroy()
                 self.add_submit_gui_objects = []
 
-        print(self.add_submit_gui_objects)
-
-        match text_smart_device:
+        match selected_smart_device:
             case "Smart Plug":
                 smart_plug = SmartPlug(150)
-
                 (
                     text_options_menu_switched_on,
-                    label_switched_on,
-                    options_menu_switched_on,
+                    gui_objects_smart_device,
                 ) = self.create_widgets_add_edit_smart_device(frame, smart_plug)
                 (
                     text_entry_consumption_rate,
-                    label_consumption_rate,
-                    entry_consumption_rate,
+                    gui_objects_smart_plug,
                 ) = self.create_widgets_add_edit_smart_plug(frame, smart_plug)
                 button_add_submit_smart_plug = Button(
                     frame,
@@ -243,23 +236,24 @@ class SmartHomeSystem:
                 )
                 button_add_submit_smart_plug.pack()
 
-                self.add_submit_gui_objects.append(label_switched_on)
-                self.add_submit_gui_objects.append(options_menu_switched_on)
-                self.add_submit_gui_objects.append(label_consumption_rate)
-                self.add_submit_gui_objects.append(entry_consumption_rate)
+                for gui_object in gui_objects_smart_device:
+                    self.add_submit_gui_objects.append(gui_object)
+
+                for gui_object in gui_objects_smart_plug:
+                    self.add_submit_gui_objects.append(gui_object)
+
                 self.add_submit_gui_objects.append(button_add_submit_smart_plug)
+
             case "Smart Air Fryer":
                 smart_air_fryer = SmartAirFryer()
                 (
                     text_options_menu_switched_on,
-                    label_switched_on,
-                    options_menu_switched_on,
+                    gui_objects_smart_device,
                 ) = self.create_widgets_add_edit_smart_device(frame, smart_air_fryer)
 
                 (
                     text_options_menu_cooking_mode,
-                    label_cooking_modes,
-                    options_menu_cooking_mode,
+                    gui_objects_smart_air_fryer,
                 ) = self.create_widgets_add_edit_smart_air_fryer(frame, smart_air_fryer)
                 button_add_submit_smart_air_fryer = Button(
                     frame,
@@ -272,10 +266,12 @@ class SmartHomeSystem:
                 )
                 button_add_submit_smart_air_fryer.pack()
 
-                self.add_submit_gui_objects.append(label_switched_on)
-                self.add_submit_gui_objects.append(options_menu_switched_on)
-                self.add_submit_gui_objects.append(label_cooking_modes)
-                self.add_submit_gui_objects.append(options_menu_cooking_mode)
+                for gui_object in gui_objects_smart_device:
+                    self.add_submit_gui_objects.append(gui_object)
+
+                for gui_object in gui_objects_smart_air_fryer:
+                    self.add_submit_gui_objects.append(gui_object)
+
                 self.add_submit_gui_objects.append(button_add_submit_smart_air_fryer)
 
     def button_add_submit_smart_plug(
@@ -311,25 +307,19 @@ class SmartHomeSystem:
         pick_smart_device_options = ["Smart Plug", "Smart Air Fryer"]
         text_options_menu_pick_smart_device = StringVar(
             frame,
-            "Smart Plug",
+            "Select a device",
         )
         options_menu_pick_smart_device = OptionMenu(
             frame,
             text_options_menu_pick_smart_device,
             *pick_smart_device_options,
-        )
-
-        button_add_submit = Button(
-            frame,
-            text="Submit",
-            command=lambda: self.button_add_submit(
-                frame, text_options_menu_pick_smart_device
+            command=lambda selected_smart_device: self.options_menu_selected(
+                frame, selected_smart_device
             ),
         )
 
         label_pick_smart_device.pack()
         options_menu_pick_smart_device.pack()
-        button_add_submit.pack()
 
     ## Add and edit widgets
     def create_widgets_add_edit_smart_device(self, frame: Frame, smart_device):
@@ -351,8 +341,7 @@ class SmartHomeSystem:
 
         return (
             text_options_menu_switched_on,
-            label_switched_on,
-            options_menu_switched_on,
+            [label_switched_on, options_menu_switched_on],
         )
 
     def create_widgets_add_edit_smart_plug(self, frame: Frame, smart_device):
@@ -369,8 +358,7 @@ class SmartHomeSystem:
 
         return (
             text_entry_consumption_rate,
-            label_consumption_rate,
-            entry_consumption_rate,
+            [label_consumption_rate, entry_consumption_rate],
         )
 
     def create_widgets_add_edit_smart_air_fryer(self, frame: Frame, smart_device):
@@ -392,8 +380,7 @@ class SmartHomeSystem:
 
         return (
             text_options_menu_cooking_mode,
-            label_cooking_modes,
-            options_menu_cooking_mode,
+            [label_cooking_modes, options_menu_cooking_mode],
         )
 
     ## Home widgets
