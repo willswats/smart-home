@@ -1,11 +1,16 @@
 # TODO
 
+## Clean up
+
+- [ ] Reduce repetition in `add_options_menu_submit`, `add_button_submit_smart_plug`, `add_button_submit_smart_air_fryer`
+
 ## Features
 
-- [ ] Improve error messages (show list of values that are valid).
-- [ ] Organize GUI with grid.
+- [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time)
+- [ ] Organize GUI with grid
+- [ ] Add error label for consumption rate entry
 
 ## Check
 
-- [ ] If we are allowed to use more classes.
-- [ ] If it's okay to add the `error_message` instance variable to `SmartPlug` (not in class diagram).
+- [ ] If we are allowed to define more classes than the ones in the document
+- [ ] If it's okay to things to the classes defined in the document, e.g. `error_message` is added to `SmartPlug`
