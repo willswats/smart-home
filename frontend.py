@@ -394,6 +394,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.add_window_frame.pack(padx=10, pady=10)
 
         self.selected_smart_device = "Smart Plug"
+        self.selected_switched_on = "Off"
+        self.selected_consumption_rate = 150
+        self.selected_cooking_mode = CookingModes.HEALTHY.value
+
         self.gui_objects = []
 
     def add_gui_objects(self, gui_objects):
@@ -406,6 +410,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 gui_object.destroy()
 
     def add_options_menu_submit(self, selected_smart_device: StringVar | str):
+        # Delete existing objects if there are any (switch device)
         self.delete_gui_objects()
 
         # The selected_smart_device can be StringVar | str as the command for
@@ -419,7 +424,19 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         match selected_smart_device:
             case "Smart Plug":
-                smart_plug = SmartPlug(150)
+                smart_plug = SmartPlug(self.selected_consumption_rate)
+                # Set the options of the last selected smart device
+                SmartHomeSystemUtilities.set_smart_plug(
+                    smart_plug,
+                    StringVar(
+                        self.add_window_frame, self.selected_switched_on
+                    ),
+                    StringVar(
+                        self.add_window_frame,
+                        f"{self.selected_consumption_rate}",
+                    ),
+                )
+
                 (
                     text_options_menu_switched_on,
                     gui_objects_smart_device,
@@ -453,6 +470,18 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
             case "Smart Air Fryer":
                 smart_air_fryer = SmartAirFryer()
+                # Set the options of the last selected smart device
+                SmartHomeSystemUtilities.set_smart_air_fryer(
+                    smart_air_fryer,
+                    StringVar(
+                        self.add_window_frame, self.selected_switched_on
+                    ),
+                    StringVar(
+                        self.add_window_frame,
+                        f"{self.selected_cooking_mode}",
+                    ),
+                )
+
                 (
                     text_options_menu_switched_on,
                     gui_objects_smart_device,
@@ -500,8 +529,11 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         self.home.add_device(smart_plug)
         self.create_widgets_smart_device(smart_plug)
-        # Save the last selected smart device
+        # Save the options of the last selected smart device
         self.selected_smart_device = "Smart Plug"
+        self.selected_switched_on = text_options_menu_switched_on.get()
+        # TODO: error check
+        self.selected_consumption_rate = int(text_entry_consumption_rate.get())
         # Call the options menu again so that a new SmartPlug object is
         # created each time
         self.add_options_menu_submit(
@@ -522,8 +554,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         self.home.add_device(smart_air_fryer)
         self.create_widgets_smart_device(smart_air_fryer)
-        # Save the last selected smart device
+        # Save the options of the last selected smart device
         self.selected_smart_device = "Smart Air Fryer"
+        self.selected_switched_on = text_options_menu_switched_on.get()
+        self.selected_cooking_mode = text_options_menu_cooking_mode.get()
         # Call the options menu again so that a new SmartAirFryer object is
         # created each time
         self.add_options_menu_submit(
