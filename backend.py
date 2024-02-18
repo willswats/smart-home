@@ -43,9 +43,8 @@ class SmartPlug(SmartDevice):
             raise ValueError(self.error_message)
 
     def __str__(self):
-        output = (
-            f"Smart Plug: {self.switched_on}, Consumption rate: {self.consumption_rate}"
-        )
+        output = f"Smart Plug: {'On' if self.switched_on is True else 'Off'}, "
+        output += f"Consumption rate: {self.consumption_rate}"
         return output
 
     def get_consumption_rate(self):
@@ -84,8 +83,9 @@ class SmartAirFryer(SmartDevice):
 
     def __str__(self):
         output = (
-            f"Smart Air Fryer: {self.switched_on}, Cooking mode: {self.cooking_mode}"
+            f"Smart Air Fryer: {'On' if self.switched_on is True else 'Off'}, "
         )
+        output += f"Cooking mode: {self.cooking_mode}"
         return output
 
     def get_cooking_mode(self):
