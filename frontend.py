@@ -66,7 +66,7 @@ def get_smart_devices():
             smart_device = get_smart_device(smart_device_num)
             smart_devices.append(smart_device)
         else:
-            print("Error: Invalid smart device number.")
+            print("Error: invalid smart device number.")
     return smart_devices
 
 
@@ -85,7 +85,6 @@ class SmartHomeSystemUtilities:
         text_options_menu_switched_on: StringVar,
         text_entry_consumption_rate: StringVar,
     ):
-        # TODO: error check and provide feedback to user (try, except)
         switched_on = (
             True if text_options_menu_switched_on.get() == "On" else False
         )
@@ -93,7 +92,10 @@ class SmartHomeSystemUtilities:
             smart_plug.toggle_switch()
 
         text_consumption_rate = text_entry_consumption_rate.get()
-        smart_plug.set_consumption_rate(int(text_consumption_rate))
+        try:
+            smart_plug.set_consumption_rate(int(text_consumption_rate))
+        except Exception as error:
+            raise error
 
     @staticmethod
     def set_smart_air_fryer(
@@ -350,12 +352,15 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         text_options_menu_switched_on: StringVar,
         text_entry_consumption_rate: StringVar,
     ):
-        SmartHomeSystemUtilities.set_smart_plug(
-            smart_plug,
-            text_options_menu_switched_on,
-            text_entry_consumption_rate,
-        )
-        self.update_text_label_smart_device(smart_plug)
+        try:
+            SmartHomeSystemUtilities.set_smart_plug(
+                smart_plug,
+                text_options_menu_switched_on,
+                text_entry_consumption_rate,
+            )
+            self.update_text_label_smart_device(smart_plug)
+        except Exception as error:
+            print("Error:", error)
 
     def edit_button_submit_smart_air_fryer(
         self,
@@ -467,16 +472,19 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             case "Smart Plug":
                 smart_plug = SmartPlug(self.selected_consumption_rate)
                 # Set the options of the last selected smart device
-                SmartHomeSystemUtilities.set_smart_plug(
-                    smart_plug,
-                    StringVar(
-                        self.add_window_frame, self.selected_switched_on
-                    ),
-                    StringVar(
-                        self.add_window_frame,
-                        f"{self.selected_consumption_rate}",
-                    ),
-                )
+                try:
+                    SmartHomeSystemUtilities.set_smart_plug(
+                        smart_plug,
+                        StringVar(
+                            self.add_window_frame, self.selected_switched_on
+                        ),
+                        StringVar(
+                            self.add_window_frame,
+                            f"{self.selected_consumption_rate}",
+                        ),
+                    )
+                except Exception as error:
+                    print("Error:", error)
 
                 (
                     text_options_menu_switched_on,
@@ -557,6 +565,20 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                     ]
                 )
 
+    def set_selected_smart_plug(
+        self, text_options_menu_switched_on, text_entry_consumption_rate
+    ):
+        self.selected_smart_device = "Smart Plug"
+        self.selected_switched_on = text_options_menu_switched_on.get()
+        self.selected_consumption_rate = int(text_entry_consumption_rate.get())
+
+    def set_selected_smart_air_fryer(
+        self, text_options_menu_switched_on, text_options_menu_cooking_mode
+    ):
+        self.selected_smart_device = "Smart Air Fryer"
+        self.selected_switched_on = text_options_menu_switched_on.get()
+        self.selected_cooking_mode = text_options_menu_cooking_mode.get()
+
     # Button methods
     def add_button_submit_smart_plug(
         self,
@@ -564,24 +586,27 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         text_options_menu_switched_on: StringVar,
         text_entry_consumption_rate: StringVar,
     ):
-        SmartHomeSystemUtilities.set_smart_plug(
-            smart_plug,
-            text_options_menu_switched_on,
-            text_entry_consumption_rate,
-        )
+        try:
+            SmartHomeSystemUtilities.set_smart_plug(
+                smart_plug,
+                text_options_menu_switched_on,
+                text_entry_consumption_rate,
+            )
+            self.home.add_device(smart_plug)
+            self.create_widgets_smart_device(smart_plug)
 
-        self.home.add_device(smart_plug)
-        self.create_widgets_smart_device(smart_plug)
-        # Save the options of the last selected smart device
-        self.selected_smart_device = "Smart Plug"
-        self.selected_switched_on = text_options_menu_switched_on.get()
-        # TODO: error check
-        self.selected_consumption_rate = int(text_entry_consumption_rate.get())
-        # Call the options menu again so that a new SmartPlug object is
-        # created each time
-        self.add_options_menu_submit(
-            StringVar(self.add_window_frame, self.selected_smart_device)
-        )
+            # Save the options of the last selected smart device
+            self.set_selected_smart_plug(
+                text_options_menu_switched_on, text_entry_consumption_rate
+            )
+
+            # Call the options menu again so that a new SmartPlug object is
+            # created each time
+            self.add_options_menu_submit(
+                StringVar(self.add_window_frame, self.selected_smart_device)
+            )
+        except Exception as error:
+            print("Error:", error)
 
     def add_button_submit_smart_air_fryer(
         self,
@@ -598,9 +623,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.home.add_device(smart_air_fryer)
         self.create_widgets_smart_device(smart_air_fryer)
         # Save the options of the last selected smart device
-        self.selected_smart_device = "Smart Air Fryer"
-        self.selected_switched_on = text_options_menu_switched_on.get()
-        self.selected_cooking_mode = text_options_menu_cooking_mode.get()
+        self.set_selected_smart_air_fryer(
+            text_options_menu_switched_on, text_options_menu_cooking_mode
+        )
         # Call the options menu again so that a new SmartAirFryer object is
         # created each time
         self.add_options_menu_submit(
