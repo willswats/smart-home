@@ -6,9 +6,12 @@
 
 ## Features
 
-- [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time)
-- [ ] Organize GUI with grid
 - [ ] Add error label for consumption rate entry
+- [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time)
+
+## Fix
+
+- [ ] Fix GUI resizing and not using all space
 
 ## Check
 
