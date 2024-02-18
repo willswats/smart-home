@@ -1,13 +1,9 @@
 # TODO
 
-## Clean up
-
-- [ ] Reduce repetition in `add_options_menu_submit`, `add_button_submit_smart_plug`, `add_button_submit_smart_air_fryer`
-
 ## Features
 
-- [ ] Add error label for consumption rate entry
-- [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time)
+- [ ] Complete challenge features
+- [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time) (this could be why the add window loses focus on submit / goes behind the main window)
 
 ## Check
 
