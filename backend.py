@@ -34,7 +34,7 @@ class SmartDevice:
 
 
 class SmartPlug(SmartDevice):
-    def __init__(self, consumption_rate):
+    def __init__(self, consumption_rate: int):
         super().__init__()
         self.error_message = "Invalid consumption rate (>= 0 and <= 150)."
         if consumption_rate >= 0 and consumption_rate <= 150:
@@ -126,17 +126,17 @@ class SmartHome:
     def get_devices(self):
         return self.devices
 
-    def get_device_at(self, index):
+    def get_device_at(self, index: int):
         if index < len(self.devices):
             return self.devices[index]
 
-    def add_device(self, device):
+    def add_device(self, device: SmartDevice):
         if isinstance(device, SmartDevice):
             self.devices.append(device)
         else:
             raise ValueError("Invalid device.")
 
-    def toggle_switch(self, index):
+    def toggle_switch(self, index: int):
         if index < len(self.devices):
             self.devices[index].toggle_switch()
 
