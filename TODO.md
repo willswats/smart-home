@@ -1,9 +1,5 @@
 # TODO
 
-## Cleanup
-
-- [ ] Create classes for edit page and add page.
-
 ## Features
 
 - [ ] Improve error messages (show list of values that are valid).
