@@ -1,5 +1,8 @@
 from enum import Enum
 from tkinter import (
+    E,
+    LEFT,
+    RIGHT,
     Button,
     Entry,
     Frame,
@@ -8,6 +11,7 @@ from tkinter import (
     StringVar,
     Tk,
     Toplevel,
+    W,
 )
 
 from backend import (
@@ -190,6 +194,8 @@ class SmartHomeSystem:
         self.main_frame = Frame(self.win)
         self.main_frame.pack(padx=10, pady=10)
 
+        self.smart_device_frames = Frame(self.main_frame)
+
         self.home = home
         self.smart_devices = self.home.get_devices()
 
@@ -228,7 +234,7 @@ class SmartHomeSystem:
 
     def button_add(self):
         smart_home_system_add = SmartHomeSystemAdd(
-            self.win, self.home, self.main_frame
+            self.win, self.home, self.main_frame, self.smart_device_frames
         )
         smart_home_system_add.add_create_widgets()
 
@@ -236,39 +242,42 @@ class SmartHomeSystem:
     def create_widgets_smart_device(self, smart_device: SmartDevice):
         text_label_smart_device = StringVar(self.main_frame, f"{smart_device}")
         smart_device.set_string_var(text_label_smart_device)
+        smart_device_frame = Frame(self.smart_device_frames)
 
         label_smart_device = Label(
-            self.main_frame, textvariable=text_label_smart_device
+            smart_device_frame, textvariable=text_label_smart_device
         )
         button_toggle_smart_device = Button(
-            self.main_frame,
+            smart_device_frame,
             text="Toggle",
             command=lambda smart_device=smart_device: self.button_toggle(
                 smart_device
             ),
         )
         button_edit_smart_device = Button(
-            self.main_frame,
+            smart_device_frame,
             text="Edit",
             command=lambda smart_device=smart_device: self.button_edit(
                 smart_device
             ),
         )
         button_delete_smart_device = Button(
-            self.main_frame,
+            smart_device_frame,
             text="Delete",
             command=lambda smart_device=smart_device: self.button_delete(
                 smart_device
             ),
         )
 
-        label_smart_device.pack()
-        button_toggle_smart_device.pack()
-        button_edit_smart_device.pack()
-        button_delete_smart_device.pack()
+        label_smart_device.pack(side=LEFT, anchor=W, padx=5)
+        button_toggle_smart_device.pack(side=RIGHT, anchor=E)
+        button_edit_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+        button_delete_smart_device.pack(side=RIGHT, anchor=E)
+        smart_device_frame.pack(fill="both")
 
         smart_device.add_gui_objects(
             [
+                smart_device_frame,
                 label_smart_device,
                 button_toggle_smart_device,
                 button_edit_smart_device,
@@ -277,27 +286,33 @@ class SmartHomeSystem:
         )
 
     def create_widgets(self):
+        button_top_frame = Frame(self.main_frame)
+
         button_turn_on_all = Button(
-            self.main_frame,
+            button_top_frame,
             text="Turn on all",
             command=self.button_turn_on_all,
         )
-        button_turn_on_all.pack()
 
         button_turn_off_all = Button(
-            self.main_frame,
+            button_top_frame,
             text="Turn off all",
             command=self.button_turn_off_all,
         )
-        button_turn_off_all.pack()
-
-        for smart_device in self.smart_devices:
-            self.create_widgets_smart_device(smart_device)
 
         button_add = Button(
             self.main_frame, text="Add", command=self.button_add
         )
-        button_add.pack()
+
+        button_turn_on_all.pack(side=LEFT)
+        button_turn_off_all.pack(side=LEFT, padx=5)
+        button_top_frame.pack(anchor=W)
+
+        for smart_device in self.smart_devices:
+            self.create_widgets_smart_device(smart_device)
+
+        self.smart_device_frames.pack()
+        button_add.pack(side=LEFT)
 
 
 class SmartHomeSystemEdit(SmartHomeSystem):
@@ -379,11 +394,18 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
 
 class SmartHomeSystemAdd(SmartHomeSystem):
-    def __init__(self, win: Tk, home: SmartHome, main_frame: Frame):
+    def __init__(
+        self,
+        win: Tk,
+        home: SmartHome,
+        main_frame: Frame,
+        smart_device_frames: Frame,
+    ):
         self.win = win
         self.home = home
         self.smart_devices = self.home.get_devices()
         self.main_frame = main_frame
+        self.smart_device_frames = smart_device_frames
 
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
