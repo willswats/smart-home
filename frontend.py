@@ -163,12 +163,12 @@ class SmartHomeSystem:
 
         text_options_menu_switched_on = self.create_widgets_add_edit_smart_device(
             edit_window_frame, smart_device
-        )
+        )[0]
 
         if isinstance(smart_device, SmartPlug):
             text_entry_consumption_rate = self.create_widgets_add_edit_smart_plug(
                 edit_window_frame, smart_device
-            )
+            )[0]
             button_edit_submit = Button(
                 edit_window_frame,
                 text="Submit",
@@ -184,7 +184,7 @@ class SmartHomeSystem:
                 self.create_widgets_add_edit_smart_air_fryer(
                     edit_window_frame, smart_device
                 )
-            )
+            )[0]
             button_edit_submit = Button(
                 edit_window_frame,
                 text="Submit",
