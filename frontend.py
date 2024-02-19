@@ -8,6 +8,7 @@ from tkinter import (
     Frame,
     Label,
     OptionMenu,
+    PhotoImage,
     StringVar,
     Tk,
     Toplevel,
@@ -220,6 +221,13 @@ class SmartHomeSystem:
         self.home = home
         self.smart_devices = self.home.get_devices()
 
+        self.smart_plug_image = PhotoImage(file="./assets/plug.png").subsample(
+            8, 8
+        )
+        self.smart_air_fryer_image = PhotoImage(
+            file="./assets/pot.png"
+        ).subsample(8, 8)
+
     def run(self):
         self.create_widgets()
         self.win.mainloop()
@@ -265,6 +273,16 @@ class SmartHomeSystem:
         smart_device.set_string_var(text_label_smart_device)
         smart_device_frame = Frame(self.smart_device_frames)
 
+        label_smart_device_image = Label(smart_device_frame)
+        if isinstance(smart_device, SmartPlug):
+            label_smart_device_image = Label(
+                smart_device_frame, image=self.smart_plug_image
+            )
+        elif isinstance(smart_device, SmartAirFryer):
+            label_smart_device_image = Label(
+                smart_device_frame, image=self.smart_air_fryer_image
+            )
+
         label_smart_device = Label(
             smart_device_frame, textvariable=text_label_smart_device
         )
@@ -289,7 +307,7 @@ class SmartHomeSystem:
                 smart_device
             ),
         )
-
+        label_smart_device_image.pack(side=LEFT, anchor=W)
         label_smart_device.pack(side=LEFT, anchor=W, padx=5)
         button_toggle_smart_device.pack(side=RIGHT, anchor=E)
         button_edit_smart_device.pack(side=RIGHT, anchor=E, padx=5)
@@ -299,6 +317,7 @@ class SmartHomeSystem:
         smart_device.add_gui_objects(
             [
                 smart_device_frame,
+                label_smart_device_image,
                 label_smart_device,
                 button_toggle_smart_device,
                 button_edit_smart_device,
