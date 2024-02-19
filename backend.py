@@ -58,7 +58,7 @@ class SmartPlug(SmartDevice):
 
 
 def test_smart_plug():
-    smart_plug = SmartPlug(150)
+    smart_plug = SmartPlug(45)
     smart_plug.toggle_switch()
     print(smart_plug.get_switched_on())
     print(smart_plug.get_consumption_rate())
@@ -130,6 +130,10 @@ class SmartHome:
         if index < len(self.devices):
             return self.devices[index]
 
+    def remove_device_at(self, index: int):
+        if index < len(self.devices):
+            return self.devices.remove(self.devices[index])
+
     def add_device(self, device: SmartDevice):
         if isinstance(device, SmartDevice):
             self.devices.append(device)
@@ -166,6 +170,8 @@ def test_smart_home():
     smart_home.toggle_switch(2)
     print(smart_home)
     smart_home.turn_on_all()
+    print(smart_home)
+    smart_home.remove_device_at(0)
     print(smart_home)
 
 
