@@ -263,7 +263,12 @@ class SmartHomeSystem:
 
     def button_add(self):
         smart_home_system_add = SmartHomeSystemAdd(
-            self.win, self.home, self.main_frame, self.smart_device_frames
+            self.win,
+            self.home,
+            self.main_frame,
+            self.smart_device_frames,
+            self.smart_plug_image,
+            self.smart_air_fryer_image,
         )
         smart_home_system_add.add_create_widgets()
 
@@ -443,12 +448,17 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         home: SmartHome,
         main_frame: Frame,
         smart_device_frames: Frame,
+        smart_plug_image: PhotoImage,
+        smart_air_fryer_image: PhotoImage,
     ):
         self.win = win
         self.home = home
         self.smart_devices = self.home.get_devices()
         self.main_frame = main_frame
         self.smart_device_frames = smart_device_frames
+
+        self.smart_plug_image = smart_plug_image
+        self.smart_air_fryer_image = smart_air_fryer_image
 
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
