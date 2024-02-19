@@ -1,9 +1,5 @@
 # TODO
 
-## Features
-
-- [ ] Pass in `SmartPlug` or `SmartAirFryer` to `add_options_menu_submit` instead of deleting and recreating objects (to create a new instance each time) (this could be why the add window loses focus on submit / goes behind the main window)
-
 ## Challenge Features
 
 - [ ] Advanced Tkinter Widgets — Tkinter provides other widgets such as CheckButton or SpinBox which we have not covered in the classes. Currently, the user can only toggle each device straight from the main window. Modify your GUI to allow the user to modify other attributes of the devices directly from the main window using the widgets of your choice. You may also want to use similar widgets in the secondary windows of your app. [4 marks]
