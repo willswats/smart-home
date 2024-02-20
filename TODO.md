@@ -1,5 +1,9 @@
 # TODO
 
+## Feedback
+
+- [ ] Add images to buttons (interactivity)
+
 ## Challenge Features
 
 - [ ] Advanced Tkinter Widgets — Tkinter provides other widgets such as CheckButton or SpinBox which we have not covered in the classes. Currently, the user can only toggle each device straight from the main window. Modify your GUI to allow the user to modify other attributes of the devices directly from the main window using the widgets of your choice. You may also want to use similar widgets in the secondary windows of your app. [4 marks]
