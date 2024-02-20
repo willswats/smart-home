@@ -246,7 +246,8 @@ class SmartHomeSystem:
         self.update_text_label_smart_device(smart_device)
 
     def button_delete(self, smart_device: SmartDevice):
-        self.smart_devices.remove(smart_device)
+        smart_device_index = self.smart_devices.index(smart_device)
+        self.home.remove_device_at(smart_device_index)
         smart_device.delete_gui_objects()
 
     def button_turn_on_all(self):
