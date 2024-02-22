@@ -6,11 +6,11 @@ from tkinter import (
     Button,
     Checkbutton,
     E,
-    Entry,
     Frame,
     Label,
     OptionMenu,
     PhotoImage,
+    Spinbox,
     StringVar,
     Tk,
     Toplevel,
@@ -147,31 +147,34 @@ class SmartHomeSystemUtilities:
     @staticmethod
     def add_edit_create_widgets_smart_plug(
         frame: Frame, smart_plug: SmartPlug
-    ) -> tuple[StringVar, list[Frame | Label | Entry]]:
+    ) -> tuple[StringVar, list[Frame | Label | Spinbox]]:
         frame_consumption_rate = Frame(frame)
 
         label_consumption_rate = Label(
             frame_consumption_rate, text="Consumption rate: "
         )
 
-        text_entry_consumption_rate = StringVar(
+        text_spinbox_consumption_rate = StringVar(
             frame_consumption_rate,
             f"{smart_plug.get_consumption_rate()}",
         )
-        entry_consumption_rate = Entry(
-            frame_consumption_rate, textvariable=text_entry_consumption_rate
+        spinbox_consumption_rate = Spinbox(
+            frame_consumption_rate,
+            textvariable=text_spinbox_consumption_rate,
+            from_=0,
+            to=150,
         )
 
         label_consumption_rate.pack(side=LEFT, anchor=W)
-        entry_consumption_rate.pack(side=RIGHT, anchor=E)
+        spinbox_consumption_rate.pack(side=RIGHT, anchor=E)
         frame_consumption_rate.pack(fill="both")
 
         return (
-            text_entry_consumption_rate,
+            text_spinbox_consumption_rate,
             [
                 frame_consumption_rate,
                 label_consumption_rate,
-                entry_consumption_rate,
+                spinbox_consumption_rate,
             ],
         )
 
