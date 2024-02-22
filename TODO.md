@@ -1,8 +1,17 @@
 # TODO
 
-## Feedback
+## Advanced Tkinter Widgets
 
-- [ ] Add images to buttons (interactivity)
+### Home
+
+- [ ] Replace on and off Label with Checkbox
+- [ ] Replace cooking modes Label with OptionsMenu
+- [ ] Replace consumption rate Label with Spinbox
+
+### Add & Edit
+
+- [ ] Replace consumption rate Entry with Spinbox
+- [ ] Replace switched on OptionsMenu with Checkbox
 
 ## Challenge Features
 
