@@ -229,18 +229,24 @@ class SmartHomeSystem:
             "smart_air_fryer_image": PhotoImage(
                 file="./assets/pot.png"
             ).subsample(8, 8),
-            "delete_button_image": PhotoImage(
-                file="./assets/delete.png"
+            "toggle_button_image": PhotoImage(
+                file="./assets/toggle.png"
             ).subsample(8, 8),
             "edit_button_image": PhotoImage(
                 file="./assets/edit.png"
             ).subsample(8, 8),
-            "toggle_button_image": PhotoImage(
-                file="./assets/toggle.png"
+            "delete_button_image": PhotoImage(
+                file="./assets/delete.png"
             ).subsample(8, 8),
             "add_button_image": PhotoImage(file="./assets/add.png").subsample(
                 8, 8
             ),
+            "toggle_all_button_off": PhotoImage(
+                file="./assets/toggle-off.png"
+            ).subsample(8, 8),
+            "toggle_all_button_on": PhotoImage(
+                file="./assets/toggle-on.png"
+            ).subsample(8, 8),
         }
 
     def run(self):
@@ -265,13 +271,16 @@ class SmartHomeSystem:
         self.home.remove_device_at(smart_device_index)
         smart_device.delete_gui_objects()
 
-    def button_turn_on_all(self):
-        self.home.turn_on_all()
+    def button_toggle_all(self, button_toggle_all):
+        self.home.toggle_switch_all()
         self.update_all_text_label_smart_device()
 
-    def button_turn_off_all(self):
-        self.home.turn_off_all()
-        self.update_all_text_label_smart_device()
+        if self.home.get_switch_all_state() is False:
+            button_toggle_all.config(
+                image=self.images["toggle_all_button_off"]
+            )
+        elif self.home.get_switch_all_state() is True:
+            button_toggle_all.config(image=self.images["toggle_all_button_on"])
 
     def button_edit(self, smart_device: SmartDevice):
         smart_home_system_edit = SmartHomeSystemEdit(self.win)
@@ -332,9 +341,11 @@ class SmartHomeSystem:
         )
         label_smart_device_image.pack(side=LEFT, anchor=W)
         label_smart_device.pack(side=LEFT, anchor=W, padx=5)
-        button_toggle_smart_device.pack(side=RIGHT, anchor=E)
-        button_edit_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+
         button_delete_smart_device.pack(side=RIGHT, anchor=E)
+        button_edit_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+        button_toggle_smart_device.pack(side=RIGHT, anchor=E)
+
         smart_device_frame.pack(fill="both")
 
         smart_device.add_gui_objects(
@@ -351,16 +362,11 @@ class SmartHomeSystem:
     def create_widgets(self):
         button_top_frame = Frame(self.main_frame)
 
-        button_turn_on_all = Button(
+        button_toggle_all = Button(
             button_top_frame,
-            text="Turn on all",
-            command=self.button_turn_on_all,
-        )
-
-        button_turn_off_all = Button(
-            button_top_frame,
-            text="Turn off all",
-            command=self.button_turn_off_all,
+            text="Toggle all",
+            image=self.images["toggle_all_button_off"],
+            command=lambda: self.button_toggle_all(button_toggle_all),
         )
 
         button_add = Button(
@@ -370,8 +376,7 @@ class SmartHomeSystem:
             command=self.button_add,
         )
 
-        button_turn_on_all.pack(side=LEFT)
-        button_turn_off_all.pack(side=LEFT, padx=5)
+        button_toggle_all.pack(side=LEFT)
         button_top_frame.pack(anchor=W)
 
         for smart_device in self.smart_devices:

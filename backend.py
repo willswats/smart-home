@@ -115,6 +115,7 @@ def test_smart_air_fryer():
 class SmartHome:
     def __init__(self):
         self.devices = []
+        self.switch_all_state = False
 
     def __str__(self):
         output = "Smart Home Devices: ["
@@ -129,6 +130,9 @@ class SmartHome:
     def get_device_at(self, index: int):
         if index < len(self.devices):
             return self.devices[index]
+
+    def get_switch_all_state(self):
+        return self.switch_all_state
 
     def remove_device_at(self, index: int):
         if index < len(self.devices):
@@ -153,6 +157,14 @@ class SmartHome:
         for device in self.devices:
             if device.get_switched_on() is True:
                 device.toggle_switch()
+
+    def toggle_switch_all(self):
+        if self.switch_all_state is False:
+            self.switch_all_state = True
+            self.turn_on_all()
+        elif self.switch_all_state is True:
+            self.switch_all_state = False
+            self.turn_off_all()
 
 
 def test_smart_home():
