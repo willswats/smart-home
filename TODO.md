@@ -1,5 +1,9 @@
 # TODO
 
+## Feedback
+
+- [ ] Replace "Turn on all" and "Turn off all" buttons with one button that uses an image to switch between toggle states
+
 ## Advanced Tkinter Widgets
 
 ### Home
