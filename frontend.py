@@ -14,6 +14,7 @@ from tkinter import (
     Toplevel,
     W,
 )
+from typing import Dict
 
 from backend import (
     CookingModes,
@@ -221,12 +222,26 @@ class SmartHomeSystem:
         self.home = home
         self.smart_devices = self.home.get_devices()
 
-        self.smart_plug_image = PhotoImage(file="./assets/plug.png").subsample(
-            8, 8
-        )
-        self.smart_air_fryer_image = PhotoImage(
-            file="./assets/pot.png"
-        ).subsample(8, 8)
+        self.images = {
+            "smart_plug_image": PhotoImage(file="./assets/plug.png").subsample(
+                8, 8
+            ),
+            "smart_air_fryer_image": PhotoImage(
+                file="./assets/pot.png"
+            ).subsample(8, 8),
+            "delete_button_image": PhotoImage(
+                file="./assets/delete.png"
+            ).subsample(8, 8),
+            "edit_button_image": PhotoImage(
+                file="./assets/edit.png"
+            ).subsample(8, 8),
+            "toggle_button_image": PhotoImage(
+                file="./assets/toggle.png"
+            ).subsample(8, 8),
+            "add_button_image": PhotoImage(file="./assets/add.png").subsample(
+                8, 8
+            ),
+        }
 
     def run(self):
         self.create_widgets()
@@ -268,8 +283,7 @@ class SmartHomeSystem:
             self.home,
             self.main_frame,
             self.smart_device_frames,
-            self.smart_plug_image,
-            self.smart_air_fryer_image,
+            self.images,
         )
         smart_home_system_add.add_create_widgets()
 
@@ -282,11 +296,11 @@ class SmartHomeSystem:
         label_smart_device_image = Label(smart_device_frame)
         if isinstance(smart_device, SmartPlug):
             label_smart_device_image = Label(
-                smart_device_frame, image=self.smart_plug_image
+                smart_device_frame, image=self.images["smart_plug_image"]
             )
         elif isinstance(smart_device, SmartAirFryer):
             label_smart_device_image = Label(
-                smart_device_frame, image=self.smart_air_fryer_image
+                smart_device_frame, image=self.images["smart_air_fryer_image"]
             )
 
         label_smart_device = Label(
@@ -295,6 +309,7 @@ class SmartHomeSystem:
         button_toggle_smart_device = Button(
             smart_device_frame,
             text="Toggle",
+            image=self.images["toggle_button_image"],
             command=lambda smart_device=smart_device: self.button_toggle(
                 smart_device
             ),
@@ -302,6 +317,7 @@ class SmartHomeSystem:
         button_edit_smart_device = Button(
             smart_device_frame,
             text="Edit",
+            image=self.images["edit_button_image"],
             command=lambda smart_device=smart_device: self.button_edit(
                 smart_device
             ),
@@ -309,6 +325,7 @@ class SmartHomeSystem:
         button_delete_smart_device = Button(
             smart_device_frame,
             text="Delete",
+            image=self.images["delete_button_image"],
             command=lambda smart_device=smart_device: self.button_delete(
                 smart_device
             ),
@@ -347,7 +364,10 @@ class SmartHomeSystem:
         )
 
         button_add = Button(
-            self.main_frame, text="Add", command=self.button_add
+            self.main_frame,
+            text="Add",
+            image=self.images["add_button_image"],
+            command=self.button_add,
         )
 
         button_turn_on_all.pack(side=LEFT)
@@ -449,8 +469,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         home: SmartHome,
         main_frame: Frame,
         smart_device_frames: Frame,
-        smart_plug_image: PhotoImage,
-        smart_air_fryer_image: PhotoImage,
+        images: Dict[str, PhotoImage],
     ):
         self.win = win
         self.home = home
@@ -458,8 +477,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.main_frame = main_frame
         self.smart_device_frames = smart_device_frames
 
-        self.smart_plug_image = smart_plug_image
-        self.smart_air_fryer_image = smart_air_fryer_image
+        self.images = images
 
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
