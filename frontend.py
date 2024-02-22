@@ -2,7 +2,9 @@ from enum import Enum
 from tkinter import (
     LEFT,
     RIGHT,
+    BooleanVar,
     Button,
+    Checkbutton,
     E,
     Entry,
     Frame,
@@ -84,12 +86,10 @@ class SmartHomeSystemUtilities:
     @staticmethod
     def set_smart_plug(
         smart_plug: SmartPlug,
-        text_options_menu_switched_on: StringVar,
+        bool_checkbutton_switched_on: BooleanVar,
         text_entry_consumption_rate: StringVar,
     ):
-        switched_on = (
-            True if text_options_menu_switched_on.get() == "On" else False
-        )
+        switched_on = bool_checkbutton_switched_on.get()
         if switched_on != smart_plug.get_switched_on():
             smart_plug.toggle_switch()
 
@@ -102,12 +102,10 @@ class SmartHomeSystemUtilities:
     @staticmethod
     def set_smart_air_fryer(
         smart_air_fryer: SmartAirFryer,
-        text_options_menu_switched_on: StringVar,
+        bool_checkbutton_switched_on: BooleanVar,
         text_options_menu_cooking_mode: StringVar,
     ):
-        switched_on = (
-            True if text_options_menu_switched_on.get() == "On" else False
-        )
+        switched_on = bool_checkbutton_switched_on.get()
         if switched_on != smart_air_fryer.get_switched_on():
             smart_air_fryer.toggle_switch()
 
@@ -117,29 +115,33 @@ class SmartHomeSystemUtilities:
     @staticmethod
     def add_edit_create_widgets_smart_device(
         frame: Frame, smart_device: SmartDevice
-    ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
+    ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
 
         label_switched_on = Label(frame_switched_on, text="Switched on: ")
 
-        switched_on_options = ["On", "Off"]
-        text_options_menu_switched_on = StringVar(
-            frame_switched_on,
-            f"{'On' if smart_device.get_switched_on() else 'Off'}",
+        bool_checkbutton_switched_on = BooleanVar(
+            frame, smart_device.get_switched_on()
         )
-        options_menu_switched_on = OptionMenu(
+
+        checkbutton_switched_on = Checkbutton(
             frame_switched_on,
-            text_options_menu_switched_on,
-            *switched_on_options,
+            variable=bool_checkbutton_switched_on,
+            onvalue=True,
+            offvalue=False,
         )
 
         label_switched_on.pack(side=LEFT, anchor=W)
-        options_menu_switched_on.pack(side=RIGHT, anchor=E)
+        checkbutton_switched_on.pack(side=RIGHT, anchor=W)
         frame_switched_on.pack(fill="both")
 
         return (
-            text_options_menu_switched_on,
-            [frame_switched_on, label_switched_on, options_menu_switched_on],
+            bool_checkbutton_switched_on,
+            [
+                frame_switched_on,
+                label_switched_on,
+                checkbutton_switched_on,
+            ],
         )
 
     @staticmethod
@@ -399,13 +401,13 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     def edit_button_submit_smart_plug(
         self,
         smart_plug: SmartPlug,
-        text_options_menu_switched_on: StringVar,
+        bool_checkbutton_switched_on: BooleanVar,
         text_entry_consumption_rate: StringVar,
     ):
         try:
             SmartHomeSystemUtilities.set_smart_plug(
                 smart_plug,
-                text_options_menu_switched_on,
+                bool_checkbutton_switched_on,
                 text_entry_consumption_rate,
             )
             self.update_text_label_smart_device(smart_plug)
@@ -415,19 +417,19 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     def edit_button_submit_smart_air_fryer(
         self,
         smart_air_fryer: SmartAirFryer,
-        text_options_menu_switched_on: StringVar,
+        bool_checkbutton_switched_on: BooleanVar,
         text_options_menu_cooking_mode: StringVar,
     ):
         SmartHomeSystemUtilities.set_smart_air_fryer(
             smart_air_fryer,
-            text_options_menu_switched_on,
+            bool_checkbutton_switched_on,
             text_options_menu_cooking_mode,
         )
         self.update_text_label_smart_device(smart_air_fryer)
 
     # Create widgets methods
     def edit_create_widgets(self, smart_device: SmartDevice):
-        text_options_menu_switched_on = (
+        bool_checkbutton_switched_on = (
             SmartHomeSystemUtilities.add_edit_create_widgets_smart_device(
                 self.edit_window_frame, smart_device
             )[0]
@@ -444,7 +446,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
                 text="Submit",
                 command=lambda: self.edit_button_submit_smart_plug(
                     smart_device,
-                    text_options_menu_switched_on,
+                    bool_checkbutton_switched_on,
                     text_entry_consumption_rate,
                 ),
             )
@@ -460,7 +462,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
                 text="Submit",
                 command=lambda: self.edit_button_submit_smart_air_fryer(
                     smart_device,
-                    text_options_menu_switched_on,
+                    bool_checkbutton_switched_on,
                     text_options_menu_cooking_mode,
                 ),
             )
@@ -493,7 +495,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.add_window_frame.pack(padx=10, pady=10, fill="both")
 
         self.selected_smart_device = "Smart Plug"
-        self.selected_switched_on = "Off"
+        self.selected_switched_on = False
         self.selected_consumption_rate = 150
         self.selected_cooking_mode = CookingModes.HEALTHY.value
 
@@ -528,7 +530,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 try:
                     SmartHomeSystemUtilities.set_smart_plug(
                         smart_plug,
-                        StringVar(
+                        BooleanVar(
                             self.add_window_frame, self.selected_switched_on
                         ),
                         StringVar(
@@ -575,7 +577,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 # Set the options of the last selected smart device
                 SmartHomeSystemUtilities.set_smart_air_fryer(
                     smart_air_fryer,
-                    StringVar(
+                    BooleanVar(
                         self.add_window_frame, self.selected_switched_on
                     ),
                     StringVar(
@@ -619,30 +621,30 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 )
 
     def set_selected_smart_plug(
-        self, text_options_menu_switched_on, text_entry_consumption_rate
+        self, bool_checkbutton_switched_on, text_entry_consumption_rate
     ):
         self.selected_smart_device = "Smart Plug"
-        self.selected_switched_on = text_options_menu_switched_on.get()
+        self.selected_switched_on = bool_checkbutton_switched_on.get()
         self.selected_consumption_rate = int(text_entry_consumption_rate.get())
 
     def set_selected_smart_air_fryer(
-        self, text_options_menu_switched_on, text_options_menu_cooking_mode
+        self, bool_checkbutton_switched_on, text_options_menu_cooking_mode
     ):
         self.selected_smart_device = "Smart Air Fryer"
-        self.selected_switched_on = text_options_menu_switched_on.get()
+        self.selected_switched_on = bool_checkbutton_switched_on.get()
         self.selected_cooking_mode = text_options_menu_cooking_mode.get()
 
     # Button methods
     def add_button_submit_smart_plug(
         self,
         smart_plug: SmartPlug,
-        text_options_menu_switched_on: StringVar,
+        bool_checkbutton_switched_on: BooleanVar,
         text_entry_consumption_rate: StringVar,
     ):
         try:
             SmartHomeSystemUtilities.set_smart_plug(
                 smart_plug,
-                text_options_menu_switched_on,
+                bool_checkbutton_switched_on,
                 text_entry_consumption_rate,
             )
             self.home.add_device(smart_plug)
@@ -650,7 +652,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
             # Save the options of the last selected smart device
             self.set_selected_smart_plug(
-                text_options_menu_switched_on, text_entry_consumption_rate
+                bool_checkbutton_switched_on, text_entry_consumption_rate
             )
 
             # Call the options menu again so that a new SmartPlug object is
@@ -664,12 +666,12 @@ class SmartHomeSystemAdd(SmartHomeSystem):
     def add_button_submit_smart_air_fryer(
         self,
         smart_air_fryer: SmartAirFryer,
-        text_options_menu_switched_on: StringVar,
+        bool_checkbutton_switched_on: BooleanVar,
         text_options_menu_cooking_mode: StringVar,
     ):
         SmartHomeSystemUtilities.set_smart_air_fryer(
             smart_air_fryer,
-            text_options_menu_switched_on,
+            bool_checkbutton_switched_on,
             text_options_menu_cooking_mode,
         )
 
@@ -677,7 +679,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.create_widgets_smart_device(smart_air_fryer)
         # Save the options of the last selected smart device
         self.set_selected_smart_air_fryer(
-            text_options_menu_switched_on, text_options_menu_cooking_mode
+            bool_checkbutton_switched_on, text_options_menu_cooking_mode
         )
         # Call the options menu again so that a new SmartAirFryer object is
         # created each time
