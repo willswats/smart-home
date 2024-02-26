@@ -497,10 +497,13 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.add_window_frame = Frame(self.add_window)
         self.add_window_frame.pack(padx=10, pady=10, fill="both")
 
-        self.selected_smart_device = "Smart Plug"
-        self.selected_switched_on = False
-        self.selected_consumption_rate = 150
-        self.selected_cooking_mode = CookingModes.HEALTHY.value
+        self.smart_device_states = {
+            "smart_device": "Smart Plug",
+            "smart_plug_switched_on": False,
+            "smart_plug_consumption_rate": 150,
+            "smart_air_fryer_switched_on": False,
+            "smart_air_fryer_cooking_mode": CookingModes.HEALTHY.value,
+        }
 
         self.gui_objects = []
 
@@ -518,7 +521,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.delete_gui_objects()
 
         # The selected_smart_device can be StringVar | str as the command for
-        # the OptionsMenu seems to call get() on it automatically,
+        # the OptionMenu seems to call get() on it automatically,
         # however, it is still passed in as a StringVar
         selected_smart_device = (
             selected_smart_device.get()
@@ -528,17 +531,24 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         match selected_smart_device:
             case "Smart Plug":
-                smart_plug = SmartPlug(self.selected_consumption_rate)
+                smart_plug = SmartPlug(
+                    self.smart_device_states["smart_plug_consumption_rate"]
+                )
                 # Set the options of the last selected smart device
                 try:
                     SmartHomeSystemUtilities.set_smart_plug(
                         smart_plug,
                         BooleanVar(
-                            self.add_window_frame, self.selected_switched_on
+                            self.add_window_frame,
+                            self.smart_device_states["smart_plug_switched_on"],
                         ),
                         StringVar(
                             self.add_window_frame,
-                            f"{self.selected_consumption_rate}",
+                            str(
+                                self.smart_device_states[
+                                    "smart_plug_consumption_rate"
+                                ]
+                            ),
                         ),
                     )
                 except Exception as error:
@@ -581,11 +591,16 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 SmartHomeSystemUtilities.set_smart_air_fryer(
                     smart_air_fryer,
                     BooleanVar(
-                        self.add_window_frame, self.selected_switched_on
+                        self.add_window_frame,
+                        self.smart_device_states[
+                            "smart_air_fryer_switched_on"
+                        ],
                     ),
                     StringVar(
                         self.add_window_frame,
-                        f"{self.selected_cooking_mode}",
+                        self.smart_device_states[
+                            "smart_air_fryer_cooking_mode"
+                        ],
                     ),
                 )
 
@@ -626,16 +641,24 @@ class SmartHomeSystemAdd(SmartHomeSystem):
     def set_selected_smart_plug(
         self, bool_checkbutton_switched_on, text_entry_consumption_rate
     ):
-        self.selected_smart_device = "Smart Plug"
-        self.selected_switched_on = bool_checkbutton_switched_on.get()
-        self.selected_consumption_rate = int(text_entry_consumption_rate.get())
+        self.smart_device_states["smart_device"] = "Smart Plug"
+        self.smart_device_states[
+            "smart_plug_switched_on"
+        ] = bool_checkbutton_switched_on.get()
+        self.smart_device_states["smart_plug_consumption_rate"] = int(
+            text_entry_consumption_rate.get()
+        )
 
     def set_selected_smart_air_fryer(
         self, bool_checkbutton_switched_on, text_options_menu_cooking_mode
     ):
-        self.selected_smart_device = "Smart Air Fryer"
-        self.selected_switched_on = bool_checkbutton_switched_on.get()
-        self.selected_cooking_mode = text_options_menu_cooking_mode.get()
+        self.smart_device_states["smart_device"] = "Smart Air Fryer"
+        self.smart_device_states[
+            "smart_air_fryer_switched_on"
+        ] = bool_checkbutton_switched_on.get()
+        self.smart_device_states[
+            "smart_air_fryer_cooking_mode"
+        ] = text_options_menu_cooking_mode.get()
 
     # Button methods
     def add_button_submit_smart_plug(
@@ -661,7 +684,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             # Call the options menu again so that a new SmartPlug object is
             # created each time
             self.add_options_menu_submit(
-                StringVar(self.add_window_frame, self.selected_smart_device)
+                StringVar(
+                    self.add_window_frame,
+                    self.smart_device_states["smart_device"],
+                )
             )
         except Exception as error:
             print("Error:", error)
@@ -687,7 +713,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         # Call the options menu again so that a new SmartAirFryer object is
         # created each time
         self.add_options_menu_submit(
-            StringVar(self.add_window_frame, self.selected_smart_device)
+            StringVar(
+                self.add_window_frame, self.smart_device_states["smart_device"]
+            )
         )
 
     # Create widgets methods
