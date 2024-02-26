@@ -1,10 +1,16 @@
 # TODO
 
+## Clean up
+
+- [ ] Remove noqa
+- [ ] Reduce repetition:
+  - [ ] create_widgets_smart_plug and create_widgets_smart_air_fryer
+
 ## Advanced Tkinter Widgets
 
 ### Home
 
-- [ ] Make widgets submit on change
+- [ ] Make spinbox widget revert to it's old value if it fails to submit
 - [ ] Switch from pack to grid
 
 ## Challenge Features
