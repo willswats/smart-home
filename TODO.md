@@ -10,7 +10,6 @@
 
 ### Home
 
-- [ ] Make spinbox widget revert to it's old value if it fails to submit
 - [ ] Switch from pack to grid
 
 ## Challenge Features
