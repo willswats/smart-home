@@ -206,7 +206,7 @@ class SmartHomeSystemUtilities:
             text_spinbox_consumption_rate,
             spinbox_consumption_rate,
         ) = SmartHomeSystemUtilities.create_widget_spinbox_smart_plug_consumption_rate(  # noqa: E501
-            frame, smart_plug
+            frame_consumption_rate, smart_plug
         )
 
         label_consumption_rate.pack(side=LEFT, anchor=W)
@@ -234,7 +234,7 @@ class SmartHomeSystemUtilities:
             text_option_menu_cooking_mode,
             option_menu_cooking_mode,
         ) = SmartHomeSystemUtilities.create_widget_option_menu_smart_air_fryer_cooking_mode(  # noqa: E501
-            frame, smart_air_fryer
+            frame_cooking_mode, smart_air_fryer
         )
 
         label_cooking_modes.pack(side=LEFT, anchor=W)
