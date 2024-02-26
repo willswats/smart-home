@@ -1,11 +1,11 @@
 from enum import Enum
-from tkinter import StringVar
+from tkinter import BooleanVar
 
 
 class SmartDevice:
     def __init__(self):
         self.switched_on = False
-        self.string_var: StringVar | None = None
+        self.bool_var: BooleanVar | None = None
         self.gui_objects = []
 
     def get_switched_on(self):
@@ -14,15 +14,15 @@ class SmartDevice:
     def toggle_switch(self):
         self.switched_on = not self.switched_on
 
-    def get_string_var(self):
-        return self.string_var
+    def get_bool_var(self):
+        return self.bool_var
 
-    def set_string_var(self, string_var):
-        self.string_var = string_var
+    def set_bool_var(self, bool_var):
+        self.bool_var = bool_var
 
-    def set_string_var_text(self, text):
-        if self.string_var is not None:
-            self.string_var.set(text)
+    def set_bool_var_value(self, value):
+        if self.bool_var is not None:
+            self.bool_var.set(value)
 
     def add_gui_objects(self, gui_objects):
         for gui_object in gui_objects:
