@@ -4,9 +4,8 @@
 
 ### Home
 
-- [ ] Replace switched on label with Checkbox
-- [ ] Replace cooking modes Label with OptionsMenu
-- [ ] Replace consumption rate Label with Spinbox
+- [ ] Make widgets submit on change
+- [ ] Switch from pack to grid
 
 ## Challenge Features
 
