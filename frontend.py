@@ -113,7 +113,7 @@ class SmartHomeSystemUtilities:
             textvariable=text_spinbox_consumption_rate,
             from_=0,
             to=150,
-            width=5,
+            width=9,
         )
         return text_spinbox_consumption_rate, spinbox_consumption_rate
 
@@ -439,7 +439,7 @@ class SmartHomeSystem:
 
         label_smart_plug_image.pack(side=LEFT, anchor=W)
         label_smart_plug_title.pack(side=LEFT, anchor=W)
-        label_smart_plug_switched_on.pack(side=LEFT, anchor=W)
+        label_smart_plug_switched_on.pack(side=LEFT, anchor=W, padx=(40, 0))
         checkbutton_switched_on.pack(side=LEFT, anchor=W)
         label_smart_plug_consumption_rate.pack(side=LEFT, anchor=W)
         spinbox_consumption_rate.pack(side=LEFT, anchor=W)
@@ -515,7 +515,9 @@ class SmartHomeSystem:
         label_smart_air_fryer_title.pack(side=LEFT, anchor=W)
         label_smart_air_fryer_switched_on.pack(side=LEFT, anchor=W)
         checkbutton_switched_on.pack(side=LEFT, anchor=W)
-        label_smart_air_fryer_cooking_mode.pack(side=LEFT, anchor=W)
+        label_smart_air_fryer_cooking_mode.pack(
+            side=LEFT, anchor=W, padx=(0, 20)
+        )
         option_menu_cooking_mode.pack(side=LEFT, anchor=W)
 
         button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=5)
