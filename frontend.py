@@ -113,6 +113,7 @@ class SmartHomeSystemUtilities:
             textvariable=text_spinbox_consumption_rate,
             from_=0,
             to=150,
+            width=5,
         )
         return text_spinbox_consumption_rate, spinbox_consumption_rate
 
@@ -170,7 +171,11 @@ class SmartHomeSystemUtilities:
     ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
 
-        label_switched_on = Label(frame_switched_on, text="Switched on: ")
+        label_switched_on = Label(
+            frame_switched_on,
+            text="Switched on: ",
+            font=("sans-serif", 10),
+        )
 
         (
             bool_checkbutton_switched_on,
@@ -199,7 +204,9 @@ class SmartHomeSystemUtilities:
         frame_consumption_rate = Frame(frame)
 
         label_consumption_rate = Label(
-            frame_consumption_rate, text="Consumption rate: "
+            frame_consumption_rate,
+            text="Consumption rate: ",
+            font=("sans-serif", 10),
         )
 
         (
@@ -228,7 +235,11 @@ class SmartHomeSystemUtilities:
     ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
         frame_cooking_mode = Frame(frame)
 
-        label_cooking_modes = Label(frame_cooking_mode, text="Cooking modes: ")
+        label_cooking_modes = Label(
+            frame_cooking_mode,
+            text="Cooking modes: ",
+            font=("sans-serif", 10),
+        )
 
         (
             text_option_menu_cooking_mode,
@@ -380,80 +391,23 @@ class SmartHomeSystem:
         )
 
     # Create widgets methods
-    def create_widgets_smart_air_fryer(self, smart_air_fryer: SmartAirFryer):
-        smart_device_frame = Frame(self.smart_device_frames)
-
-        label_smart_air_fryer_image = Label(
-            smart_device_frame, image=self.images["smart_air_fryer_image"]
-        )
-        label_smart_air_fryer = Label(
-            smart_device_frame, text="Smart Air Fryer:"
-        )
-
-        (
-            text_option_menu_cooking_mode,
-            option_menu_cooking_mode,
-        ) = SmartHomeSystemUtilities.create_widget_option_menu_smart_air_fryer_cooking_mode(  # noqa: E501
-            smart_device_frame, smart_air_fryer
-        )
-        smart_air_fryer.set_string_var(text_option_menu_cooking_mode)
-
-        (
-            bool_checkbutton_switched_on,
-            checkbutton_switched_on,
-        ) = SmartHomeSystemUtilities.create_widget_checkbox_smart_device_switched_on(  # noqa: E501
-            smart_device_frame, smart_air_fryer
-        )
-        smart_air_fryer.set_bool_var(bool_checkbutton_switched_on)
-
-        (
-            button_toggle_smart_device,
-            button_edit_smart_device,
-            button_delete_smart_device,
-        ) = self.create_widgets_buttons_smart_device(
-            smart_device_frame, smart_air_fryer
-        )
-
-        label_smart_air_fryer_image.pack(side=LEFT, anchor=W)
-        label_smart_air_fryer.pack(side=LEFT, anchor=W, padx=5)
-        checkbutton_switched_on.pack(side=LEFT, anchor=W)
-        option_menu_cooking_mode.pack(side=LEFT, anchor=W)
-
-        button_delete_smart_device.pack(side=RIGHT, anchor=E)
-        button_edit_smart_device.pack(side=RIGHT, anchor=E, padx=5)
-        button_toggle_smart_device.pack(side=RIGHT, anchor=E)
-
-        smart_device_frame.pack(fill="both")
-
-        smart_air_fryer.add_gui_objects(
-            [
-                smart_device_frame,
-                label_smart_air_fryer_image,
-                label_smart_air_fryer,
-                checkbutton_switched_on,
-                option_menu_cooking_mode,
-                button_toggle_smart_device,
-                button_edit_smart_device,
-                button_delete_smart_device,
-            ]
-        )
-
     def create_widgets_smart_plug(self, smart_plug: SmartPlug):
         smart_device_frame = Frame(self.smart_device_frames)
 
         label_smart_plug_image = Label(
             smart_device_frame, image=self.images["smart_plug_image"]
         )
-        label_smart_plug = Label(smart_device_frame, text="Smart Plug:")
-
-        (
-            text_spinbox_consumption_rate,
-            spinbox_consumption_rate,
-        ) = SmartHomeSystemUtilities.create_widget_spinbox_smart_plug_consumption_rate(  # noqa: E501
-            smart_device_frame, smart_plug
+        label_smart_plug_title = Label(
+            smart_device_frame,
+            text="Smart Plug:",
+            font=("sans-serif", 12, "bold"),
         )
-        smart_plug.set_string_var(text_spinbox_consumption_rate)
 
+        label_smart_plug_switched_on = Label(
+            smart_device_frame,
+            text="Switched on:",
+            font=("sans-serif", 10),
+        )
         (
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
@@ -461,6 +415,19 @@ class SmartHomeSystem:
             smart_device_frame, smart_plug
         )
         smart_plug.set_bool_var(bool_checkbutton_switched_on)
+
+        label_smart_plug_consumption_rate = Label(
+            smart_device_frame,
+            text="Consumption rate:",
+            font=("sans-serif", 10),
+        )
+        (
+            text_spinbox_consumption_rate,
+            spinbox_consumption_rate,
+        ) = SmartHomeSystemUtilities.create_widget_spinbox_smart_plug_consumption_rate(  # noqa: E501
+            smart_device_frame, smart_plug
+        )
+        smart_plug.set_string_var(text_spinbox_consumption_rate)
 
         (
             button_toggle_smart_device,
@@ -471,13 +438,15 @@ class SmartHomeSystem:
         )
 
         label_smart_plug_image.pack(side=LEFT, anchor=W)
-        label_smart_plug.pack(side=LEFT, anchor=W, padx=5)
+        label_smart_plug_title.pack(side=LEFT, anchor=W)
+        label_smart_plug_switched_on.pack(side=LEFT, anchor=W)
         checkbutton_switched_on.pack(side=LEFT, anchor=W)
+        label_smart_plug_consumption_rate.pack(side=LEFT, anchor=W)
         spinbox_consumption_rate.pack(side=LEFT, anchor=W)
 
-        button_delete_smart_device.pack(side=RIGHT, anchor=E)
-        button_edit_smart_device.pack(side=RIGHT, anchor=E, padx=5)
-        button_toggle_smart_device.pack(side=RIGHT, anchor=E)
+        button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+        button_edit_smart_device.pack(side=RIGHT, anchor=E)
+        button_toggle_smart_device.pack(side=RIGHT, anchor=E, padx=5)
 
         smart_device_frame.pack(fill="both")
 
@@ -485,9 +454,85 @@ class SmartHomeSystem:
             [
                 smart_device_frame,
                 label_smart_plug_image,
-                label_smart_plug,
+                label_smart_plug_title,
+                label_smart_plug_switched_on,
+                label_smart_plug_consumption_rate,
                 checkbutton_switched_on,
                 spinbox_consumption_rate,
+                button_toggle_smart_device,
+                button_edit_smart_device,
+                button_delete_smart_device,
+            ]
+        )
+
+    def create_widgets_smart_air_fryer(self, smart_air_fryer: SmartAirFryer):
+        smart_device_frame = Frame(self.smart_device_frames)
+
+        label_smart_air_fryer_image = Label(
+            smart_device_frame, image=self.images["smart_air_fryer_image"]
+        )
+        label_smart_air_fryer_title = Label(
+            smart_device_frame,
+            text="Smart Air Fryer:",
+            font=("sans-serif", 12, "bold"),
+        )
+
+        label_smart_air_fryer_switched_on = Label(
+            smart_device_frame,
+            text="Switched on:",
+            font=("sans-serif", 10),
+        )
+        (
+            bool_checkbutton_switched_on,
+            checkbutton_switched_on,
+        ) = SmartHomeSystemUtilities.create_widget_checkbox_smart_device_switched_on(  # noqa: E501
+            smart_device_frame, smart_air_fryer
+        )
+        smart_air_fryer.set_bool_var(bool_checkbutton_switched_on)
+
+        label_smart_air_fryer_cooking_mode = Label(
+            smart_device_frame,
+            text="Cooking mode:",
+            font=("sans-serif", 10),
+        )
+        (
+            text_option_menu_cooking_mode,
+            option_menu_cooking_mode,
+        ) = SmartHomeSystemUtilities.create_widget_option_menu_smart_air_fryer_cooking_mode(  # noqa: E501
+            smart_device_frame, smart_air_fryer
+        )
+        smart_air_fryer.set_string_var(text_option_menu_cooking_mode)
+
+        (
+            button_toggle_smart_device,
+            button_edit_smart_device,
+            button_delete_smart_device,
+        ) = self.create_widgets_buttons_smart_device(
+            smart_device_frame, smart_air_fryer
+        )
+
+        label_smart_air_fryer_image.pack(side=LEFT, anchor=W)
+        label_smart_air_fryer_title.pack(side=LEFT, anchor=W)
+        label_smart_air_fryer_switched_on.pack(side=LEFT, anchor=W)
+        checkbutton_switched_on.pack(side=LEFT, anchor=W)
+        label_smart_air_fryer_cooking_mode.pack(side=LEFT, anchor=W)
+        option_menu_cooking_mode.pack(side=LEFT, anchor=W)
+
+        button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+        button_edit_smart_device.pack(side=RIGHT, anchor=E)
+        button_toggle_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+
+        smart_device_frame.pack(fill="both")
+
+        smart_air_fryer.add_gui_objects(
+            [
+                smart_device_frame,
+                label_smart_air_fryer_image,
+                label_smart_air_fryer_title,
+                label_smart_air_fryer_switched_on,
+                label_smart_air_fryer_cooking_mode,
+                checkbutton_switched_on,
+                option_menu_cooking_mode,
                 button_toggle_smart_device,
                 button_edit_smart_device,
                 button_delete_smart_device,
@@ -856,7 +901,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         frame_pick_smart_device = Frame(self.add_window_frame)
 
         label_pick_smart_device = Label(
-            frame_pick_smart_device, text="Pick device: "
+            frame_pick_smart_device,
+            text="Pick device: ",
+            font=("sans-serif", 10),
         )
 
         pick_smart_device_options = ["Smart Plug", "Smart Air Fryer"]
