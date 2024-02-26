@@ -90,12 +90,14 @@ class SmartHomeSystemUtilities:
         bool_checkbutton_switched_on = BooleanVar(
             frame, smart_device.get_switched_on()
         )
-
         checkbutton_switched_on = Checkbutton(
             frame,
             variable=bool_checkbutton_switched_on,
             onvalue=True,
             offvalue=False,
+            command=lambda: SmartHomeSystemUtilities.set_smart_device_switched_on(  # noqa: E501
+                smart_device, bool_checkbutton_switched_on
+            ),
         )
 
         return bool_checkbutton_switched_on, checkbutton_switched_on
@@ -114,7 +116,19 @@ class SmartHomeSystemUtilities:
             from_=0,
             to=150,
             width=9,
+            command=lambda: SmartHomeSystemUtilities.set_smart_plug_consumption_rate(  # noqa: E501
+                smart_plug, text_spinbox_consumption_rate
+            ),
         )
+        # Spinbox command is only executed when arrows are pressed, this
+        # creates a way to submit upon pressing return
+        spinbox_consumption_rate.bind(
+            "<Return>",
+            lambda _: SmartHomeSystemUtilities.set_smart_plug_consumption_rate(
+                smart_plug, text_spinbox_consumption_rate
+            ),
+        )
+
         return text_spinbox_consumption_rate, spinbox_consumption_rate
 
     @staticmethod
@@ -133,19 +147,26 @@ class SmartHomeSystemUtilities:
             frame,
             text_option_menu_cooking_mode,
             *cooking_mode_options,
+            command=lambda _: SmartHomeSystemUtilities.set_smart_air_fryer_cooking_mode(  # noqa: E501
+                smart_air_fryer, text_option_menu_cooking_mode
+            ),
         )
         return text_option_menu_cooking_mode, option_menu_cooking_mode
 
     @staticmethod
-    def set_smart_plug(
-        smart_plug: SmartPlug,
+    def set_smart_device_switched_on(
+        smart_plug: SmartDevice,
         bool_checkbutton_switched_on: BooleanVar,
-        text_spinbox_consumption_rate: StringVar,
     ):
         switched_on = bool_checkbutton_switched_on.get()
         if switched_on != smart_plug.get_switched_on():
             smart_plug.toggle_switch()
 
+    @staticmethod
+    def set_smart_plug_consumption_rate(
+        smart_plug: SmartPlug,
+        text_spinbox_consumption_rate: StringVar,
+    ):
         text_consumption_rate = text_spinbox_consumption_rate.get()
         try:
             smart_plug.set_consumption_rate(int(text_consumption_rate))
@@ -153,17 +174,38 @@ class SmartHomeSystemUtilities:
             raise error
 
     @staticmethod
+    def set_smart_air_fryer_cooking_mode(
+        smart_air_fryer: SmartAirFryer,
+        text_option_menu_cooking_mode: StringVar,
+    ):
+        text_cooking_mode = text_option_menu_cooking_mode.get()
+        smart_air_fryer.set_cooking_mode(text_cooking_mode)
+
+    @staticmethod
+    def set_smart_plug(
+        smart_plug: SmartPlug,
+        bool_checkbutton_switched_on: BooleanVar,
+        text_spinbox_consumption_rate: StringVar,
+    ):
+        SmartHomeSystemUtilities.set_smart_device_switched_on(
+            smart_plug, bool_checkbutton_switched_on
+        )
+        SmartHomeSystemUtilities.set_smart_plug_consumption_rate(
+            smart_plug, text_spinbox_consumption_rate
+        )
+
+    @staticmethod
     def set_smart_air_fryer(
         smart_air_fryer: SmartAirFryer,
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
     ):
-        switched_on = bool_checkbutton_switched_on.get()
-        if switched_on != smart_air_fryer.get_switched_on():
-            smart_air_fryer.toggle_switch()
-
-        text_cooking_mode = text_option_menu_cooking_mode.get()
-        smart_air_fryer.set_cooking_mode(text_cooking_mode)
+        SmartHomeSystemUtilities.set_smart_device_switched_on(
+            smart_air_fryer, bool_checkbutton_switched_on
+        )
+        SmartHomeSystemUtilities.set_smart_air_fryer_cooking_mode(
+            smart_air_fryer, text_option_menu_cooking_mode
+        )
 
     @staticmethod
     def add_edit_create_widgets_smart_device(
