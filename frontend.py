@@ -124,7 +124,7 @@ class SmartHomeSystemUtilities:
         # creates a way to submit upon pressing return
         spinbox_consumption_rate.bind(
             "<Return>",
-            lambda _: SmartHomeSystemUtilities.set_smart_plug_consumption_rate(
+            lambda _: SmartHomeSystemUtilities.set_smart_plug_consumption_rate_validate(  # noqa: E501
                 smart_plug, text_spinbox_consumption_rate
             ),
         )
@@ -172,6 +172,22 @@ class SmartHomeSystemUtilities:
             smart_plug.set_consumption_rate(int(text_consumption_rate))
         except Exception as error:
             raise error
+
+    # This is needed for the Spinbox bind on return, because
+    # I am raising an error in set_smart_plug_consumption_rate to ensure
+    # that a device is not added, even when the validation fails
+    # (by using try except later on in the code)
+    @staticmethod
+    def set_smart_plug_consumption_rate_validate(
+        smart_plug: SmartPlug,
+        text_spinbox_consumption_rate: StringVar,
+    ):
+        try:
+            SmartHomeSystemUtilities.set_smart_plug_consumption_rate(
+                smart_plug, text_spinbox_consumption_rate
+            )
+        except Exception as error:
+            print("Error", error)
 
     @staticmethod
     def set_smart_air_fryer_cooking_mode(
