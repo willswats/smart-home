@@ -2,7 +2,6 @@
 
 ## Clean up
 
-- [ ] Remove noqa
 - [ ] Reduce repetition:
   - [ ] create_widgets_smart_plug and create_widgets_smart_air_fryer
 - [ ] Change submit button to an image of a tick
