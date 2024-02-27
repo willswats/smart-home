@@ -335,33 +335,21 @@ class SmartHomeSystem:
         self.smart_devices = self.home.get_devices()
 
         self.images = {
-            "smart_plug_image": PhotoImage(file="./assets/plug.png").subsample(
-                8, 8
-            ),
-            "smart_air_fryer_image": PhotoImage(
-                file="./assets/pot.png"
-            ).subsample(8, 8),
-            "toggle_button_image": PhotoImage(
-                file="./assets/toggle.png"
-            ).subsample(8, 8),
-            "edit_button_image": PhotoImage(
-                file="./assets/edit.png"
-            ).subsample(8, 8),
-            "delete_button_image": PhotoImage(
-                file="./assets/delete.png"
-            ).subsample(8, 8),
-            "add_button_image": PhotoImage(file="./assets/add.png").subsample(
-                8, 8
-            ),
+            "smart_plug_image": PhotoImage(file="./assets/plug.png"),
+            "smart_air_fryer_image": PhotoImage(file="./assets/pot.png"),
+            "toggle_button_image": PhotoImage(file="./assets/toggle.png"),
+            "edit_button_image": PhotoImage(file="./assets/edit.png"),
+            "delete_button_image": PhotoImage(file="./assets/delete.png"),
+            "add_button_image": PhotoImage(file="./assets/add.png"),
             "toggle_all_button_off": PhotoImage(
                 file="./assets/toggle-off.png"
-            ).subsample(8, 8),
-            "toggle_all_button_on": PhotoImage(
-                file="./assets/toggle-on.png"
-            ).subsample(8, 8),
+            ),
+            "toggle_all_button_on": PhotoImage(file="./assets/toggle-on.png"),
         }
 
     def run(self):
+        for image in self.images:
+            self.images[image] = self.images[image].subsample(8, 8)
         self.create_widgets()
         self.win.mainloop()
 
