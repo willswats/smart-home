@@ -2,10 +2,9 @@
 
 ## Clean up
 
-- [ ] Reduce repetition:
-  - [ ] create_widgets_smart_plug and create_widgets_smart_air_fryer
 - [ ] Change submit button to an image of a tick
 - [ ] Switch from pack to grid
+- [ ] The code below most of the `isinstance` can be separated into separate functions
 
 ## Challenge Features
 
