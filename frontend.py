@@ -82,9 +82,9 @@ def set_up_home():
     return smart_home
 
 
-class SmartHomeSystemUtilities:
+class Utilities:
     @staticmethod
-    def create_widget_checkbox_smart_device_switched_on(
+    def create_checkbox_smart_device_switched_on(
         frame: Frame, smart_device: SmartDevice
     ):
         bool_checkbutton_switched_on = BooleanVar(
@@ -95,7 +95,7 @@ class SmartHomeSystemUtilities:
             variable=bool_checkbutton_switched_on,
             onvalue=True,
             offvalue=False,
-            command=lambda: SmartHomeSystemUtilities.set_smart_device_switched_on(  # noqa: E501
+            command=lambda: Utilities.set_smart_device_switched_on(
                 smart_device, bool_checkbutton_switched_on
             ),
         )
@@ -103,7 +103,7 @@ class SmartHomeSystemUtilities:
         return bool_checkbutton_switched_on, checkbutton_switched_on
 
     @staticmethod
-    def create_widget_spinbox_smart_plug_consumption_rate(
+    def create_spinbox_smart_plug_consumption_rate(
         frame: Frame, smart_plug: SmartPlug
     ):
         text_spinbox_consumption_rate = StringVar(
@@ -116,7 +116,7 @@ class SmartHomeSystemUtilities:
             from_=0,
             to=150,
             width=9,
-            command=lambda: SmartHomeSystemUtilities.set_smart_plug_consumption_rate(  # noqa: E501
+            command=lambda: Utilities.set_smart_plug_consumption_rate(
                 smart_plug, text_spinbox_consumption_rate
             ),
         )
@@ -124,7 +124,7 @@ class SmartHomeSystemUtilities:
         # creates a way to submit upon pressing return
         spinbox_consumption_rate.bind(
             "<Return>",
-            lambda _: SmartHomeSystemUtilities.set_smart_plug_consumption_rate_validate(  # noqa: E501
+            lambda _: Utilities.set_smart_plug_consumption_rate_validate(
                 smart_plug, text_spinbox_consumption_rate
             ),
         )
@@ -132,7 +132,7 @@ class SmartHomeSystemUtilities:
         return text_spinbox_consumption_rate, spinbox_consumption_rate
 
     @staticmethod
-    def create_widget_option_menu_smart_air_fryer_cooking_mode(
+    def create_option_menu_smart_air_fryer_cooking_mode(
         frame: Frame, smart_air_fryer: SmartAirFryer
     ):
         cooking_mode_options = [
@@ -147,7 +147,7 @@ class SmartHomeSystemUtilities:
             frame,
             text_option_menu_cooking_mode,
             *cooking_mode_options,
-            command=lambda _: SmartHomeSystemUtilities.set_smart_air_fryer_cooking_mode(  # noqa: E501
+            command=lambda _: Utilities.set_smart_air_fryer_cooking_mode(
                 smart_air_fryer, text_option_menu_cooking_mode
             ),
         )
@@ -183,7 +183,7 @@ class SmartHomeSystemUtilities:
         text_spinbox_consumption_rate: StringVar,
     ):
         try:
-            SmartHomeSystemUtilities.set_smart_plug_consumption_rate(
+            Utilities.set_smart_plug_consumption_rate(
                 smart_plug, text_spinbox_consumption_rate
             )
         except Exception as error:
@@ -203,10 +203,10 @@ class SmartHomeSystemUtilities:
         bool_checkbutton_switched_on: BooleanVar,
         text_spinbox_consumption_rate: StringVar,
     ):
-        SmartHomeSystemUtilities.set_smart_device_switched_on(
+        Utilities.set_smart_device_switched_on(
             smart_plug, bool_checkbutton_switched_on
         )
-        SmartHomeSystemUtilities.set_smart_plug_consumption_rate(
+        Utilities.set_smart_plug_consumption_rate(
             smart_plug, text_spinbox_consumption_rate
         )
 
@@ -216,10 +216,10 @@ class SmartHomeSystemUtilities:
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
     ):
-        SmartHomeSystemUtilities.set_smart_device_switched_on(
+        Utilities.set_smart_device_switched_on(
             smart_air_fryer, bool_checkbutton_switched_on
         )
-        SmartHomeSystemUtilities.set_smart_air_fryer_cooking_mode(
+        Utilities.set_smart_air_fryer_cooking_mode(
             smart_air_fryer, text_option_menu_cooking_mode
         )
 
@@ -238,7 +238,7 @@ class SmartHomeSystemUtilities:
         (
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
-        ) = SmartHomeSystemUtilities.create_widget_checkbox_smart_device_switched_on(  # noqa: E501
+        ) = Utilities.create_checkbox_smart_device_switched_on(
             frame_switched_on, smart_device
         )
 
@@ -270,7 +270,7 @@ class SmartHomeSystemUtilities:
         (
             text_spinbox_consumption_rate,
             spinbox_consumption_rate,
-        ) = SmartHomeSystemUtilities.create_widget_spinbox_smart_plug_consumption_rate(  # noqa: E501
+        ) = Utilities.create_spinbox_smart_plug_consumption_rate(
             frame_consumption_rate, smart_plug
         )
 
@@ -302,7 +302,7 @@ class SmartHomeSystemUtilities:
         (
             text_option_menu_cooking_mode,
             option_menu_cooking_mode,
-        ) = SmartHomeSystemUtilities.create_widget_option_menu_smart_air_fryer_cooking_mode(  # noqa: E501
+        ) = Utilities.create_option_menu_smart_air_fryer_cooking_mode(
             frame_cooking_mode, smart_air_fryer
         )
 
@@ -469,7 +469,7 @@ class SmartHomeSystem:
         (
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
-        ) = SmartHomeSystemUtilities.create_widget_checkbox_smart_device_switched_on(  # noqa: E501
+        ) = Utilities.create_checkbox_smart_device_switched_on(
             smart_device_frame, smart_plug
         )
         smart_plug.set_bool_var(bool_checkbutton_switched_on)
@@ -482,7 +482,7 @@ class SmartHomeSystem:
         (
             text_spinbox_consumption_rate,
             spinbox_consumption_rate,
-        ) = SmartHomeSystemUtilities.create_widget_spinbox_smart_plug_consumption_rate(  # noqa: E501
+        ) = Utilities.create_spinbox_smart_plug_consumption_rate(
             smart_device_frame, smart_plug
         )
         smart_plug.set_string_var(text_spinbox_consumption_rate)
@@ -543,7 +543,7 @@ class SmartHomeSystem:
         (
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
-        ) = SmartHomeSystemUtilities.create_widget_checkbox_smart_device_switched_on(  # noqa: E501
+        ) = Utilities.create_checkbox_smart_device_switched_on(
             smart_device_frame, smart_air_fryer
         )
         smart_air_fryer.set_bool_var(bool_checkbutton_switched_on)
@@ -556,7 +556,7 @@ class SmartHomeSystem:
         (
             text_option_menu_cooking_mode,
             option_menu_cooking_mode,
-        ) = SmartHomeSystemUtilities.create_widget_option_menu_smart_air_fryer_cooking_mode(  # noqa: E501
+        ) = Utilities.create_option_menu_smart_air_fryer_cooking_mode(
             smart_device_frame, smart_air_fryer
         )
         smart_air_fryer.set_string_var(text_option_menu_cooking_mode)
@@ -646,7 +646,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         text_spinbox_consumption_rate: StringVar,
     ):
         try:
-            SmartHomeSystemUtilities.set_smart_plug(
+            Utilities.set_smart_plug(
                 smart_plug,
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
@@ -661,7 +661,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
     ):
-        SmartHomeSystemUtilities.set_smart_air_fryer(
+        Utilities.set_smart_air_fryer(
             smart_air_fryer,
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
@@ -671,14 +671,14 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     # Create widgets methods
     def edit_create_widgets(self, smart_device: SmartDevice):
         bool_checkbutton_switched_on = (
-            SmartHomeSystemUtilities.add_edit_create_widgets_smart_device(
+            Utilities.add_edit_create_widgets_smart_device(
                 self.edit_window_frame, smart_device
             )[0]
         )
 
         if isinstance(smart_device, SmartPlug):
             text_spinbox_consumption_rate = (
-                SmartHomeSystemUtilities.add_edit_create_widgets_smart_plug(
+                Utilities.add_edit_create_widgets_smart_plug(
                     self.edit_window_frame, smart_device
                 )[0]
             )
@@ -694,7 +694,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             edit_button_submit.pack(side=LEFT, anchor=W)
         elif isinstance(smart_device, SmartAirFryer):
             text_option_menu_cooking_mode = (
-                SmartHomeSystemUtilities.add_edit_create_widgets_smart_air_fryer(
+                Utilities.add_edit_create_widgets_smart_air_fryer(
                     self.edit_window_frame, smart_device
                 )
             )[0]
@@ -774,7 +774,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 )
                 # Set the options of the last selected smart device
                 try:
-                    SmartHomeSystemUtilities.set_smart_plug(
+                    Utilities.set_smart_plug(
                         smart_plug,
                         BooleanVar(
                             self.add_window_frame,
@@ -795,13 +795,13 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 (
                     text_option_menu_switched_on,
                     gui_objects_smart_device,
-                ) = SmartHomeSystemUtilities.add_edit_create_widgets_smart_device(  # noqa: E501
+                ) = Utilities.add_edit_create_widgets_smart_device(
                     self.add_window_frame, smart_plug
                 )
                 (
                     text_spinbox_consumption_rate,
                     gui_objects_smart_plug,
-                ) = SmartHomeSystemUtilities.add_edit_create_widgets_smart_plug(  # noqa: E501
+                ) = Utilities.add_edit_create_widgets_smart_plug(
                     self.add_window_frame, smart_plug
                 )
                 button_add_submit_smart_plug = Button(
@@ -826,7 +826,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             case "Smart Air Fryer":
                 smart_air_fryer = SmartAirFryer()
                 # Set the options of the last selected smart device
-                SmartHomeSystemUtilities.set_smart_air_fryer(
+                Utilities.set_smart_air_fryer(
                     smart_air_fryer,
                     BooleanVar(
                         self.add_window_frame,
@@ -845,14 +845,14 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 (
                     text_option_menu_switched_on,
                     gui_objects_smart_device,
-                ) = SmartHomeSystemUtilities.add_edit_create_widgets_smart_device(  # noqa: E501
+                ) = Utilities.add_edit_create_widgets_smart_device(
                     self.add_window_frame, smart_air_fryer
                 )
 
                 (
                     text_option_menu_cooking_mode,
                     gui_objects_smart_air_fryer,
-                ) = SmartHomeSystemUtilities.add_edit_create_widgets_smart_air_fryer(  # noqa: E501
+                ) = Utilities.add_edit_create_widgets_smart_air_fryer(
                     self.add_window_frame, smart_air_fryer
                 )
                 button_add_submit_smart_air_fryer = Button(
@@ -906,7 +906,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         text_spinbox_consumption_rate: StringVar,
     ):
         try:
-            SmartHomeSystemUtilities.set_smart_plug(
+            Utilities.set_smart_plug(
                 smart_plug,
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
@@ -936,7 +936,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
     ):
-        SmartHomeSystemUtilities.set_smart_air_fryer(
+        Utilities.set_smart_air_fryer(
             smart_air_fryer,
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
