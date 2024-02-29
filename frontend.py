@@ -729,6 +729,8 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             "smart_air_fryer_cooking_mode": CookingModes.HEALTHY.value,
         }
 
+        # Used to store the SmartHomeSystemAdd widgets,
+        # allows for easy deletion
         self.gui_objects = []
 
     def add_gui_objects(self, gui_objects):

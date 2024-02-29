@@ -5,8 +5,13 @@ from tkinter import BooleanVar, StringVar
 class SmartDevice:
     def __init__(self):
         self.switched_on = False
+        # bool_var is used to set and get the switched_on Checkbox value
+        # on the GUI
         self.bool_var: BooleanVar | None = None
+        # string_var is used to set and get the consumption_rate and cooking
+        # mode for a SmartPlug or SmartDevice on the GUI
         self.string_var: StringVar | None = None
+        # Used to store a SmartDevice's widgets, allow for easy deletion
         self.gui_objects = []
 
     def get_switched_on(self):
