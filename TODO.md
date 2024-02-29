@@ -2,8 +2,13 @@
 
 ## Clean up
 
+### Frontend
+
 - [ ] Switch from pack to grid
-- [ ] The code below most of the `isinstance` can be separated into separate functions
+
+### Backend
+
+- [ ] Move back-end-type logic to front-end (tkinter related)
 
 ## Challenge Features
 
