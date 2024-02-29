@@ -341,6 +341,7 @@ class SmartHomeSystem:
             "edit_button_image": PhotoImage(file="./assets/edit.png"),
             "delete_button_image": PhotoImage(file="./assets/delete.png"),
             "add_button_image": PhotoImage(file="./assets/add.png"),
+            "submit_button_image": PhotoImage(file="./assets/check.png"),
             "toggle_all_button_off": PhotoImage(
                 file="./assets/toggle-off.png"
             ),
@@ -389,7 +390,7 @@ class SmartHomeSystem:
             button_toggle_all.config(image=self.images["toggle_all_button_on"])
 
     def button_edit(self, smart_device: SmartDevice):
-        smart_home_system_edit = SmartHomeSystemEdit(self.win)
+        smart_home_system_edit = SmartHomeSystemEdit(self.win, self.images)
         smart_home_system_edit.edit_create_widgets(smart_device)
 
     def button_add(self):
@@ -583,13 +584,15 @@ class SmartHomeSystem:
 
 
 class SmartHomeSystemEdit(SmartHomeSystem):
-    def __init__(self, win):
+    def __init__(self, win, images):
         self.edit_window = Toplevel(win)
         self.edit_window.title("Edit")
         self.edit_window.resizable(False, False)
 
         self.edit_window_frame = Frame(self.edit_window)
         self.edit_window_frame.pack(padx=10, pady=10, fill="both")
+
+        self.images = images
 
     # Button methods
     def edit_button_submit_smart_plug(
@@ -638,6 +641,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             edit_button_submit = Button(
                 self.edit_window_frame,
                 text="Submit",
+                image=self.images["submit_button_image"],
                 command=lambda: self.edit_button_submit_smart_plug(
                     smart_device,
                     bool_checkbutton_switched_on,
@@ -654,6 +658,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             edit_button_submit = Button(
                 self.edit_window_frame,
                 text="Submit",
+                image=self.images["submit_button_image"],
                 command=lambda: self.edit_button_submit_smart_air_fryer(
                     smart_device,
                     bool_checkbutton_switched_on,
@@ -760,6 +765,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 button_add_submit_smart_plug = Button(
                     self.add_window_frame,
                     text="Submit",
+                    image=self.images["submit_button_image"],
                     command=lambda: self.add_button_submit_smart_plug(
                         smart_plug,
                         text_option_menu_switched_on,
@@ -811,6 +817,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 button_add_submit_smart_air_fryer = Button(
                     self.add_window_frame,
                     text="Submit",
+                    image=self.images["submit_button_image"],
                     command=lambda: self.add_button_submit_smart_air_fryer(
                         smart_air_fryer,
                         text_option_menu_switched_on,
