@@ -474,10 +474,12 @@ class SmartHomeSystem:
 
         label_smart_device_image.pack(side=LEFT, anchor=W)
         label_smart_device_title.pack(side=LEFT, anchor=W)
-        label_smart_device_switched_on.pack(side=LEFT, anchor=W, padx=(40, 0))
-        checkbutton_switched_on.pack(side=LEFT, anchor=W)
 
         if isinstance(smart_device, SmartPlug):
+            label_smart_device_switched_on.pack(
+                side=LEFT, anchor=W, padx=(40, 0)
+            )
+            checkbutton_switched_on.pack(side=LEFT, anchor=W)
             label_smart_plug_consumption_rate = Label(
                 smart_device_frame,
                 text="Consumption rate:",
@@ -496,6 +498,8 @@ class SmartHomeSystem:
                 [label_smart_plug_consumption_rate, spinbox_consumption_rate]
             )
         elif isinstance(smart_device, SmartAirFryer):
+            label_smart_device_switched_on.pack(side=LEFT, anchor=W)
+            checkbutton_switched_on.pack(side=LEFT, anchor=W)
             label_smart_air_fryer_cooking_mode = Label(
                 smart_device_frame,
                 text="Cooking mode:",
@@ -548,7 +552,7 @@ class SmartHomeSystem:
 
     def create_widgets_smart_air_fryer(self, smart_air_fryer: SmartAirFryer):
         smart_device_image = self.images["smart_air_fryer_image"]
-        smart_device_text_title = "Smart Plug:"
+        smart_device_text_title = "Smart Air Fryer:"
         self.create_widgets_smart_device(
             smart_air_fryer, smart_device_image, smart_device_text_title
         )
