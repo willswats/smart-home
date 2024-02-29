@@ -2,7 +2,6 @@
 
 ## Clean up
 
-- [ ] Change submit button to an image of a tick
 - [ ] Switch from pack to grid
 - [ ] The code below most of the `isinstance` can be separated into separate functions
 
