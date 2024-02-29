@@ -8,8 +8,8 @@ class SmartDevice:
         # bool_var is used to set and get the switched_on Checkbox value
         # on the GUI
         self.bool_var: BooleanVar | None = None
-        # string_var is used to set and get the consumption_rate and cooking
-        # mode for a SmartPlug or SmartDevice on the GUI
+        # string_var is used to set and get the consumption_rate Spinbox and
+        # cooking_mode OptionMenu for a SmartPlug or SmartAirFryer on the GUI
         self.string_var: StringVar | None = None
         # Used to store a SmartDevice's widgets, allow for easy deletion
         self.gui_objects = []
