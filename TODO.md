@@ -2,13 +2,7 @@
 
 ## Clean up
 
-### Frontend
-
 - [ ] Switch from pack to grid
-
-### Backend
-
-- [ ] Move back-end-type logic to front-end (tkinter related)
 
 ## Challenge Features
 
