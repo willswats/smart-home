@@ -2,7 +2,6 @@
 
 ## Clean up
 
-- [ ] Move backend code to frontend (anything relating to Tkinter):
 - [ ] Switch from pack to grid
 
 ## Challenge Features
