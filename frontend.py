@@ -468,7 +468,9 @@ class SmartHomeSystem:
             button_toggle_all.config(image=self.images["toggle_all_button_on"])
 
     def button_edit(self, smart_device: SmartDevice):
-        smart_home_system_edit = SmartHomeSystemEdit(self.win, self.images)
+        smart_home_system_edit = SmartHomeSystemEdit(
+            self.win, self.smart_devices_gui, self.images
+        )
         smart_home_system_edit.edit_create_widgets(smart_device)
 
     def button_add(self):
@@ -476,8 +478,8 @@ class SmartHomeSystem:
             self.win,
             self.main_frame,
             self.home,
-            self.smart_devices_gui,
             self.smart_device_frames,
+            self.smart_devices_gui,
             self.images,
         )
         smart_home_system_add.add_create_widgets()
@@ -675,7 +677,7 @@ class SmartHomeSystem:
 
 
 class SmartHomeSystemEdit(SmartHomeSystem):
-    def __init__(self, win, images):
+    def __init__(self, win, smart_devices_gui, images):
         self.edit_window = Toplevel(win)
         self.edit_window.title("Edit")
         self.edit_window.resizable(False, False)
@@ -683,6 +685,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self.edit_window_frame = Frame(self.edit_window)
         self.edit_window_frame.pack(padx=10, pady=10, fill="both")
 
+        self.smart_devices_gui = smart_devices_gui
         self.images = images
 
     # Edit widget submit methods
@@ -779,18 +782,18 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         win: Tk,
         main_frame: Frame,
         home: SmartHome,
-        smart_devices_gui: SmartDevicesGui,
         smart_device_frames: Frame,
+        smart_devices_gui: SmartDevicesGui,
         images: Dict[str, PhotoImage],
     ):
         self.win = win
         self.main_frame = main_frame
 
         self.home = home
-        self.smart_devices_gui = smart_devices_gui
         self.smart_devices = self.home.get_devices()
         self.smart_device_frames = smart_device_frames
 
+        self.smart_devices_gui = smart_devices_gui
         self.images = images
 
         self.add_window = Toplevel(win)
