@@ -1,52 +1,15 @@
 from enum import Enum
-from tkinter import BooleanVar, StringVar
 
 
 class SmartDevice:
     def __init__(self):
         self.switched_on = False
-        # bool_var is used to set and get the switched_on Checkbox value
-        # on the GUI
-        self.bool_var: BooleanVar | None = None
-        # string_var is used to set and get the consumption_rate Spinbox and
-        # cooking_mode OptionMenu for a SmartPlug or SmartAirFryer on the GUI
-        self.string_var: StringVar | None = None
-        # Used to store a SmartDevice's widgets, allow for easy deletion
-        self.gui_objects = []
 
     def get_switched_on(self):
         return self.switched_on
 
     def toggle_switch(self):
         self.switched_on = not self.switched_on
-
-    def get_string_var(self):
-        return self.string_var
-
-    def set_string_var(self, string_var):
-        self.string_var = string_var
-
-    def set_string_var_value(self, value):
-        if self.string_var is not None:
-            self.string_var.set(value)
-
-    def get_bool_var(self):
-        return self.bool_var
-
-    def set_bool_var(self, bool_var):
-        self.bool_var = bool_var
-
-    def set_bool_var_value(self, value):
-        if self.bool_var is not None:
-            self.bool_var.set(value)
-
-    def add_gui_objects(self, gui_objects):
-        for gui_object in gui_objects:
-            self.gui_objects.append(gui_object)
-
-    def delete_gui_objects(self):
-        for gui_object in self.gui_objects:
-            gui_object.destroy()
 
 
 class SmartPlug(SmartDevice):
