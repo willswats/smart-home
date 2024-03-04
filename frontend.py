@@ -348,7 +348,7 @@ class Utilities:
                 smart_plug, text_spinbox_consumption_rate
             )
         except Exception as error:
-            print("Error", error)
+            print("Error:", error)
 
     @staticmethod
     def set_smart_air_fryer_cooking_mode(
