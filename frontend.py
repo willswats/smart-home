@@ -116,13 +116,91 @@ class SmartDeviceGui:
         if self.bool_var is not None:
             self.bool_var.set(value)
 
+    def set_smart_device_switched_on(
+        self,
+        bool_checkbutton_switched_on: BooleanVar,
+    ):
+        switched_on = bool_checkbutton_switched_on.get()
+        if switched_on != self.smart_device.get_switched_on():
+            self.smart_device.toggle_switch()
+
     def add_widgets(self, widgets):
         for widget in widgets:
             self.widgets.append(widget)
 
-    def delete_gui_objects(self):
+    def delete_widgets(self):
         for widget in self.widgets:
             widget.destroy()
+
+    def update_smart_device(self):
+        self.set_bool_var_value(self.smart_device.get_switched_on())
+        if isinstance(self.smart_device, SmartPlug):
+            self.set_string_var_value(self.smart_device.get_consumption_rate())
+        elif isinstance(self.smart_device, SmartAirFryer):
+            self.set_string_var_value(self.smart_device.get_cooking_mode())
+
+
+class SmartPlugGui(SmartDeviceGui):
+    def __init__(self, smart_plug: SmartPlug):
+        super().__init__(smart_plug)
+        self.smart_device = smart_plug
+
+    def get_smart_device(self):
+        return self.smart_device
+
+    def set_smart_plug_consumption_rate(
+        self,
+        text_spinbox_consumption_rate: StringVar,
+    ):
+        text_consumption_rate = text_spinbox_consumption_rate.get()
+        try:
+            self.smart_device.set_consumption_rate(int(text_consumption_rate))
+        except Exception as error:
+            raise error
+
+    # This is needed for the Spinbox bind on return, because
+    # I am raising an error in set_smart_plug_consumption_rate to ensure
+    # that a device is not added, even when the validation fails
+    def set_smart_plug_consumption_rate_validate(
+        self,
+        text_spinbox_consumption_rate: StringVar,
+    ):
+        try:
+            self.set_smart_plug_consumption_rate(text_spinbox_consumption_rate)
+        except Exception as error:
+            print("Error:", error)
+
+    def set_smart_plug(
+        self,
+        bool_checkbutton_switched_on: BooleanVar,
+        text_spinbox_consumption_rate: StringVar,
+    ):
+        self.set_smart_device_switched_on(bool_checkbutton_switched_on)
+        self.set_smart_plug_consumption_rate(text_spinbox_consumption_rate)
+
+
+class SmartAirFryerGui(SmartDeviceGui):
+    def __init__(self, smart_air_fryer: SmartAirFryer):
+        super().__init__(smart_air_fryer)
+        self.smart_device = smart_air_fryer
+
+    def get_smart_device(self):
+        return self.smart_device
+
+    def set_smart_air_fryer_cooking_mode(
+        self,
+        text_option_menu_cooking_mode: StringVar,
+    ):
+        text_cooking_mode = text_option_menu_cooking_mode.get()
+        self.smart_device.set_cooking_mode(text_cooking_mode)
+
+    def set_smart_air_fryer(
+        self,
+        bool_checkbutton_switched_on: BooleanVar,
+        text_option_menu_cooking_mode: StringVar,
+    ):
+        self.set_smart_device_switched_on(bool_checkbutton_switched_on)
+        self.set_smart_air_fryer_cooking_mode(text_option_menu_cooking_mode)
 
 
 class SmartDevicesGui:
@@ -132,24 +210,25 @@ class SmartDevicesGui:
     def add_smart_device_gui(self, smart_device_gui: SmartDeviceGui):
         self.smart_devices_gui.append(smart_device_gui)
 
-    def get_corresponding_smart_device_gui(self, smart_device: SmartDevice):
-        for smart_device_gui in self.smart_devices_gui:
-            if smart_device_gui.get_smart_device() == smart_device:
-                return smart_device_gui
+    def delete_smart_device_gui(self, smart_device_gui: SmartDeviceGui):
+        self.smart_devices_gui.remove(smart_device_gui)
 
-    def delete_corresponding_smart_device_gui(self, smart_device: SmartDevice):
+        smart_device_gui_index = self.smart_devices_gui.index(smart_device_gui)
+        self.smart_devices_gui[smart_device_gui_index].delete_gui_objects()
+
+    def update_all_smart_devices(self):
         for smart_device_gui in self.smart_devices_gui:
-            if smart_device_gui.get_smart_device() == smart_device:
-                smart_device_gui.delete_gui_objects()
-                self.smart_devices_gui.remove(smart_device_gui)
+            smart_device_gui.update_smart_device()
 
 
 class Utilities:
     # General create widget methods
     @staticmethod
     def create_checkbox_smart_device_switched_on(
-        frame: Frame, smart_device: SmartDevice
+        frame: Frame, smart_device_gui: SmartDeviceGui
     ):
+        smart_device = smart_device_gui.get_smart_device()
+
         bool_checkbutton_switched_on = BooleanVar(
             frame, smart_device.get_switched_on()
         )
@@ -158,8 +237,8 @@ class Utilities:
             variable=bool_checkbutton_switched_on,
             onvalue=True,
             offvalue=False,
-            command=lambda: Utilities.set_smart_device_switched_on(
-                smart_device, bool_checkbutton_switched_on
+            command=lambda: smart_device_gui.set_smart_device_switched_on(
+                bool_checkbutton_switched_on
             ),
         )
 
@@ -167,8 +246,9 @@ class Utilities:
 
     @staticmethod
     def create_spinbox_smart_plug_consumption_rate(
-        frame: Frame, smart_plug: SmartPlug
+        frame: Frame, smart_plug_gui: SmartPlugGui
     ):
+        smart_plug = smart_plug_gui.get_smart_device()
         text_spinbox_consumption_rate = StringVar(
             frame,
             f"{smart_plug.get_consumption_rate()}",
@@ -179,16 +259,16 @@ class Utilities:
             from_=0,
             to=150,
             width=9,
-            command=lambda: Utilities.set_smart_plug_consumption_rate(
-                smart_plug, text_spinbox_consumption_rate
+            command=lambda: smart_plug_gui.set_smart_plug_consumption_rate(
+                text_spinbox_consumption_rate
             ),
         )
         # Spinbox command is only executed when arrows are pressed, this
         # creates a way to submit upon pressing return
         spinbox_consumption_rate.bind(
             "<Return>",
-            lambda _: Utilities.set_smart_plug_consumption_rate_validate(
-                smart_plug, text_spinbox_consumption_rate
+            lambda _: smart_plug_gui.set_smart_plug_consumption_rate_validate(
+                text_spinbox_consumption_rate
             ),
         )
 
@@ -196,8 +276,10 @@ class Utilities:
 
     @staticmethod
     def create_option_menu_smart_air_fryer_cooking_mode(
-        frame: Frame, smart_air_fryer: SmartAirFryer
+        frame: Frame, smart_air_fryer_gui: SmartAirFryerGui
     ):
+        smart_air_fryer = smart_air_fryer_gui.get_smart_device()
+
         cooking_mode_options = [
             cooking_mode.value for cooking_mode in CookingModes
         ]
@@ -210,8 +292,8 @@ class Utilities:
             frame,
             text_option_menu_cooking_mode,
             *cooking_mode_options,
-            command=lambda _: Utilities.set_smart_air_fryer_cooking_mode(
-                smart_air_fryer, text_option_menu_cooking_mode
+            command=lambda _: smart_air_fryer_gui.set_smart_air_fryer_cooking_mode(  # noqa: E501
+                text_option_menu_cooking_mode
             ),
         )
         return text_option_menu_cooking_mode, option_menu_cooking_mode
@@ -219,7 +301,7 @@ class Utilities:
     # Add & edit create widgets methods
     @staticmethod
     def add_edit_create_widgets_smart_device(
-        frame: Frame, smart_device: SmartDevice
+        frame: Frame, smart_device_gui: SmartDeviceGui
     ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
 
@@ -233,7 +315,7 @@ class Utilities:
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
         ) = Utilities.create_checkbox_smart_device_switched_on(
-            frame_switched_on, smart_device
+            frame_switched_on, smart_device_gui
         )
 
         label_switched_on.pack(side=LEFT, anchor=W)
@@ -251,7 +333,7 @@ class Utilities:
 
     @staticmethod
     def add_edit_create_widgets_smart_plug(
-        frame: Frame, smart_plug: SmartPlug
+        frame: Frame, smart_plug_gui: SmartPlugGui
     ) -> tuple[StringVar, list[Frame | Label | Spinbox]]:
         frame_consumption_rate = Frame(frame)
 
@@ -265,7 +347,7 @@ class Utilities:
             text_spinbox_consumption_rate,
             spinbox_consumption_rate,
         ) = Utilities.create_spinbox_smart_plug_consumption_rate(
-            frame_consumption_rate, smart_plug
+            frame_consumption_rate, smart_plug_gui
         )
 
         label_consumption_rate.pack(side=LEFT, anchor=W)
@@ -283,7 +365,7 @@ class Utilities:
 
     @staticmethod
     def add_edit_create_widgets_smart_air_fryer(
-        frame: Frame, smart_air_fryer: SmartAirFryer
+        frame: Frame, smart_air_fryer_gui: SmartAirFryerGui
     ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
         frame_cooking_mode = Frame(frame)
 
@@ -297,7 +379,7 @@ class Utilities:
             text_option_menu_cooking_mode,
             option_menu_cooking_mode,
         ) = Utilities.create_option_menu_smart_air_fryer_cooking_mode(
-            frame_cooking_mode, smart_air_fryer
+            frame_cooking_mode, smart_air_fryer_gui
         )
 
         label_cooking_modes.pack(side=LEFT, anchor=W)
@@ -312,101 +394,6 @@ class Utilities:
                 option_menu_cooking_mode,
             ],
         )
-
-    # Set methods for widgets
-    @staticmethod
-    def set_smart_device_switched_on(
-        smart_plug: SmartDevice,
-        bool_checkbutton_switched_on: BooleanVar,
-    ):
-        switched_on = bool_checkbutton_switched_on.get()
-        if switched_on != smart_plug.get_switched_on():
-            smart_plug.toggle_switch()
-
-    @staticmethod
-    def set_smart_plug_consumption_rate(
-        smart_plug: SmartPlug,
-        text_spinbox_consumption_rate: StringVar,
-    ):
-        text_consumption_rate = text_spinbox_consumption_rate.get()
-        try:
-            smart_plug.set_consumption_rate(int(text_consumption_rate))
-        except Exception as error:
-            raise error
-
-    # This is needed for the Spinbox bind on return, because
-    # I am raising an error in set_smart_plug_consumption_rate to ensure
-    # that a device is not added, even when the validation fails
-    # (by using try except later on in the code)
-    @staticmethod
-    def set_smart_plug_consumption_rate_validate(
-        smart_plug: SmartPlug,
-        text_spinbox_consumption_rate: StringVar,
-    ):
-        try:
-            Utilities.set_smart_plug_consumption_rate(
-                smart_plug, text_spinbox_consumption_rate
-            )
-        except Exception as error:
-            print("Error:", error)
-
-    @staticmethod
-    def set_smart_air_fryer_cooking_mode(
-        smart_air_fryer: SmartAirFryer,
-        text_option_menu_cooking_mode: StringVar,
-    ):
-        text_cooking_mode = text_option_menu_cooking_mode.get()
-        smart_air_fryer.set_cooking_mode(text_cooking_mode)
-
-    @staticmethod
-    def set_smart_plug(
-        smart_plug: SmartPlug,
-        bool_checkbutton_switched_on: BooleanVar,
-        text_spinbox_consumption_rate: StringVar,
-    ):
-        Utilities.set_smart_device_switched_on(
-            smart_plug, bool_checkbutton_switched_on
-        )
-        Utilities.set_smart_plug_consumption_rate(
-            smart_plug, text_spinbox_consumption_rate
-        )
-
-    @staticmethod
-    def set_smart_air_fryer(
-        smart_air_fryer: SmartAirFryer,
-        bool_checkbutton_switched_on: BooleanVar,
-        text_option_menu_cooking_mode: StringVar,
-    ):
-        Utilities.set_smart_device_switched_on(
-            smart_air_fryer, bool_checkbutton_switched_on
-        )
-        Utilities.set_smart_air_fryer_cooking_mode(
-            smart_air_fryer, text_option_menu_cooking_mode
-        )
-
-    # Update methods
-    @staticmethod
-    def update_smart_device(
-        smart_device: SmartDevice, smart_devices_gui: SmartDevicesGui
-    ):
-        smart_device_gui = (
-            smart_devices_gui.get_corresponding_smart_device_gui(smart_device)
-        )
-        if smart_device_gui is not None:
-            smart_device_gui.set_bool_var_value(smart_device.get_switched_on())
-            if isinstance(smart_device, SmartPlug):
-                smart_device_gui.set_string_var_value(
-                    smart_device.get_consumption_rate()
-                )
-            elif isinstance(smart_device, SmartAirFryer):
-                smart_device_gui.set_string_var_value(
-                    smart_device.get_cooking_mode()
-                )
-
-    @staticmethod
-    def update_all_smart_devices(smart_devices, smart_devices_gui):
-        for smart_device in smart_devices:
-            Utilities.update_smart_device(smart_device, smart_devices_gui)
 
 
 class SmartHomeSystem:
@@ -443,22 +430,20 @@ class SmartHomeSystem:
         self.win.mainloop()
 
     # Widget submit methods
-    def button_toggle(self, smart_device: SmartDevice):
+    def button_toggle(self, smart_device_gui: SmartDeviceGui):
+        smart_device = smart_device_gui.get_smart_device()
         smart_device.toggle_switch()
-        Utilities.update_smart_device(smart_device, self.smart_devices_gui)
+        smart_device_gui.update_smart_device()
 
-    def button_delete(self, smart_device: SmartDevice):
+    def button_delete(self, smart_device_gui: SmartDeviceGui):
+        smart_device = smart_device_gui.get_smart_device()
         smart_device_index = self.smart_devices.index(smart_device)
         self.home.remove_device_at(smart_device_index)
-        self.smart_devices_gui.delete_corresponding_smart_device_gui(
-            smart_device
-        )
+        smart_device_gui.delete_widgets()
 
     def button_toggle_all(self, button_toggle_all):
         self.home.toggle_switch_all()
-        Utilities.update_all_smart_devices(
-            self.smart_devices, self.smart_devices_gui
-        )
+        self.smart_devices_gui.update_all_smart_devices()
 
         if self.home.get_switch_all_state() is False:
             button_toggle_all.config(
@@ -467,11 +452,11 @@ class SmartHomeSystem:
         elif self.home.get_switch_all_state() is True:
             button_toggle_all.config(image=self.images["toggle_all_button_on"])
 
-    def button_edit(self, smart_device: SmartDevice):
+    def button_edit(self, smart_device_gui: SmartDeviceGui):
         smart_home_system_edit = SmartHomeSystemEdit(
             self.win, self.smart_devices_gui, self.images
         )
-        smart_home_system_edit.edit_create_widgets(smart_device)
+        smart_home_system_edit.edit_create_widgets(smart_device_gui)
 
     def button_add(self):
         smart_home_system_add = SmartHomeSystemAdd(
@@ -486,31 +471,25 @@ class SmartHomeSystem:
 
     # Create widgets methods
     def create_widgets_buttons_smart_device(
-        self, frame: Frame, smart_device: SmartDevice
+        self, frame: Frame, smart_device_gui: SmartDeviceGui
     ):
         button_toggle_smart_device = Button(
             frame,
             text="Toggle",
             image=self.images["toggle_button_image"],
-            command=lambda smart_device=smart_device: self.button_toggle(
-                smart_device
-            ),
+            command=lambda: self.button_toggle(smart_device_gui),
         )
         button_edit_smart_device = Button(
             frame,
             text="Edit",
             image=self.images["edit_button_image"],
-            command=lambda smart_device=smart_device: self.button_edit(
-                smart_device
-            ),
+            command=lambda: self.button_edit(smart_device_gui),
         )
         button_delete_smart_device = Button(
             frame,
             text="Delete",
             image=self.images["delete_button_image"],
-            command=lambda smart_device=smart_device: self.button_delete(
-                smart_device
-            ),
+            command=lambda: self.button_delete(smart_device_gui),
         )
 
         button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=5)
@@ -525,12 +504,11 @@ class SmartHomeSystem:
 
     def create_widgets_smart_device(
         self,
-        smart_device: SmartDevice,
+        smart_device_gui: SmartDeviceGui,
         smart_device_image: PhotoImage,
         smart_device_text_title: str,
     ):
         smart_device_frame = Frame(self.smart_device_frames)
-        smart_device_gui = SmartDeviceGui(smart_device)
 
         label_smart_device_image = Label(
             smart_device_frame, image=smart_device_image
@@ -550,14 +528,14 @@ class SmartHomeSystem:
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
         ) = Utilities.create_checkbox_smart_device_switched_on(
-            smart_device_frame, smart_device
+            smart_device_frame, smart_device_gui
         )
         smart_device_gui.set_bool_var(bool_checkbutton_switched_on)
 
         label_smart_device_image.pack(side=LEFT, anchor=W)
         label_smart_device_title.pack(side=LEFT, anchor=W)
 
-        if isinstance(smart_device, SmartPlug):
+        if isinstance(smart_device_gui, SmartPlugGui):
             label_smart_device_switched_on.pack(
                 side=LEFT, anchor=W, padx=(40, 0)
             )
@@ -572,7 +550,7 @@ class SmartHomeSystem:
                 text_spinbox_consumption_rate,
                 spinbox_consumption_rate,
             ) = Utilities.create_spinbox_smart_plug_consumption_rate(
-                smart_device_frame, smart_device
+                smart_device_frame, smart_device_gui
             )
             smart_device_gui.set_string_var(text_spinbox_consumption_rate)
             label_smart_plug_consumption_rate.pack(side=LEFT, anchor=W)
@@ -580,7 +558,7 @@ class SmartHomeSystem:
             smart_device_gui.add_widgets(
                 [label_smart_plug_consumption_rate, spinbox_consumption_rate]
             )
-        elif isinstance(smart_device, SmartAirFryer):
+        elif isinstance(smart_device_gui, SmartAirFryerGui):
             label_smart_device_switched_on.pack(side=LEFT, anchor=W)
             checkbutton_switched_on.pack(side=LEFT, anchor=W)
 
@@ -593,7 +571,7 @@ class SmartHomeSystem:
                 text_option_menu_cooking_mode,
                 option_menu_cooking_mode,
             ) = Utilities.create_option_menu_smart_air_fryer_cooking_mode(
-                smart_device_frame, smart_device
+                smart_device_frame, smart_device_gui
             )
             smart_device_gui.set_string_var(text_option_menu_cooking_mode)
             label_smart_air_fryer_cooking_mode.pack(
@@ -609,7 +587,7 @@ class SmartHomeSystem:
             button_edit_smart_device,
             button_delete_smart_device,
         ) = self.create_widgets_buttons_smart_device(
-            smart_device_frame, smart_device
+            smart_device_frame, smart_device_gui
         )
 
         smart_device_frame.pack(fill="both")
@@ -628,18 +606,20 @@ class SmartHomeSystem:
         )
         self.smart_devices_gui.add_smart_device_gui(smart_device_gui)
 
-    def create_widgets_smart_plug(self, smart_plug: SmartPlug):
+    def create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
         smart_device_image = self.images["smart_plug_image"]
         smart_device_text_title = "Smart Plug:"
         self.create_widgets_smart_device(
-            smart_plug, smart_device_image, smart_device_text_title
+            smart_plug_gui, smart_device_image, smart_device_text_title
         )
 
-    def create_widgets_smart_air_fryer(self, smart_air_fryer: SmartAirFryer):
+    def create_widgets_smart_air_fryer(
+        self, smart_air_fryer_gui: SmartAirFryerGui
+    ):
         smart_device_image = self.images["smart_air_fryer_image"]
         smart_device_text_title = "Smart Air Fryer:"
         self.create_widgets_smart_device(
-            smart_air_fryer, smart_device_image, smart_device_text_title
+            smart_air_fryer_gui, smart_device_image, smart_device_text_title
         )
 
     def create_widgets(self):
@@ -668,9 +648,11 @@ class SmartHomeSystem:
 
         for smart_device in self.smart_devices:
             if isinstance(smart_device, SmartPlug):
-                self.create_widgets_smart_plug(smart_device)
+                smart_plug_gui = SmartPlugGui(smart_device)
+                self.create_widgets_smart_plug(smart_plug_gui)
             elif isinstance(smart_device, SmartAirFryer):
-                self.create_widgets_smart_air_fryer(smart_device)
+                smart_air_fryer_gui = SmartAirFryerGui(smart_device)
+                self.create_widgets_smart_air_fryer(smart_air_fryer_gui)
 
         self.smart_device_frames.pack()
         button_add.pack(side=LEFT)
@@ -691,40 +673,40 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     # Edit widget submit methods
     def edit_button_submit_smart_plug(
         self,
-        smart_plug: SmartPlug,
+        smart_plug_gui: SmartPlugGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_spinbox_consumption_rate: StringVar,
     ):
         try:
-            Utilities.set_smart_plug(
-                smart_plug,
+            smart_plug_gui.set_smart_plug(
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
             )
-            Utilities.update_smart_device(smart_plug, self.smart_devices_gui)
+            smart_plug_gui.update_smart_device()
         except Exception as error:
             print("Error:", error)
 
     def edit_button_submit_smart_air_fryer(
         self,
-        smart_air_fryer: SmartAirFryer,
+        smart_air_fryer_gui: SmartAirFryerGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
     ):
-        Utilities.set_smart_air_fryer(
-            smart_air_fryer,
+        smart_air_fryer_gui.set_smart_air_fryer(
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
         )
-        Utilities.update_smart_device(smart_air_fryer, self.smart_devices_gui)
+        smart_air_fryer_gui.update_smart_device()
 
     # Edit create widgets methods
     def edit_create_widgets_smart_plug(
-        self, smart_device, bool_checkbutton_switched_on
+        self,
+        smart_plug_gui: SmartPlugGui,
+        bool_checkbutton_switched_on: BooleanVar,
     ):
         text_spinbox_consumption_rate = (
             Utilities.add_edit_create_widgets_smart_plug(
-                self.edit_window_frame, smart_device
+                self.edit_window_frame, smart_plug_gui
             )[0]
         )
         edit_button_submit = Button(
@@ -732,7 +714,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             text="Submit",
             image=self.images["submit_button_image"],
             command=lambda: self.edit_button_submit_smart_plug(
-                smart_device,
+                smart_plug_gui,
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
             ),
@@ -740,11 +722,13 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         edit_button_submit.pack(side=LEFT, anchor=W)
 
     def edit_create_widgets_smart_air_fryer(
-        self, smart_device, bool_checkbutton_switched_on
+        self,
+        smart_air_fryer_gui: SmartAirFryerGui,
+        bool_checkbutton_switched_on: BooleanVar,
     ):
         text_option_menu_cooking_mode = (
             Utilities.add_edit_create_widgets_smart_air_fryer(
-                self.edit_window_frame, smart_device
+                self.edit_window_frame, smart_air_fryer_gui
             )
         )[0]
         edit_button_submit = Button(
@@ -752,27 +736,27 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             text="Submit",
             image=self.images["submit_button_image"],
             command=lambda: self.edit_button_submit_smart_air_fryer(
-                smart_device,
+                smart_air_fryer_gui,
                 bool_checkbutton_switched_on,
                 text_option_menu_cooking_mode,
             ),
         )
         edit_button_submit.pack(side=LEFT, anchor=W)
 
-    def edit_create_widgets(self, smart_device: SmartDevice):
+    def edit_create_widgets(self, smart_device_gui: SmartDeviceGui):
         bool_checkbutton_switched_on = (
             Utilities.add_edit_create_widgets_smart_device(
-                self.edit_window_frame, smart_device
+                self.edit_window_frame, smart_device_gui
             )[0]
         )
 
-        if isinstance(smart_device, SmartPlug):
+        if isinstance(smart_device_gui, SmartPlugGui):
             self.edit_create_widgets_smart_plug(
-                smart_device, bool_checkbutton_switched_on
+                smart_device_gui, bool_checkbutton_switched_on
             )
-        elif isinstance(smart_device, SmartAirFryer):
+        elif isinstance(smart_device_gui, SmartAirFryerGui):
             self.edit_create_widgets_smart_air_fryer(
-                smart_device, bool_checkbutton_switched_on
+                smart_device_gui, bool_checkbutton_switched_on
             )
 
 
@@ -864,26 +848,26 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         match selected_smart_device:
             case "Smart Plug":
-                smart_plug = SmartPlug(150)
-                self.add_create_widgets_smart_plug(smart_plug)
+                smart_plug_gui = SmartPlugGui(SmartPlug(150))
+                self.add_create_widgets_smart_plug(smart_plug_gui)
             case "Smart Air Fryer":
-                smart_air_fryer = SmartAirFryer()
-                self.add_create_widgets_smart_air_fryer(smart_air_fryer)
+                smart_air_fryer_gui = SmartAirFryerGui(SmartAirFryer())
+                self.add_create_widgets_smart_air_fryer(smart_air_fryer_gui)
 
     def add_button_submit_smart_plug(
         self,
-        smart_plug: SmartPlug,
+        smart_plug_gui: SmartPlugGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_spinbox_consumption_rate: StringVar,
     ):
         try:
-            Utilities.set_smart_plug(
-                smart_plug,
+            smart_plug_gui.set_smart_plug(
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
             )
+            smart_plug = smart_plug_gui.get_smart_device()
             self.home.add_device(smart_plug)
-            self.create_widgets_smart_plug(smart_plug)
+            self.create_widgets_smart_plug(smart_plug_gui)
 
             # Save the options of the last selected smart device
             self.set_selected_smart_plug(
@@ -903,18 +887,18 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
     def add_button_submit_smart_air_fryer(
         self,
-        smart_air_fryer: SmartAirFryer,
+        smart_air_fryer_gui: SmartAirFryerGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
     ):
-        Utilities.set_smart_air_fryer(
-            smart_air_fryer,
+        smart_air_fryer_gui.set_smart_air_fryer(
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
         )
 
+        smart_air_fryer = smart_air_fryer_gui.get_smart_device()
         self.home.add_device(smart_air_fryer)
-        self.create_widgets_smart_air_fryer(smart_air_fryer)
+        self.create_widgets_smart_air_fryer(smart_air_fryer_gui)
         # Save the options of the last selected smart device
         self.set_selected_smart_air_fryer(
             bool_checkbutton_switched_on, text_option_menu_cooking_mode
@@ -928,11 +912,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         )
 
     # Add create widgets methods
-    def add_create_widgets_smart_plug(self, smart_plug: SmartPlug):
+    def add_create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
         # Set the options of the last selected smart device
         try:
-            Utilities.set_smart_plug(
-                smart_plug,
+            smart_plug_gui.set_smart_plug(
                 BooleanVar(
                     self.add_window_frame,
                     self.smart_device_states["smart_plug_switched_on"],
@@ -951,13 +934,13 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             text_option_menu_switched_on,
             gui_objects_smart_device,
         ) = Utilities.add_edit_create_widgets_smart_device(
-            self.add_window_frame, smart_plug
+            self.add_window_frame, smart_plug_gui
         )
         (
             text_spinbox_consumption_rate,
             gui_objects_smart_plug,
         ) = Utilities.add_edit_create_widgets_smart_plug(
-            self.add_window_frame, smart_plug
+            self.add_window_frame, smart_plug_gui
         )
 
         button_add_submit_smart_plug = Button(
@@ -965,7 +948,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             text="Submit",
             image=self.images["submit_button_image"],
             command=lambda: self.add_button_submit_smart_plug(
-                smart_plug,
+                smart_plug_gui,
                 text_option_menu_switched_on,
                 text_spinbox_consumption_rate,
             ),
@@ -980,10 +963,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             ]
         )
 
-    def add_create_widgets_smart_air_fryer(self, smart_air_fryer):
+    def add_create_widgets_smart_air_fryer(self, smart_air_fryer_gui):
         # Set the options of the last selected smart device
-        Utilities.set_smart_air_fryer(
-            smart_air_fryer,
+        smart_air_fryer_gui.set_smart_air_fryer(
             BooleanVar(
                 self.add_window_frame,
                 self.smart_device_states["smart_air_fryer_switched_on"],
@@ -998,14 +980,14 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             text_option_menu_switched_on,
             gui_objects_smart_device,
         ) = Utilities.add_edit_create_widgets_smart_device(
-            self.add_window_frame, smart_air_fryer
+            self.add_window_frame, smart_air_fryer_gui
         )
 
         (
             text_option_menu_cooking_mode,
             gui_objects_smart_air_fryer,
         ) = Utilities.add_edit_create_widgets_smart_air_fryer(
-            self.add_window_frame, smart_air_fryer
+            self.add_window_frame, smart_air_fryer_gui
         )
 
         button_add_submit_smart_air_fryer = Button(
@@ -1013,7 +995,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             text="Submit",
             image=self.images["submit_button_image"],
             command=lambda: self.add_button_submit_smart_air_fryer(
-                smart_air_fryer,
+                smart_air_fryer_gui,
                 text_option_menu_switched_on,
                 text_option_menu_cooking_mode,
             ),
