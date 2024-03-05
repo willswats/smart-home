@@ -212,9 +212,7 @@ class SmartDevicesGui:
 
     def delete_smart_device_gui(self, smart_device_gui: SmartDeviceGui):
         self.smart_devices_gui.remove(smart_device_gui)
-
-        smart_device_gui_index = self.smart_devices_gui.index(smart_device_gui)
-        self.smart_devices_gui[smart_device_gui_index].delete_gui_objects()
+        smart_device_gui.delete_widgets()
 
     def update_all_smart_devices(self):
         for smart_device_gui in self.smart_devices_gui:
@@ -439,7 +437,7 @@ class SmartHomeSystem:
         smart_device = smart_device_gui.get_smart_device()
         smart_device_index = self.smart_devices.index(smart_device)
         self.home.remove_device_at(smart_device_index)
-        smart_device_gui.delete_widgets()
+        self.smart_devices_gui.delete_smart_device_gui(smart_device_gui)
 
     def button_toggle_all(self, button_toggle_all):
         self.home.toggle_switch_all()
@@ -774,7 +772,6 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.main_frame = main_frame
 
         self.home = home
-        self.smart_devices = self.home.get_devices()
         self.smart_device_frames = smart_device_frames
 
         self.smart_devices_gui = smart_devices_gui
