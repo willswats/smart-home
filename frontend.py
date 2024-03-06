@@ -441,7 +441,7 @@ class SmartHomeSystem:
 
         self.smart_device_frames = Frame(self.main_frame)
 
-        self.smart_devices_gui = SmartDevicesStateManager(home)
+        self.smart_devices_state_manager = SmartDevicesStateManager(home)
 
         self.images = {
             "smart_plug_image": PhotoImage(file="./assets/plug.png"),
@@ -469,12 +469,12 @@ class SmartHomeSystem:
         smart_device_gui.toggle_smart_device()
 
     def button_delete(self, smart_device_gui: SmartDeviceGui):
-        self.smart_devices_gui.delete_smart_device(smart_device_gui)
+        self.smart_devices_state_manager.delete_smart_device(smart_device_gui)
 
     def button_toggle_all(self, button_toggle_all):
         image_off = self.images["toggle_all_button_off"]
         image_on = self.images["toggle_all_button_on"]
-        self.smart_devices_gui.toggle_all_smart_devices(
+        self.smart_devices_state_manager.toggle_all_smart_devices(
             button_toggle_all, image_off, image_on
         )
 
@@ -487,7 +487,7 @@ class SmartHomeSystem:
             self.win,
             self.main_frame,
             self.smart_device_frames,
-            self.smart_devices_gui,
+            self.smart_devices_state_manager,
             self.images,
         )
         smart_home_system_add.add_create_widgets()
@@ -664,7 +664,9 @@ class SmartHomeSystem:
         button_toggle_all.pack(side=LEFT)
         button_top_frame.pack(anchor=W)
 
-        for smart_device_gui in self.smart_devices_gui.get_smart_devices_gui():
+        for (
+            smart_device_gui
+        ) in self.smart_devices_state_manager.get_smart_devices_gui():
             if isinstance(smart_device_gui, SmartPlugGui):
                 self.create_widgets_smart_plug(smart_device_gui)
             elif isinstance(smart_device_gui, SmartAirFryerGui):
@@ -781,7 +783,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         win: Tk,
         main_frame: Frame,
         smart_device_frames: Frame,
-        smart_devices_gui: SmartDevicesStateManager,
+        smart_devices_state_manager: SmartDevicesStateManager,
         images: Dict[str, PhotoImage],
     ):
         self.win = win
@@ -789,7 +791,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         self.smart_device_frames = smart_device_frames
 
-        self.smart_devices_gui = smart_devices_gui
+        self.smart_devices_state_manager = smart_devices_state_manager
 
         self.images = images
 
@@ -876,7 +878,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
             )
-            self.smart_devices_gui.add_smart_device(smart_plug_gui)
+            self.smart_devices_state_manager.add_smart_device(smart_plug_gui)
             self.create_widgets_smart_plug(smart_plug_gui)
 
             # Save the options of the last selected smart device
@@ -905,7 +907,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
         )
-        self.smart_devices_gui.add_smart_device(smart_air_fryer_gui)
+        self.smart_devices_state_manager.add_smart_device(smart_air_fryer_gui)
         self.create_widgets_smart_air_fryer(smart_air_fryer_gui)
         # Save the options of the last selected smart device
         self.set_selected_smart_air_fryer(
