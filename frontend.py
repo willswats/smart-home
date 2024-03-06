@@ -207,7 +207,7 @@ class SmartAirFryerGui(SmartDeviceGui):
         self.set_smart_air_fryer_cooking_mode(text_option_menu_cooking_mode)
 
 
-class SmartDevicesGui:
+class SmartDevicesStateManager:
     def __init__(self, home):
         self.home = home
         self.smart_devices_gui = []
@@ -219,16 +219,6 @@ class SmartDevicesGui:
             elif isinstance(smart_device, SmartAirFryer):
                 smart_air_fryer_gui = SmartAirFryerGui(smart_device)
                 self.smart_devices_gui.append(smart_air_fryer_gui)
-
-        self.images = {
-            "toggle_all_button_off": PhotoImage(
-                file="./assets/toggle-off.png"
-            ),
-            "toggle_all_button_on": PhotoImage(file="./assets/toggle-on.png"),
-        }
-
-        for image in self.images:
-            self.images[image] = self.images[image].subsample(8, 8)
 
     def get_smart_devices_gui(self):
         return self.smart_devices_gui
@@ -246,16 +236,19 @@ class SmartDevicesGui:
         self.smart_devices_gui.remove(smart_device_gui)
         smart_device_gui.delete_widgets()
 
-    def toggle_all(self, button_toggle_all):
+    def toggle_all_smart_devices(
+        self,
+        button_toggle_all: Button,
+        image_off: PhotoImage,
+        image_on: PhotoImage,
+    ):
         self.home.toggle_switch_all()
         self.update_all_smart_devices_gui()
 
         if self.home.get_switch_all_state() is False:
-            button_toggle_all.config(
-                image=self.images["toggle_all_button_off"]
-            )
+            button_toggle_all.config(image=image_off)
         elif self.home.get_switch_all_state() is True:
-            button_toggle_all.config(image=self.images["toggle_all_button_on"])
+            button_toggle_all.config(image=image_on)
 
     def update_all_smart_devices_gui(self):
         for smart_device_gui in self.smart_devices_gui:
@@ -448,7 +441,7 @@ class SmartHomeSystem:
 
         self.smart_device_frames = Frame(self.main_frame)
 
-        self.smart_devices_gui = SmartDevicesGui(home)
+        self.smart_devices_gui = SmartDevicesStateManager(home)
 
         self.images = {
             "smart_plug_image": PhotoImage(file="./assets/plug.png"),
@@ -479,7 +472,11 @@ class SmartHomeSystem:
         self.smart_devices_gui.delete_smart_device(smart_device_gui)
 
     def button_toggle_all(self, button_toggle_all):
-        self.smart_devices_gui.toggle_all(button_toggle_all)
+        image_off = self.images["toggle_all_button_off"]
+        image_on = self.images["toggle_all_button_on"]
+        self.smart_devices_gui.toggle_all_smart_devices(
+            button_toggle_all, image_off, image_on
+        )
 
     def button_edit(self, smart_device_gui: SmartDeviceGui):
         smart_home_system_edit = SmartHomeSystemEdit(self.win, self.images)
@@ -784,7 +781,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         win: Tk,
         main_frame: Frame,
         smart_device_frames: Frame,
-        smart_devices_gui: SmartDevicesGui,
+        smart_devices_gui: SmartDevicesStateManager,
         images: Dict[str, PhotoImage],
     ):
         self.win = win
