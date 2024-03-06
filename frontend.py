@@ -1048,6 +1048,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         frame_pick_smart_device.pack(fill="both")
 
 
+class SmartHomeSystemAccessibility(SmartHomeSystem):
+    pass
+
+
 def main():
     home = set_up_home()
     smart_home_system = SmartHomeSystem(home)
