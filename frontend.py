@@ -212,6 +212,14 @@ class SmartDevicesGui:
         self.home = home
         self.smart_devices_gui = []
 
+        for smart_device in self.home.get_devices():
+            if isinstance(smart_device, SmartPlug):
+                smart_plug_gui = SmartPlugGui(smart_device)
+                self.smart_devices_gui.append(smart_plug_gui)
+            elif isinstance(smart_device, SmartAirFryer):
+                smart_air_fryer_gui = SmartAirFryerGui(smart_device)
+                self.smart_devices_gui.append(smart_air_fryer_gui)
+
         self.images = {
             "toggle_all_button_off": PhotoImage(
                 file="./assets/toggle-off.png"
@@ -222,7 +230,12 @@ class SmartDevicesGui:
         for image in self.images:
             self.images[image] = self.images[image].subsample(8, 8)
 
+    def get_smart_devices_gui(self):
+        return self.smart_devices_gui
+
     def add_smart_device(self, smart_device_gui: SmartDeviceGui):
+        smart_device = smart_device_gui.get_smart_device()
+        self.home.add_device(smart_device)
         self.smart_devices_gui.append(smart_device_gui)
 
     def delete_smart_device(self, smart_device_gui: SmartDeviceGui):
@@ -435,7 +448,6 @@ class SmartHomeSystem:
 
         self.smart_device_frames = Frame(self.main_frame)
 
-        self.home = home
         self.smart_devices_gui = SmartDevicesGui(home)
 
         self.images = {
@@ -479,7 +491,6 @@ class SmartHomeSystem:
         smart_home_system_add = SmartHomeSystemAdd(
             self.win,
             self.main_frame,
-            self.home,
             self.smart_device_frames,
             self.smart_devices_gui,
             self.images,
@@ -621,7 +632,6 @@ class SmartHomeSystem:
                 button_delete_smart_device,
             ]
         )
-        self.smart_devices_gui.add_smart_device(smart_device_gui)
 
     def create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
         smart_device_image = self.images["smart_plug_image"]
@@ -659,13 +669,11 @@ class SmartHomeSystem:
         button_toggle_all.pack(side=LEFT)
         button_top_frame.pack(anchor=W)
 
-        for smart_device in self.home.get_devices():
-            if isinstance(smart_device, SmartPlug):
-                smart_plug_gui = SmartPlugGui(smart_device)
-                self.create_widgets_smart_plug(smart_plug_gui)
-            elif isinstance(smart_device, SmartAirFryer):
-                smart_air_fryer_gui = SmartAirFryerGui(smart_device)
-                self.create_widgets_smart_air_fryer(smart_air_fryer_gui)
+        for smart_device_gui in self.smart_devices_gui.get_smart_devices_gui():
+            if isinstance(smart_device_gui, SmartPlugGui):
+                self.create_widgets_smart_plug(smart_device_gui)
+            elif isinstance(smart_device_gui, SmartAirFryerGui):
+                self.create_widgets_smart_air_fryer(smart_device_gui)
 
         self.smart_device_frames.pack()
         button_add.pack(side=LEFT)
@@ -778,7 +786,6 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self,
         win: Tk,
         main_frame: Frame,
-        home: SmartHome,
         smart_device_frames: Frame,
         smart_devices_gui: SmartDevicesGui,
         images: Dict[str, PhotoImage],
@@ -786,10 +793,10 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self.win = win
         self.main_frame = main_frame
 
-        self.home = home
         self.smart_device_frames = smart_device_frames
 
         self.smart_devices_gui = smart_devices_gui
+
         self.images = images
 
         self.add_window = Toplevel(win)
@@ -808,18 +815,16 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             "smart_air_fryer_cooking_mode": CookingModes.HEALTHY.value,
         }
 
-        # Used to store the SmartHomeSystemAdd widgets,
-        # allows for easy deletion
-        self.gui_objects = []
+        self.widgets = []
 
-    def add_gui_objects(self, gui_objects):
-        for gui_object in gui_objects:
-            self.gui_objects.append(gui_object)
+    def add_widgets(self, widgets):
+        for widget in widgets:
+            self.widgets.append(widget)
 
-    def delete_gui_objects(self):
-        if len(self.gui_objects) > 0:
-            for gui_object in self.gui_objects:
-                gui_object.destroy()
+    def delete_widgets(self):
+        if len(self.widgets) > 0:
+            for widget in self.widgets:
+                widget.destroy()
 
     # Set methods for the last selected device state
     def set_selected_smart_plug(
@@ -847,7 +852,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
     # Add widget submit methods
     def add_option_menu_submit(self, selected_smart_device: StringVar | str):
         # Delete existing objects if there are any (switch device)
-        self.delete_gui_objects()
+        self.delete_widgets()
 
         # The selected_smart_device can be StringVar | str as the command for
         # the OptionMenu seems to call get() on it automatically,
@@ -877,8 +882,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 bool_checkbutton_switched_on,
                 text_spinbox_consumption_rate,
             )
-            smart_plug = smart_plug_gui.get_smart_device()
-            self.home.add_device(smart_plug)
+            self.smart_devices_gui.add_smart_device(smart_plug_gui)
             self.create_widgets_smart_plug(smart_plug_gui)
 
             # Save the options of the last selected smart device
@@ -907,9 +911,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
         )
-
-        smart_air_fryer = smart_air_fryer_gui.get_smart_device()
-        self.home.add_device(smart_air_fryer)
+        self.smart_devices_gui.add_smart_device(smart_air_fryer_gui)
         self.create_widgets_smart_air_fryer(smart_air_fryer_gui)
         # Save the options of the last selected smart device
         self.set_selected_smart_air_fryer(
@@ -967,7 +969,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         )
         button_add_submit_smart_plug.pack(side=LEFT, anchor=W, pady=5)
 
-        self.add_gui_objects(
+        self.add_widgets(
             [
                 *gui_objects_smart_device,
                 *gui_objects_smart_plug,
@@ -1014,7 +1016,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         )
         button_add_submit_smart_air_fryer.pack(side=LEFT, anchor=W, pady=5)
 
-        self.add_gui_objects(
+        self.add_widgets(
             [
                 *gui_objects_smart_device,
                 *gui_objects_smart_air_fryer,
