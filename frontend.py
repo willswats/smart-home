@@ -116,6 +116,10 @@ class SmartDeviceGui:
         if self.bool_var is not None:
             self.bool_var.set(value)
 
+    def toggle_smart_device(self):
+        self.smart_device.toggle_switch()
+        self.update_smart_device()
+
     def set_smart_device_switched_on(
         self,
         bool_checkbutton_switched_on: BooleanVar,
@@ -204,17 +208,43 @@ class SmartAirFryerGui(SmartDeviceGui):
 
 
 class SmartDevicesGui:
-    def __init__(self):
+    def __init__(self, home):
+        self.home = home
         self.smart_devices_gui = []
 
-    def add_smart_device_gui(self, smart_device_gui: SmartDeviceGui):
+        self.images = {
+            "toggle_all_button_off": PhotoImage(
+                file="./assets/toggle-off.png"
+            ),
+            "toggle_all_button_on": PhotoImage(file="./assets/toggle-on.png"),
+        }
+
+        for image in self.images:
+            self.images[image] = self.images[image].subsample(8, 8)
+
+    def add_smart_device(self, smart_device_gui: SmartDeviceGui):
         self.smart_devices_gui.append(smart_device_gui)
 
-    def delete_smart_device_gui(self, smart_device_gui: SmartDeviceGui):
+    def delete_smart_device(self, smart_device_gui: SmartDeviceGui):
+        smart_device = smart_device_gui.get_smart_device()
+        smart_device_index = self.home.get_devices().index(smart_device)
+        self.home.remove_device_at(smart_device_index)
+
         self.smart_devices_gui.remove(smart_device_gui)
         smart_device_gui.delete_widgets()
 
-    def update_all_smart_devices(self):
+    def toggle_all(self, button_toggle_all):
+        self.home.toggle_switch_all()
+        self.update_all_smart_devices_gui()
+
+        if self.home.get_switch_all_state() is False:
+            button_toggle_all.config(
+                image=self.images["toggle_all_button_off"]
+            )
+        elif self.home.get_switch_all_state() is True:
+            button_toggle_all.config(image=self.images["toggle_all_button_on"])
+
+    def update_all_smart_devices_gui(self):
         for smart_device_gui in self.smart_devices_gui:
             smart_device_gui.update_smart_device()
 
@@ -406,7 +436,7 @@ class SmartHomeSystem:
         self.smart_device_frames = Frame(self.main_frame)
 
         self.home = home
-        self.smart_devices_gui = SmartDevicesGui()
+        self.smart_devices_gui = SmartDevicesGui(home)
 
         self.images = {
             "smart_plug_image": PhotoImage(file="./assets/plug.png"),
@@ -422,32 +452,22 @@ class SmartHomeSystem:
             "toggle_all_button_on": PhotoImage(file="./assets/toggle-on.png"),
         }
 
+        for image in self.images:
+            self.images[image] = self.images[image].subsample(8, 8)
+
     def run(self):
         self.create_widgets()
         self.win.mainloop()
 
     # Widget submit methods
     def button_toggle(self, smart_device_gui: SmartDeviceGui):
-        smart_device = smart_device_gui.get_smart_device()
-        smart_device.toggle_switch()
-        smart_device_gui.update_smart_device()
+        smart_device_gui.toggle_smart_device()
 
     def button_delete(self, smart_device_gui: SmartDeviceGui):
-        smart_device = smart_device_gui.get_smart_device()
-        smart_device_index = self.home.get_devices().index(smart_device)
-        self.home.remove_device_at(smart_device_index)
-        self.smart_devices_gui.delete_smart_device_gui(smart_device_gui)
+        self.smart_devices_gui.delete_smart_device(smart_device_gui)
 
     def button_toggle_all(self, button_toggle_all):
-        self.home.toggle_switch_all()
-        self.smart_devices_gui.update_all_smart_devices()
-
-        if self.home.get_switch_all_state() is False:
-            button_toggle_all.config(
-                image=self.images["toggle_all_button_off"]
-            )
-        elif self.home.get_switch_all_state() is True:
-            button_toggle_all.config(image=self.images["toggle_all_button_on"])
+        self.smart_devices_gui.toggle_all(button_toggle_all)
 
     def button_edit(self, smart_device_gui: SmartDeviceGui):
         smart_home_system_edit = SmartHomeSystemEdit(
@@ -601,7 +621,7 @@ class SmartHomeSystem:
                 button_delete_smart_device,
             ]
         )
-        self.smart_devices_gui.add_smart_device_gui(smart_device_gui)
+        self.smart_devices_gui.add_smart_device(smart_device_gui)
 
     def create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
         smart_device_image = self.images["smart_plug_image"]
@@ -620,10 +640,6 @@ class SmartHomeSystem:
         )
 
     def create_widgets(self):
-        # Set size for all images
-        for image in self.images:
-            self.images[image] = self.images[image].subsample(8, 8)
-
         button_top_frame = Frame(self.main_frame)
 
         button_toggle_all = Button(
