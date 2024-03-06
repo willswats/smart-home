@@ -406,7 +406,6 @@ class SmartHomeSystem:
         self.smart_device_frames = Frame(self.main_frame)
 
         self.home = home
-        self.smart_devices = self.home.get_devices()
         self.smart_devices_gui = SmartDevicesGui()
 
         self.images = {
@@ -435,7 +434,7 @@ class SmartHomeSystem:
 
     def button_delete(self, smart_device_gui: SmartDeviceGui):
         smart_device = smart_device_gui.get_smart_device()
-        smart_device_index = self.smart_devices.index(smart_device)
+        smart_device_index = self.home.get_devices().index(smart_device)
         self.home.remove_device_at(smart_device_index)
         self.smart_devices_gui.delete_smart_device_gui(smart_device_gui)
 
@@ -644,7 +643,7 @@ class SmartHomeSystem:
         button_toggle_all.pack(side=LEFT)
         button_top_frame.pack(anchor=W)
 
-        for smart_device in self.smart_devices:
+        for smart_device in self.home.get_devices():
             if isinstance(smart_device, SmartPlug):
                 smart_plug_gui = SmartPlugGui(smart_device)
                 self.create_widgets_smart_plug(smart_plug_gui)
