@@ -3,7 +3,6 @@
 ## Clean up
 
 - [ ] Switch from pack to grid
-- [ ] Reduce code by moving more into `SmartDeviceGui` and `SmartDevicesGui`
 
 ## Challenge Features
 
