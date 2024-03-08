@@ -128,6 +128,9 @@ class SmartDeviceGui:
         if switched_on != self.smart_device.get_switched_on():
             self.smart_device.toggle_switch()
 
+    def get_widgets(self):
+        return self.widgets
+
     def add_widgets(self, widgets):
         for widget in widgets:
             self.widgets.append(widget)
@@ -450,6 +453,9 @@ class SmartHomeSystem:
             "edit_button_image": PhotoImage(file="./assets/edit.png"),
             "delete_button_image": PhotoImage(file="./assets/delete.png"),
             "add_button_image": PhotoImage(file="./assets/add.png"),
+            "accessibility_button_image": PhotoImage(
+                file="./assets/settings.png"
+            ),
             "submit_button_image": PhotoImage(file="./assets/check.png"),
             "toggle_all_button_off": PhotoImage(
                 file="./assets/toggle-off.png"
@@ -485,12 +491,17 @@ class SmartHomeSystem:
     def button_add(self):
         smart_home_system_add = SmartHomeSystemAdd(
             self.win,
-            self.main_frame,
             self.smart_device_frames,
             self.smart_devices_state_manager,
             self.images,
         )
         smart_home_system_add.add_create_widgets()
+
+    def button_accessibility(self):
+        smart_home_system_accessibility = SmartHomeSystemAccessibility(
+            self.win, self.smart_devices_state_manager, self.images
+        )
+        smart_home_system_accessibility.accessibility_create_widgets()
 
     # Create widgets methods
     def create_widgets_buttons_smart_device(
@@ -515,9 +526,9 @@ class SmartHomeSystem:
             command=lambda: self.button_delete(smart_device_gui),
         )
 
-        button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+        button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=(5, 0))
         button_edit_smart_device.pack(side=RIGHT, anchor=E)
-        button_toggle_smart_device.pack(side=RIGHT, anchor=E, padx=5)
+        button_toggle_smart_device.pack(side=RIGHT, anchor=E, padx=(5, 0))
 
         return (
             button_toggle_smart_device,
@@ -654,6 +665,13 @@ class SmartHomeSystem:
             command=lambda: self.button_toggle_all(button_toggle_all),
         )
 
+        button_accessibility = Button(
+            button_top_frame,
+            text="Accessibility",
+            image=self.images["accessibility_button_image"],
+            command=lambda: self.button_accessibility(),
+        )
+
         button_add = Button(
             self.main_frame,
             text="Add",
@@ -662,7 +680,8 @@ class SmartHomeSystem:
         )
 
         button_toggle_all.pack(side=LEFT)
-        button_top_frame.pack(anchor=W)
+        button_accessibility.pack(side=RIGHT)
+        button_top_frame.pack(fill="both")
 
         for (
             smart_device_gui
@@ -781,18 +800,13 @@ class SmartHomeSystemAdd(SmartHomeSystem):
     def __init__(
         self,
         win: Tk,
-        main_frame: Frame,
         smart_device_frames: Frame,
         smart_devices_state_manager: SmartDevicesStateManager,
         images: Dict[str, PhotoImage],
     ):
         self.win = win
-        self.main_frame = main_frame
-
         self.smart_device_frames = smart_device_frames
-
         self.smart_devices_state_manager = smart_devices_state_manager
-
         self.images = images
 
         self.add_window = Toplevel(win)
@@ -827,9 +841,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self, bool_checkbutton_switched_on, text_spinbox_consumption_rate
     ):
         self.smart_device_states["smart_device"] = "Smart Plug"
-        self.smart_device_states[
-            "smart_plug_switched_on"
-        ] = bool_checkbutton_switched_on.get()
+        self.smart_device_states["smart_plug_switched_on"] = (
+            bool_checkbutton_switched_on.get()
+        )
         self.smart_device_states["smart_plug_consumption_rate"] = int(
             text_spinbox_consumption_rate.get()
         )
@@ -838,12 +852,12 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self, bool_checkbutton_switched_on, text_option_menu_cooking_mode
     ):
         self.smart_device_states["smart_device"] = "Smart Air Fryer"
-        self.smart_device_states[
-            "smart_air_fryer_switched_on"
-        ] = bool_checkbutton_switched_on.get()
-        self.smart_device_states[
-            "smart_air_fryer_cooking_mode"
-        ] = text_option_menu_cooking_mode.get()
+        self.smart_device_states["smart_air_fryer_switched_on"] = (
+            bool_checkbutton_switched_on.get()
+        )
+        self.smart_device_states["smart_air_fryer_cooking_mode"] = (
+            text_option_menu_cooking_mode.get()
+        )
 
     # Add widget submit methods
     def add_option_menu_submit(self, selected_smart_device: StringVar | str):
@@ -1049,7 +1063,63 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
 
 class SmartHomeSystemAccessibility(SmartHomeSystem):
-    pass
+    # Alter text size (ttk.Scale)
+    # Change between light and dark (toggle button)
+    # Custom colour scheme (background and text colour) (tkColor)
+    def __init__(
+        self,
+        win: Tk,
+        smart_devices_state_manager: SmartDevicesStateManager,
+        images: dict[str, PhotoImage],
+    ):
+        self.win = win
+        self.smart_devices_state_manager = smart_devices_state_manager
+        self.images = images
+
+        self.accessibility_window = Toplevel(win)
+        self.accessibility_window.title("Accessibility")
+        self.accessibility_window.resizable(False, False)
+
+        self.accessibility_window_frame = Frame(self.accessibility_window)
+        self.accessibility_window_frame.pack(padx=10, pady=10, fill="both")
+
+    def accessibility_create_widgets_font_size(self):
+        frame_font_size = Frame(self.accessibility_window)
+
+        label_font_size = Label(
+            frame_font_size,
+            text="Font size: ",
+            font=("sans-serif", 10),
+        )
+
+        text_spinbox_font_size = StringVar()
+
+        def slider_changed(event):
+            font_size = int(event.get())
+            for (
+                device
+            ) in self.smart_devices_state_manager.get_smart_devices_gui():
+                for widget in device.get_widgets():
+                    if isinstance(widget, Label):
+                        widget.config(font=("sans-serif", font_size))
+
+        spinbox_font_size = Spinbox(
+            frame_font_size,
+            textvariable=text_spinbox_font_size,
+            from_=0,
+            to=50,
+            width=9,
+            command=lambda: slider_changed(text_spinbox_font_size),
+        )
+        # Spinbox command is only executed when arrows are pressed, this
+        # creates a way to submit upon pressing return
+
+        label_font_size.pack(side=LEFT)
+        spinbox_font_size.pack(side=RIGHT)
+        frame_font_size.pack(fill="both")
+
+    def accessibility_create_widgets(self):
+        self.accessibility_create_widgets_font_size()
 
 
 def main():
