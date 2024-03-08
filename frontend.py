@@ -32,6 +32,13 @@ class SmartDeviceNums(Enum):
     SMART_AIR_FRYER = "2"
 
 
+# Used in accessibility (distinguish Label from another
+# when changing font size)
+class SmartDeviceTitles(Enum):
+    SMART_PLUG = "Smart Plug:"
+    SMART_AIR_FRYER = "Smart Air Fryer:"
+
+
 def check_valid_device_num(smart_device_num: str):
     valid_smart_device_nums = [
         smart_device_num.value for smart_device_num in SmartDeviceNums
@@ -641,7 +648,7 @@ class SmartHomeSystem:
 
     def create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
         smart_device_image = self.images["smart_plug_image"]
-        smart_device_text_title = "Smart Plug:"
+        smart_device_text_title = SmartDeviceTitles.SMART_PLUG.value
         self.create_widgets_smart_device(
             smart_plug_gui, smart_device_image, smart_device_text_title
         )
@@ -650,7 +657,7 @@ class SmartHomeSystem:
         self, smart_air_fryer_gui: SmartAirFryerGui
     ):
         smart_device_image = self.images["smart_air_fryer_image"]
-        smart_device_text_title = "Smart Air Fryer:"
+        smart_device_text_title = SmartDeviceTitles.SMART_AIR_FRYER.value
         self.create_widgets_smart_device(
             smart_air_fryer_gui, smart_device_image, smart_device_text_title
         )
@@ -1096,12 +1103,22 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
 
         def slider_changed(event):
             font_size = int(event.get())
+
+            smart_device_titles = [
+                smart_device_title.value
+                for smart_device_title in SmartDeviceTitles
+            ]
             for (
                 device
             ) in self.smart_devices_state_manager.get_smart_devices_gui():
                 for widget in device.get_widgets():
                     if isinstance(widget, Label):
-                        widget.config(font=("sans-serif", font_size))
+                        if widget.cget("text") in smart_device_titles:
+                            widget.config(
+                                font=("sans-serif", font_size + 2, "bold")
+                            )
+                        else:
+                            widget.config(font=("sans-serif", font_size))
 
         spinbox_font_size = Spinbox(
             frame_font_size,
