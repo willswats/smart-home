@@ -2,7 +2,11 @@
 
 ## Clean up
 
-- [ ] Switch from pack to grid
+- [ ] Remove noqa
+
+## Test
+
+- [ ] Test on Windows
 
 ## Challenge Features
 
