@@ -1131,7 +1131,9 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
             font=("sans-serif", self.font_sizes["body"]),
         )
 
-        text_spinbox_font_size = StringVar()
+        text_spinbox_font_size = StringVar(
+            frame_font_size, str(self.font_sizes["body"])
+        )
 
         def slider_changed(event):
             font_size = int(event.get())
