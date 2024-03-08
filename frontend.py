@@ -482,6 +482,11 @@ class SmartHomeSystem:
         self.create_widgets()
         self.win.mainloop()
 
+    # Set methods
+    def set_font_size(self, font_size):
+        self.font_sizes["title"] = font_size + 2
+        self.font_sizes["body"] = font_size
+
     # Widget submit methods
     def button_toggle(self, smart_device_gui: SmartDeviceGui):
         smart_device_gui.toggle_smart_device()
@@ -1096,7 +1101,6 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
 
 class SmartHomeSystemAccessibility(SmartHomeSystem):
-    # Alter text size (ttk.Scale)
     # Change between light and dark (toggle button)
     # Custom colour scheme (background and text colour) (tkColor)
     def __init__(
@@ -1131,8 +1135,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
 
         def slider_changed(event):
             font_size = int(event.get())
-            self.font_sizes["title"] = font_size + 2
-            self.font_sizes["body"] = font_size
+            self.set_font_size(font_size)
 
             smart_device_titles = [
                 smart_device_title.value
