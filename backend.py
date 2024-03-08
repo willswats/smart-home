@@ -97,10 +97,9 @@ class SmartHome:
         self.switch_all_state = False
 
     def __str__(self):
-        output = "Smart Home Devices: ["
+        output = "Smart Home Devices:"
         for device in self.devices:
-            output += f"[{device}]"
-        output += "]"
+            output += f"\n  - {device}"
         return output
 
     def get_devices(self):
