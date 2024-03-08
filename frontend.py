@@ -345,14 +345,14 @@ class CreateWidgets:
     # Add & edit create widgets methods
     @staticmethod
     def add_edit_create_widgets_smart_device(
-        frame: Frame, smart_device_gui: SmartDeviceGui
+        frame: Frame, smart_device_gui: SmartDeviceGui, font_size: int
     ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
 
         label_switched_on = Label(
             frame_switched_on,
             text="Switched on: ",
-            font=("sans-serif", 10),
+            font=("sans-serif", font_size),
         )
 
         (
@@ -377,14 +377,14 @@ class CreateWidgets:
 
     @staticmethod
     def add_edit_create_widgets_smart_plug(
-        frame: Frame, smart_plug_gui: SmartPlugGui
+        frame: Frame, smart_plug_gui: SmartPlugGui, font_size: int
     ) -> tuple[StringVar, list[Frame | Label | Spinbox]]:
         frame_consumption_rate = Frame(frame)
 
         label_consumption_rate = Label(
             frame_consumption_rate,
             text="Consumption rate: ",
-            font=("sans-serif", 10),
+            font=("sans-serif", font_size),
         )
 
         (
@@ -409,14 +409,14 @@ class CreateWidgets:
 
     @staticmethod
     def add_edit_create_widgets_smart_air_fryer(
-        frame: Frame, smart_air_fryer_gui: SmartAirFryerGui
+        frame: Frame, smart_air_fryer_gui: SmartAirFryerGui, font_size: int
     ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
         frame_cooking_mode = Frame(frame)
 
         label_cooking_modes = Label(
             frame_cooking_mode,
             text="Cooking modes: ",
-            font=("sans-serif", 10),
+            font=("sans-serif", font_size),
         )
 
         (
@@ -452,6 +452,11 @@ class SmartHomeSystem:
         self.smart_device_frames = Frame(self.main_frame)
 
         self.smart_devices_state_manager = SmartDevicesStateManager(home)
+
+        self.font_sizes = {
+            "title": 12,
+            "body": 10,
+        }
 
         self.images = {
             "smart_plug_image": PhotoImage(file="./assets/plug.png"),
@@ -492,7 +497,9 @@ class SmartHomeSystem:
         )
 
     def button_edit(self, smart_device_gui: SmartDeviceGui):
-        smart_home_system_edit = SmartHomeSystemEdit(self.win, self.images)
+        smart_home_system_edit = SmartHomeSystemEdit(
+            self.win, self.font_sizes, self.images
+        )
         smart_home_system_edit.edit_create_widgets(smart_device_gui)
 
     def button_add(self):
@@ -500,13 +507,17 @@ class SmartHomeSystem:
             self.win,
             self.smart_device_frames,
             self.smart_devices_state_manager,
+            self.font_sizes,
             self.images,
         )
         smart_home_system_add.add_create_widgets()
 
     def button_accessibility(self):
         smart_home_system_accessibility = SmartHomeSystemAccessibility(
-            self.win, self.smart_devices_state_manager, self.images
+            self.win,
+            self.smart_devices_state_manager,
+            self.font_sizes,
+            self.images,
         )
         smart_home_system_accessibility.accessibility_create_widgets()
 
@@ -557,13 +568,17 @@ class SmartHomeSystem:
         label_smart_device_title = Label(
             smart_device_frame,
             text=smart_device_text_title,
-            font=("sans-serif", 12, "bold"),
+            font=(
+                "sans-serif",
+                self.font_sizes["title"],
+                "bold",
+            ),
         )
 
         label_smart_device_switched_on = Label(
             smart_device_frame,
             text="Switched on:",
-            font=("sans-serif", 10),
+            font=("sans-serif", self.font_sizes["body"]),
         )
         (
             bool_checkbutton_switched_on,
@@ -585,7 +600,7 @@ class SmartHomeSystem:
             label_smart_plug_consumption_rate = Label(
                 smart_device_frame,
                 text="Consumption rate:",
-                font=("sans-serif", 10),
+                font=("sans-serif", self.font_sizes["body"]),
             )
             (
                 text_spinbox_consumption_rate,
@@ -606,7 +621,7 @@ class SmartHomeSystem:
             label_smart_air_fryer_cooking_mode = Label(
                 smart_device_frame,
                 text="Cooking mode:",
-                font=("sans-serif", 10),
+                font=("sans-serif", self.font_sizes["body"]),
             )
             (
                 text_option_menu_cooking_mode,
@@ -703,7 +718,12 @@ class SmartHomeSystem:
 
 
 class SmartHomeSystemEdit(SmartHomeSystem):
-    def __init__(self, win, images):
+    def __init__(
+        self,
+        win: Tk,
+        font_sizes: dict[str, int],
+        images: dict[str, PhotoImage],
+    ):
         self.edit_window = Toplevel(win)
         self.edit_window.title("Edit")
         self.edit_window.resizable(False, False)
@@ -711,6 +731,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self.edit_window_frame = Frame(self.edit_window)
         self.edit_window_frame.pack(padx=10, pady=10, fill="both")
 
+        self.font_sizes = font_sizes
         self.images = images
 
     # Edit widget submit methods
@@ -749,7 +770,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     ):
         text_spinbox_consumption_rate = (
             CreateWidgets.add_edit_create_widgets_smart_plug(
-                self.edit_window_frame, smart_plug_gui
+                self.edit_window_frame, smart_plug_gui, self.font_sizes["body"]
             )[0]
         )
         edit_button_submit = Button(
@@ -771,7 +792,9 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     ):
         text_option_menu_cooking_mode = (
             CreateWidgets.add_edit_create_widgets_smart_air_fryer(
-                self.edit_window_frame, smart_air_fryer_gui
+                self.edit_window_frame,
+                smart_air_fryer_gui,
+                self.font_sizes["body"],
             )
         )[0]
         edit_button_submit = Button(
@@ -789,7 +812,9 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     def edit_create_widgets(self, smart_device_gui: SmartDeviceGui):
         bool_checkbutton_switched_on = (
             CreateWidgets.add_edit_create_widgets_smart_device(
-                self.edit_window_frame, smart_device_gui
+                self.edit_window_frame,
+                smart_device_gui,
+                self.font_sizes["body"],
             )[0]
         )
 
@@ -809,17 +834,18 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         win: Tk,
         smart_device_frames: Frame,
         smart_devices_state_manager: SmartDevicesStateManager,
+        font_sizes: Dict[str, int],
         images: Dict[str, PhotoImage],
     ):
         self.win = win
         self.smart_device_frames = smart_device_frames
         self.smart_devices_state_manager = smart_devices_state_manager
+        self.font_sizes = font_sizes
         self.images = images
 
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
         self.add_window.resizable(False, False)
-        self.add_window.geometry("300x150")
 
         self.add_window_frame = Frame(self.add_window)
         self.add_window_frame.pack(padx=10, pady=10, fill="both")
@@ -965,13 +991,13 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             text_option_menu_switched_on,
             gui_objects_smart_device,
         ) = CreateWidgets.add_edit_create_widgets_smart_device(
-            self.add_window_frame, smart_plug_gui
+            self.add_window_frame, smart_plug_gui, self.font_sizes["body"]
         )
         (
             text_spinbox_consumption_rate,
             gui_objects_smart_plug,
         ) = CreateWidgets.add_edit_create_widgets_smart_plug(
-            self.add_window_frame, smart_plug_gui
+            self.add_window_frame, smart_plug_gui, self.font_sizes["body"]
         )
 
         button_add_submit_smart_plug = Button(
@@ -1011,14 +1037,14 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             text_option_menu_switched_on,
             gui_objects_smart_device,
         ) = CreateWidgets.add_edit_create_widgets_smart_device(
-            self.add_window_frame, smart_air_fryer_gui
+            self.add_window_frame, smart_air_fryer_gui, self.font_sizes["body"]
         )
 
         (
             text_option_menu_cooking_mode,
             gui_objects_smart_air_fryer,
         ) = CreateWidgets.add_edit_create_widgets_smart_air_fryer(
-            self.add_window_frame, smart_air_fryer_gui
+            self.add_window_frame, smart_air_fryer_gui, self.font_sizes["body"]
         )
 
         button_add_submit_smart_air_fryer = Button(
@@ -1047,7 +1073,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         label_pick_smart_device = Label(
             frame_pick_smart_device,
             text="Pick device: ",
-            font=("sans-serif", 10),
+            font=("sans-serif", self.font_sizes["body"]),
         )
 
         pick_smart_device_options = ["Smart Plug", "Smart Air Fryer"]
@@ -1077,10 +1103,12 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self,
         win: Tk,
         smart_devices_state_manager: SmartDevicesStateManager,
+        font_sizes: dict[str, int],
         images: dict[str, PhotoImage],
     ):
         self.win = win
         self.smart_devices_state_manager = smart_devices_state_manager
+        self.font_sizes = font_sizes
         self.images = images
 
         self.accessibility_window = Toplevel(win)
@@ -1096,13 +1124,15 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         label_font_size = Label(
             frame_font_size,
             text="Font size: ",
-            font=("sans-serif", 10),
+            font=("sans-serif", self.font_sizes["body"]),
         )
 
         text_spinbox_font_size = StringVar()
 
         def slider_changed(event):
             font_size = int(event.get())
+            self.font_sizes["title"] = font_size + 2
+            self.font_sizes["body"] = font_size
 
             smart_device_titles = [
                 smart_device_title.value
