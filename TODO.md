@@ -2,6 +2,7 @@
 
 ## Clean up
 
+- [ ] Add submit button for accessibility (replace command)
 - [ ] Remove noqa
 
 ## Test
