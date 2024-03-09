@@ -394,6 +394,7 @@ class CreateWidgets:
         current_theme: Theme,
     ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
+        frame_switched_on.configure(bg=current_theme.get_background())
 
         label_switched_on = Label(
             frame_switched_on,
@@ -431,6 +432,7 @@ class CreateWidgets:
         current_theme: Theme,
     ) -> tuple[StringVar, list[Frame | Label | Spinbox]]:
         frame_consumption_rate = Frame(frame)
+        frame_consumption_rate.configure(bg=current_theme.get_background())
 
         label_consumption_rate = Label(
             frame_consumption_rate,
@@ -468,6 +470,7 @@ class CreateWidgets:
         current_theme: Theme,
     ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
         frame_cooking_mode = Frame(frame)
+        frame_cooking_mode.configure(bg=current_theme.get_background())
 
         label_cooking_modes = Label(
             frame_cooking_mode,
@@ -877,6 +880,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self.font_sizes = font_sizes
         self.current_theme = current_theme
         self.images = images
+
+        self.edit_window.configure(bg=self.current_theme.get_background())
+        self.edit_window_frame.configure(
+            bg=self.current_theme.get_background()
+        )
 
     # Edit widget submit methods
     def edit_button_submit_smart_plug(
@@ -1297,6 +1305,13 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.accessibility_window_frame = Frame(self.accessibility_window)
         self.accessibility_window_frame.pack(padx=10, pady=10, fill="both")
 
+        self.accessibility_window.configure(
+            bg=self.current_theme.get_background()
+        )
+        self.accessibility_window_frame.configure(
+            bg=self.current_theme.get_background()
+        )
+
         self.maximum_font_size = 32
         self.minimum_font_size = 10
 
@@ -1376,6 +1391,7 @@ and <= {self.maximum_font_size}"
 
     def accessibility_create_widgets_theme(self):
         frame_theme = Frame(self.accessibility_window)
+        frame_theme.configure(bg=self.current_theme.get_background())
 
         theme_options = ["Light", "Dark"]
 
@@ -1399,6 +1415,19 @@ and <= {self.maximum_font_size}"
             command=lambda _: self.option_menu_theme_submit(
                 text_option_menu_theme
             ),
+        )
+
+        option_menu_theme.configure(
+            fg=self.current_theme.get_foreground(),
+            bg=self.current_theme.get_background(),
+            activeforeground=self.current_theme.get_foreground(),
+            activebackground=self.current_theme.get_background(),
+        )
+        option_menu_theme["menu"].configure(
+            fg=self.current_theme.get_foreground(),
+            bg=self.current_theme.get_background(),
+            activeforeground=self.current_theme.get_foreground(),
+            activebackground=self.current_theme.get_activebackground(),
         )
 
         label_theme.pack(side=LEFT)
