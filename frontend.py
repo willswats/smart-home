@@ -307,8 +307,6 @@ class CreateWidgets:
                 text_spinbox_consumption_rate
             ),
         )
-        # Spinbox command is only executed when arrows are pressed, this
-        # creates a way to submit upon pressing return
         spinbox_consumption_rate.bind(
             "<Return>",
             lambda _: smart_plug_gui.set_smart_plug_consumption_rate_validate(
@@ -1122,23 +1120,14 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.accessibility_window_frame = Frame(self.accessibility_window)
         self.accessibility_window_frame.pack(padx=10, pady=10, fill="both")
 
-    def accessibility_create_widgets_font_size(self):
-        frame_font_size = Frame(self.accessibility_window)
+        self.maximum_font_size = 32
+        self.minimum_font_size = 10
 
-        label_font_size = Label(
-            frame_font_size,
-            text="Font size: ",
-            font=("sans-serif", self.font_sizes["body"]),
-        )
-
-        text_spinbox_font_size = StringVar(
-            frame_font_size, str(self.font_sizes["body"])
-        )
-
-        def slider_changed(event):
-            font_size = int(event.get())
-            self.set_font_size(font_size)
-
+    def set_widgets_font_size(self, font_size):
+        if (
+            font_size >= self.minimum_font_size
+            and font_size <= self.maximum_font_size
+        ):
             smart_device_titles = [
                 smart_device_title.value
                 for smart_device_title in SmartDeviceTitles
@@ -1154,17 +1143,46 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
                             )
                         else:
                             widget.config(font=("sans-serif", font_size))
+        else:
+            print(
+                f"Error: font size must be >= {self.minimum_font_size} \
+and <= {self.maximum_font_size}"
+            )
+
+    def spinbox_font_size_submit(self, event):
+        try:
+            font_size = int(event.get())
+            self.set_font_size(font_size)
+            self.set_widgets_font_size(font_size)
+        except Exception as error:
+            print("Error:", error)
+
+    def accessibility_create_widgets_font_size(self):
+        frame_font_size = Frame(self.accessibility_window)
+
+        label_font_size = Label(
+            frame_font_size,
+            text="Font size: ",
+            font=("sans-serif", self.font_sizes["body"]),
+        )
+        text_spinbox_font_size = StringVar(
+            frame_font_size, str(self.font_sizes["body"])
+        )
 
         spinbox_font_size = Spinbox(
             frame_font_size,
             textvariable=text_spinbox_font_size,
-            from_=0,
-            to=50,
+            from_=self.minimum_font_size,
+            to=self.maximum_font_size,
             width=9,
-            command=lambda: slider_changed(text_spinbox_font_size),
+            command=lambda: self.spinbox_font_size_submit(
+                text_spinbox_font_size
+            ),
         )
-        # Spinbox command is only executed when arrows are pressed, this
-        # creates a way to submit upon pressing return
+        spinbox_font_size.bind(
+            "<Return>",
+            lambda _: self.spinbox_font_size_submit(text_spinbox_font_size),
+        )
 
         label_font_size.pack(side=LEFT)
         spinbox_font_size.pack(side=RIGHT)
