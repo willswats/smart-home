@@ -265,6 +265,23 @@ class SmartDevicesStateManager:
             smart_device_gui.update_smart_device()
 
 
+class Themes:
+    def __init__(self):
+        self.themes = {
+            "light": Theme("#000", "#fff", "#EDEDED"),
+            "dark": Theme("#fff", "#1a1a1a", "#2C2C2C"),
+        }
+        self.current = self.themes["light"]
+
+    def get_current(self):
+        return self.current
+
+    def set_current(self, theme_name):
+        theme = theme_name.lower()
+        if theme == "light" or theme == "dark":
+            self.current = self.themes[theme]
+
+
 class Theme:
     def __init__(
         self, foreground: str, background: str, activebackground: str
@@ -282,14 +299,36 @@ class Theme:
     def get_activebackground(self):
         return self.activebackground
 
+    def configure_widget_theme(self, widget):
+        widget.configure(
+            fg=self.foreground,
+            bg=self.background,
+            activeforeground=self.foreground,
+            activebackground=self.background,
+        )
 
-class CreateWidgets:
+    def configure_options_menu_theme(self, option_menu: OptionMenu):
+        option_menu.configure(
+            fg=self.foreground,
+            bg=self.background,
+            activeforeground=self.foreground,
+            activebackground=self.background,
+        )
+        option_menu["menu"].configure(
+            fg=self.foreground,
+            bg=self.background,
+            activeforeground=self.foreground,
+            activebackground=self.background,
+        )
+
+
+class Utilities:
     # General create widget methods
     @staticmethod
     def create_checkbox_smart_device_switched_on(
         frame: Frame,
         smart_device_gui: SmartDeviceGui,
-        current_theme: Theme,
+        themes: Themes,
     ):
         smart_device = smart_device_gui.get_smart_device()
 
@@ -304,9 +343,9 @@ class CreateWidgets:
             # Always keep fg as black as the checkbutton bg
             # doesn't fully change
             fg="black",
-            bg=current_theme.get_background(),
-            activeforeground=current_theme.get_foreground(),
-            activebackground=current_theme.get_activebackground(),
+            bg=themes.get_current().get_background(),
+            activeforeground=themes.get_current().get_foreground(),
+            activebackground=themes.get_current().get_activebackground(),
             command=lambda: smart_device_gui.set_smart_device_switched_on(
                 bool_checkbutton_switched_on
             ),
@@ -318,7 +357,7 @@ class CreateWidgets:
     def create_spinbox_smart_plug_consumption_rate(
         frame: Frame,
         smart_plug_gui: SmartPlugGui,
-        current_theme: Theme,
+        themes: Themes,
     ):
         smart_plug = smart_plug_gui.get_smart_device()
         text_spinbox_consumption_rate = StringVar(
@@ -331,8 +370,8 @@ class CreateWidgets:
             from_=0,
             to=150,
             width=9,
-            fg=current_theme.get_foreground(),
-            bg=current_theme.get_background(),
+            fg=themes.get_current().get_foreground(),
+            bg=themes.get_current().get_background(),
             command=lambda: smart_plug_gui.set_smart_plug_consumption_rate(
                 text_spinbox_consumption_rate
             ),
@@ -350,7 +389,7 @@ class CreateWidgets:
     def create_option_menu_smart_air_fryer_cooking_mode(
         frame: Frame,
         smart_air_fryer_gui: SmartAirFryerGui,
-        current_theme: Theme,
+        themes: Themes,
     ):
         smart_air_fryer = smart_air_fryer_gui.get_smart_device()
 
@@ -370,17 +409,8 @@ class CreateWidgets:
                 text_option_menu_cooking_mode
             ),
         )
-        option_menu_cooking_mode.configure(
-            fg=current_theme.get_foreground(),
-            bg=current_theme.get_background(),
-            activeforeground=current_theme.get_foreground(),
-            activebackground=current_theme.get_background(),
-        )
-        option_menu_cooking_mode["menu"].configure(
-            fg=current_theme.get_foreground(),
-            bg=current_theme.get_background(),
-            activeforeground=current_theme.get_foreground(),
-            activebackground=current_theme.get_activebackground(),
+        themes.get_current().configure_options_menu_theme(
+            option_menu_cooking_mode
         )
 
         return text_option_menu_cooking_mode, option_menu_cooking_mode
@@ -391,24 +421,24 @@ class CreateWidgets:
         frame: Frame,
         smart_device_gui: SmartDeviceGui,
         font_size: int,
-        current_theme: Theme,
+        themes: Themes,
     ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
-        frame_switched_on.configure(bg=current_theme.get_background())
+        frame_switched_on.configure(bg=themes.get_current().get_background())
 
         label_switched_on = Label(
             frame_switched_on,
             text="Switched on: ",
             font=("sans-serif", font_size),
-            fg=current_theme.get_foreground(),
-            bg=current_theme.get_background(),
+            fg=themes.get_current().get_foreground(),
+            bg=themes.get_current().get_background(),
         )
 
         (
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
-        ) = CreateWidgets.create_checkbox_smart_device_switched_on(
-            frame_switched_on, smart_device_gui, current_theme
+        ) = Utilities.create_checkbox_smart_device_switched_on(
+            frame_switched_on, smart_device_gui, themes
         )
 
         label_switched_on.pack(side=LEFT, anchor=W)
@@ -429,24 +459,26 @@ class CreateWidgets:
         frame: Frame,
         smart_plug_gui: SmartPlugGui,
         font_size: int,
-        current_theme: Theme,
+        themes: Themes,
     ) -> tuple[StringVar, list[Frame | Label | Spinbox]]:
         frame_consumption_rate = Frame(frame)
-        frame_consumption_rate.configure(bg=current_theme.get_background())
+        frame_consumption_rate.configure(
+            bg=themes.get_current().get_background()
+        )
 
         label_consumption_rate = Label(
             frame_consumption_rate,
             text="Consumption rate: ",
-            fg=current_theme.get_foreground(),
-            bg=current_theme.get_background(),
+            fg=themes.get_current().get_foreground(),
+            bg=themes.get_current().get_background(),
             font=("sans-serif", font_size),
         )
 
         (
             text_spinbox_consumption_rate,
             spinbox_consumption_rate,
-        ) = CreateWidgets.create_spinbox_smart_plug_consumption_rate(
-            frame_consumption_rate, smart_plug_gui, current_theme
+        ) = Utilities.create_spinbox_smart_plug_consumption_rate(
+            frame_consumption_rate, smart_plug_gui, themes
         )
 
         label_consumption_rate.pack(side=LEFT, anchor=W)
@@ -467,24 +499,24 @@ class CreateWidgets:
         frame: Frame,
         smart_air_fryer_gui: SmartAirFryerGui,
         font_size: int,
-        current_theme: Theme,
+        themes: Themes,
     ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
         frame_cooking_mode = Frame(frame)
-        frame_cooking_mode.configure(bg=current_theme.get_background())
+        frame_cooking_mode.configure(bg=themes.get_current().get_background())
 
         label_cooking_modes = Label(
             frame_cooking_mode,
             text="Cooking modes: ",
             font=("sans-serif", font_size),
-            fg=current_theme.get_foreground(),
-            bg=current_theme.get_background(),
+            fg=themes.get_current().get_foreground(),
+            bg=themes.get_current().get_background(),
         )
 
         (
             text_option_menu_cooking_mode,
             option_menu_cooking_mode,
-        ) = CreateWidgets.create_option_menu_smart_air_fryer_cooking_mode(
-            frame_cooking_mode, smart_air_fryer_gui, current_theme
+        ) = Utilities.create_option_menu_smart_air_fryer_cooking_mode(
+            frame_cooking_mode, smart_air_fryer_gui, themes
         )
 
         label_cooking_modes.pack(side=LEFT, anchor=W)
@@ -521,18 +553,18 @@ class SmartHomeSystem:
             "body": 10,
         }
 
-        self.themes = {
-            "light": Theme("#000", "#fff", "#EDEDED"),
-            "dark": Theme("#fff", "#1a1a1a", "#2C2C2C"),
-        }
-        self.current_theme = self.themes["light"]
+        self.themes = Themes()
 
-        self.win.configure(bg=self.current_theme.get_background())
-        self.main_frame.configure(bg=self.current_theme.get_background())
-        self.smart_device_frames.configure(
-            bg=self.current_theme.get_background()
+        self.win.configure(bg=self.themes.get_current().get_background())
+        self.main_frame.configure(
+            bg=self.themes.get_current().get_background()
         )
-        self.button_top_frame.configure(bg=self.current_theme.get_background())
+        self.smart_device_frames.configure(
+            bg=self.themes.get_current().get_background()
+        )
+        self.button_top_frame.configure(
+            bg=self.themes.get_current().get_background()
+        )
 
         self.images = {
             "smart_plug_image": PhotoImage(file="./assets/plug.png"),
@@ -564,50 +596,37 @@ class SmartHomeSystem:
         self.font_sizes["body"] = font_size
 
     def set_theme(self, theme):
-        if theme == "Light":
-            self.current_theme = self.themes["light"]
-        elif theme == "Dark":
-            self.current_theme = self.themes["dark"]
+        self.themes.set_current(theme)
         self.set_theme_widgets()
 
     def set_theme_widgets(self):
-        self.win.configure(bg=self.current_theme.get_background())
-        self.main_frame.configure(bg=self.current_theme.get_background())
-        self.smart_device_frames.configure(
-            bg=self.current_theme.get_background()
-        )
-        self.button_top_frame.configure(bg=self.current_theme.get_background())
-
-        def configure_widget_theme_all(widget):
-            widget.configure(
-                fg=self.current_theme.get_foreground(),
-                bg=self.current_theme.get_background(),
-                activeforeground=self.current_theme.get_foreground(),
-                activebackground=self.current_theme.get_activebackground(),
-            )
+        current_theme = self.themes.get_current()
+        self.win.configure(bg=current_theme.get_background())
+        self.main_frame.configure(bg=current_theme.get_background())
+        self.smart_device_frames.configure(bg=current_theme.get_background())
+        self.button_top_frame.configure(bg=current_theme.get_background())
 
         for device in self.smart_devices_state_manager.get_smart_devices_gui():
             for widget in device.get_widgets():
                 if isinstance(widget, Frame):
                     widget.configure(
-                        bg=self.current_theme.get_background(),
+                        bg=current_theme.get_background(),
                     )
                 elif isinstance(widget, Checkbutton):
-                    configure_widget_theme_all(widget)
+                    current_theme.configure_widget_theme(widget)
                     widget.configure(
                         # Always keep fg as black as the checkbutton bg
                         # doesn't fully change
                         fg="black",
                     )
                 elif isinstance(widget, Button):
-                    configure_widget_theme_all(widget)
+                    current_theme.configure_widget_theme(widget)
                 elif isinstance(widget, OptionMenu):
-                    configure_widget_theme_all(widget)
-                    configure_widget_theme_all(widget["menu"])
+                    current_theme.configure_options_menu_theme(widget)
                 else:
                     widget.configure(
-                        fg=self.current_theme.get_foreground(),
-                        bg=self.current_theme.get_background(),
+                        fg=self.themes.get_current().get_foreground(),
+                        bg=self.themes.get_current().get_background(),
                     )
 
     # Widget submit methods
@@ -626,7 +645,7 @@ class SmartHomeSystem:
 
     def button_edit(self, smart_device_gui: SmartDeviceGui):
         smart_home_system_edit = SmartHomeSystemEdit(
-            self.win, self.font_sizes, self.current_theme, self.images
+            self.win, self.font_sizes, self.themes, self.images
         )
         smart_home_system_edit.edit_create_widgets(smart_device_gui)
 
@@ -636,7 +655,7 @@ class SmartHomeSystem:
             self.smart_device_frames,
             self.smart_devices_state_manager,
             self.font_sizes,
-            self.current_theme,
+            self.themes,
             self.images,
         )
         smart_home_system_add.add_create_widgets()
@@ -649,7 +668,6 @@ class SmartHomeSystem:
             self.button_top_frame,
             self.smart_devices_state_manager,
             self.font_sizes,
-            self.current_theme,
             self.themes,
             self.images,
         )
@@ -662,19 +680,19 @@ class SmartHomeSystem:
         button_toggle_smart_device = Button(
             frame,
             image=self.images["toggle_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_toggle(smart_device_gui),
         )
         button_edit_smart_device = Button(
             frame,
             image=self.images["edit_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_edit(smart_device_gui),
         )
         button_delete_smart_device = Button(
             frame,
             image=self.images["delete_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_delete(smart_device_gui),
         )
 
@@ -696,13 +714,13 @@ class SmartHomeSystem:
     ):
         smart_device_frame = Frame(self.smart_device_frames)
         smart_device_frame.configure(
-            background=self.current_theme.get_background()
+            background=self.themes.get_current().get_background()
         )
 
         label_smart_device_image = Label(
             smart_device_frame,
             image=smart_device_image,
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
         )
         label_smart_device_title = Label(
             smart_device_frame,
@@ -712,22 +730,22 @@ class SmartHomeSystem:
                 self.font_sizes["title"],
                 "bold",
             ),
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
         )
 
         label_smart_device_switched_on = Label(
             smart_device_frame,
             text="Switched on:",
             font=("sans-serif", self.font_sizes["body"]),
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
         )
         (
             bool_checkbutton_switched_on,
             checkbutton_switched_on,
-        ) = CreateWidgets.create_checkbox_smart_device_switched_on(
-            smart_device_frame, smart_device_gui, self.current_theme
+        ) = Utilities.create_checkbox_smart_device_switched_on(
+            smart_device_frame, smart_device_gui, self.themes
         )
         smart_device_gui.set_bool_var(bool_checkbutton_switched_on)
 
@@ -744,14 +762,14 @@ class SmartHomeSystem:
                 smart_device_frame,
                 text="Consumption rate:",
                 font=("sans-serif", self.font_sizes["body"]),
-                fg=self.current_theme.get_foreground(),
-                bg=self.current_theme.get_background(),
+                fg=self.themes.get_current().get_foreground(),
+                bg=self.themes.get_current().get_background(),
             )
             (
                 text_spinbox_consumption_rate,
                 spinbox_consumption_rate,
-            ) = CreateWidgets.create_spinbox_smart_plug_consumption_rate(
-                smart_device_frame, smart_device_gui, self.current_theme
+            ) = Utilities.create_spinbox_smart_plug_consumption_rate(
+                smart_device_frame, smart_device_gui, self.themes
             )
             smart_device_gui.set_string_var(text_spinbox_consumption_rate)
             label_smart_plug_consumption_rate.pack(side=LEFT, anchor=W)
@@ -767,14 +785,14 @@ class SmartHomeSystem:
                 smart_device_frame,
                 text="Cooking mode:",
                 font=("sans-serif", self.font_sizes["body"]),
-                fg=self.current_theme.get_foreground(),
-                bg=self.current_theme.get_background(),
+                fg=self.themes.get_current().get_foreground(),
+                bg=self.themes.get_current().get_background(),
             )
             (
                 text_option_menu_cooking_mode,
                 option_menu_cooking_mode,
-            ) = CreateWidgets.create_option_menu_smart_air_fryer_cooking_mode(
-                smart_device_frame, smart_device_gui, self.current_theme
+            ) = Utilities.create_option_menu_smart_air_fryer_cooking_mode(
+                smart_device_frame, smart_device_gui, self.themes
             )
             smart_device_gui.set_string_var(text_option_menu_cooking_mode)
             label_smart_air_fryer_cooking_mode.pack(
@@ -828,21 +846,21 @@ class SmartHomeSystem:
         button_toggle_all = Button(
             self.button_top_frame,
             image=self.images["toggle_all_button_off"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_toggle_all(button_toggle_all),
         )
 
         button_accessibility = Button(
             self.button_top_frame,
             image=self.images["accessibility_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_accessibility(),
         )
 
         button_add = Button(
             self.main_frame,
             image=self.images["add_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=self.button_add,
         )
 
@@ -867,7 +885,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self,
         win: Tk,
         font_sizes: dict[str, int],
-        current_theme: Theme,
+        themes: Themes,
         images: dict[str, PhotoImage],
     ):
         self.edit_window = Toplevel(win)
@@ -878,12 +896,14 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self.edit_window_frame.pack(padx=10, pady=10, fill="both")
 
         self.font_sizes = font_sizes
-        self.current_theme = current_theme
+        self.themes = themes
         self.images = images
 
-        self.edit_window.configure(bg=self.current_theme.get_background())
+        self.edit_window.configure(
+            bg=self.themes.get_current().get_background()
+        )
         self.edit_window_frame.configure(
-            bg=self.current_theme.get_background()
+            bg=self.themes.get_current().get_background()
         )
 
     # Edit widget submit methods
@@ -921,17 +941,17 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         bool_checkbutton_switched_on: BooleanVar,
     ):
         text_spinbox_consumption_rate = (
-            CreateWidgets.add_edit_create_widgets_smart_plug(
+            Utilities.add_edit_create_widgets_smart_plug(
                 self.edit_window_frame,
                 smart_plug_gui,
                 self.font_sizes["body"],
-                self.current_theme,
+                self.themes,
             )[0]
         )
         edit_button_submit = Button(
             self.edit_window_frame,
             image=self.images["submit_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.edit_button_submit_smart_plug(
                 smart_plug_gui,
                 bool_checkbutton_switched_on,
@@ -946,17 +966,17 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         bool_checkbutton_switched_on: BooleanVar,
     ):
         text_option_menu_cooking_mode = (
-            CreateWidgets.add_edit_create_widgets_smart_air_fryer(
+            Utilities.add_edit_create_widgets_smart_air_fryer(
                 self.edit_window_frame,
                 smart_air_fryer_gui,
                 self.font_sizes["body"],
-                self.current_theme,
+                self.themes,
             )
         )[0]
         edit_button_submit = Button(
             self.edit_window_frame,
             image=self.images["submit_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.edit_button_submit_smart_air_fryer(
                 smart_air_fryer_gui,
                 bool_checkbutton_switched_on,
@@ -967,11 +987,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
     def edit_create_widgets(self, smart_device_gui: SmartDeviceGui):
         bool_checkbutton_switched_on = (
-            CreateWidgets.add_edit_create_widgets_smart_device(
+            Utilities.add_edit_create_widgets_smart_device(
                 self.edit_window_frame,
                 smart_device_gui,
                 self.font_sizes["body"],
-                self.current_theme,
+                self.themes,
             )[0]
         )
 
@@ -992,24 +1012,28 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         smart_device_frames: Frame,
         smart_devices_state_manager: SmartDevicesStateManager,
         font_sizes: Dict[str, int],
-        current_theme: Theme,
+        themes: Themes,
         images: Dict[str, PhotoImage],
     ):
         self.win = win
         self.smart_device_frames = smart_device_frames
         self.smart_devices_state_manager = smart_devices_state_manager
         self.font_sizes = font_sizes
-        self.current_theme = current_theme
+        self.themes = themes
         self.images = images
 
         self.add_window = Toplevel(win)
         self.add_window.title("Add")
         self.add_window.resizable(False, False)
-        self.add_window.configure(bg=self.current_theme.get_background())
+        self.add_window.configure(
+            bg=self.themes.get_current().get_background()
+        )
 
         self.add_window_frame = Frame(self.add_window)
         self.add_window_frame.pack(padx=10, pady=10, fill="both")
-        self.add_window_frame.configure(bg=self.current_theme.get_background())
+        self.add_window_frame.configure(
+            bg=self.themes.get_current().get_background()
+        )
 
         self.smart_device_states = {
             "smart_device": "Smart Plug",
@@ -1151,26 +1175,26 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         (
             text_option_menu_switched_on,
             gui_objects_smart_device,
-        ) = CreateWidgets.add_edit_create_widgets_smart_device(
+        ) = Utilities.add_edit_create_widgets_smart_device(
             self.add_window_frame,
             smart_plug_gui,
             self.font_sizes["body"],
-            self.current_theme,
+            self.themes,
         )
         (
             text_spinbox_consumption_rate,
             gui_objects_smart_plug,
-        ) = CreateWidgets.add_edit_create_widgets_smart_plug(
+        ) = Utilities.add_edit_create_widgets_smart_plug(
             self.add_window_frame,
             smart_plug_gui,
             self.font_sizes["body"],
-            self.current_theme,
+            self.themes,
         )
 
         button_add_submit_smart_plug = Button(
             self.add_window_frame,
             image=self.images["submit_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.add_button_submit_smart_plug(
                 smart_plug_gui,
                 text_option_menu_switched_on,
@@ -1203,27 +1227,27 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         (
             text_option_menu_switched_on,
             gui_objects_smart_device,
-        ) = CreateWidgets.add_edit_create_widgets_smart_device(
+        ) = Utilities.add_edit_create_widgets_smart_device(
             self.add_window_frame,
             smart_air_fryer_gui,
             self.font_sizes["body"],
-            self.current_theme,
+            self.themes,
         )
 
         (
             text_option_menu_cooking_mode,
             gui_objects_smart_air_fryer,
-        ) = CreateWidgets.add_edit_create_widgets_smart_air_fryer(
+        ) = Utilities.add_edit_create_widgets_smart_air_fryer(
             self.add_window_frame,
             smart_air_fryer_gui,
             self.font_sizes["body"],
-            self.current_theme,
+            self.themes,
         )
 
         button_add_submit_smart_air_fryer = Button(
             self.add_window_frame,
             image=self.images["submit_button_image"],
-            bg=self.current_theme.get_background(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.add_button_submit_smart_air_fryer(
                 smart_air_fryer_gui,
                 text_option_menu_switched_on,
@@ -1243,15 +1267,15 @@ class SmartHomeSystemAdd(SmartHomeSystem):
     def add_create_widgets(self):
         frame_pick_smart_device = Frame(self.add_window_frame)
         frame_pick_smart_device.configure(
-            bg=self.current_theme.get_background()
+            bg=self.themes.get_current().get_background()
         )
 
         label_pick_smart_device = Label(
             frame_pick_smart_device,
             text="Pick device: ",
             font=("sans-serif", self.font_sizes["body"]),
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
         )
 
         pick_smart_device_options = ["Smart Plug", "Smart Air Fryer"]
@@ -1266,6 +1290,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             command=lambda selected_smart_device: self.add_option_menu_submit(
                 selected_smart_device
             ),
+        )
+        self.themes.get_current().configure_options_menu_theme(
+            option_menu_pick_smart_device
         )
 
         label_pick_smart_device.pack(side=LEFT, anchor=W)
@@ -1284,8 +1311,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         button_top_frame: Frame,
         smart_devices_state_manager: SmartDevicesStateManager,
         font_sizes: dict[str, int],
-        current_theme: Theme,
-        themes: dict[str, Theme],
+        themes: Themes,
         images: dict[str, PhotoImage],
     ):
         self.win = win
@@ -1294,7 +1320,6 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.button_top_frame = button_top_frame
         self.smart_devices_state_manager = smart_devices_state_manager
         self.font_sizes = font_sizes
-        self.current_theme = current_theme
         self.themes = themes
         self.images = images
 
@@ -1306,10 +1331,10 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.accessibility_window_frame.pack(padx=10, pady=10, fill="both")
 
         self.accessibility_window.configure(
-            bg=self.current_theme.get_background()
+            bg=self.themes.get_current().get_background()
         )
         self.accessibility_window_frame.configure(
-            bg=self.current_theme.get_background()
+            bg=self.themes.get_current().get_background()
         )
 
         self.maximum_font_size = 32
@@ -1360,8 +1385,8 @@ and <= {self.maximum_font_size}"
             frame_font_size,
             text="Font size: ",
             font=("sans-serif", self.font_sizes["body"]),
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
         )
 
         text_spinbox_font_size = StringVar(
@@ -1374,8 +1399,8 @@ and <= {self.maximum_font_size}"
             from_=self.minimum_font_size,
             to=self.maximum_font_size,
             width=9,
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
             command=lambda: self.spinbox_font_size_submit(
                 text_spinbox_font_size
             ),
@@ -1391,7 +1416,7 @@ and <= {self.maximum_font_size}"
 
     def accessibility_create_widgets_theme(self):
         frame_theme = Frame(self.accessibility_window)
-        frame_theme.configure(bg=self.current_theme.get_background())
+        frame_theme.configure(bg=self.themes.get_current().get_background())
 
         theme_options = ["Light", "Dark"]
 
@@ -1404,8 +1429,8 @@ and <= {self.maximum_font_size}"
             frame_theme,
             text="Theme: ",
             font=("sans-serif", self.font_sizes["body"]),
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
         )
 
         option_menu_theme = OptionMenu(
@@ -1417,17 +1442,8 @@ and <= {self.maximum_font_size}"
             ),
         )
 
-        option_menu_theme.configure(
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
-            activeforeground=self.current_theme.get_foreground(),
-            activebackground=self.current_theme.get_background(),
-        )
-        option_menu_theme["menu"].configure(
-            fg=self.current_theme.get_foreground(),
-            bg=self.current_theme.get_background(),
-            activeforeground=self.current_theme.get_foreground(),
-            activebackground=self.current_theme.get_activebackground(),
+        self.themes.get_current().configure_options_menu_theme(
+            option_menu_theme
         )
 
         label_theme.pack(side=LEFT)
