@@ -10,11 +10,6 @@
 
 ## Challenge Features
 
-### Accessibility
-
-- [ ] Add submit button (replace command)
-- [ ] Add ability to define custom colour scheme, consisting of background and text colour (tkColorChooser)
-
 ### Permanent Data Storage
 
 - [ ] Permanent Data Storage — Currently, the user needs to create the devices one by one in the shell and the smart home system does not have permanent storage (i.e., upon closing the smart home system, all data will be lost). Investigate the tkFileDialog module of Tkinter which allows the user to upload a file (e.g., a text or a CSV file) where each row represents a device. Your app should also allow the user to save the state of a smart home to a file. [4 marks]
