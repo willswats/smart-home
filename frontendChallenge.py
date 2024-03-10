@@ -6,16 +6,25 @@ class Themes:
         self.themes = {
             "light": Theme("#000", "#fff", "#f4f4f4"),
             "dark": Theme("#fff", "#3a3a3a", "#4a4a4a"),
+            "custom": Theme("#000", "#fff", "#f4f4f4"),
         }
         self.current = self.themes["light"]
 
     def get_current(self):
         return self.current
 
-    def set_current(self, theme_name):
+    def set_current(self, theme_name: str):
         theme = theme_name.lower()
-        if theme == "light" or theme == "dark":
+        if theme == "light" or theme == "dark" or theme == "custom":
             self.current = self.themes[theme]
+
+    def get_custom_theme(self):
+        return self.themes["custom"]
+
+    def set_custom_theme(
+        self, foreground: str, background: str, activebackground: str
+    ):
+        self.themes["custom"] = Theme(foreground, background, activebackground)
 
 
 class Theme:

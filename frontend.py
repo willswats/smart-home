@@ -15,6 +15,7 @@ from tkinter import (
     Tk,
     Toplevel,
     W,
+    colorchooser,
 )
 
 from backend import (
@@ -1327,20 +1328,11 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
 and <= {self.maximum_font_size}"
             )
 
-    def option_menu_theme_submit(self, theme):
-        theme_value = theme.get()
-        self.set_theme(theme_value)
-
-    def spinbox_font_size_submit(self, font_size):
-        try:
-            font_size_value = int(font_size.get())
-            self.font_info.set_font_size(font_size_value)
-            self.set_widgets_font_size(font_size_value)
-        except Exception as error:
-            print("Error:", error)
-
     def accessibility_create_widgets_font_size(self):
-        frame_font_size = Frame(self.accessibility_window)
+        frame_font_size = Frame(self.accessibility_window_frame)
+        frame_font_size.configure(
+            bg=self.themes.get_current().get_background()
+        )
 
         label_font_size = Label(
             frame_font_size,
@@ -1362,24 +1354,19 @@ and <= {self.maximum_font_size}"
             width=9,
             fg=self.themes.get_current().get_foreground(),
             bg=self.themes.get_current().get_background(),
-            command=lambda: self.spinbox_font_size_submit(
-                text_spinbox_font_size
-            ),
-        )
-        spinbox_font_size.bind(
-            "<Return>",
-            lambda _: self.spinbox_font_size_submit(text_spinbox_font_size),
         )
 
         label_font_size.pack(side=LEFT)
         spinbox_font_size.pack(side=RIGHT)
         frame_font_size.pack(fill="both")
 
+        return text_spinbox_font_size
+
     def accessibility_create_widgets_theme(self):
-        frame_theme = Frame(self.accessibility_window)
+        frame_theme = Frame(self.accessibility_window_frame)
         frame_theme.configure(bg=self.themes.get_current().get_background())
 
-        theme_options = ["Light", "Dark"]
+        theme_options = ["Light", "Dark", "Custom"]
 
         text_option_menu_theme = StringVar(
             frame_theme,
@@ -1398,9 +1385,6 @@ and <= {self.maximum_font_size}"
             frame_theme,
             text_option_menu_theme,
             *theme_options,
-            command=lambda _: self.option_menu_theme_submit(
-                text_option_menu_theme
-            ),
         )
 
         self.themes.get_current().configure_options_menu_theme(
@@ -1411,9 +1395,101 @@ and <= {self.maximum_font_size}"
         option_menu_theme.pack(side=RIGHT)
         frame_theme.pack(fill="both")
 
+        return text_option_menu_theme
+
+    def accessibility_create_widgets_colorchooser(
+        self, label_colorchooser_text, text_colorchooser_value
+    ):
+        frame_colorchooser = Frame(self.accessibility_window_frame)
+        frame_colorchooser.configure(
+            bg=self.themes.get_current().get_background()
+        )
+
+        text_colorchooser = StringVar(
+            frame_colorchooser, text_colorchooser_value
+        )
+
+        label_colorchooser = Label(
+            frame_colorchooser,
+            text=f"{label_colorchooser_text}",
+            font=(self.font_info.get_family(), self.font_info.get_size_body()),
+            fg=self.themes.get_current().get_foreground(),
+            bg=self.themes.get_current().get_background(),
+        )
+
+        button_colorchooser = Button(
+            frame_colorchooser,
+            textvariable=text_colorchooser,
+            command=lambda: button_colorchooser_submit(),
+        )
+
+        self.themes.get_current().configure_widget_theme(button_colorchooser)
+
+        def button_colorchooser_submit():
+            color = colorchooser.askcolor()
+            hexa = color[1]
+            if hexa is not None:
+                text_colorchooser.set(str(hexa))
+
+        label_colorchooser.pack(side=LEFT)
+        button_colorchooser.pack(side=RIGHT)
+        frame_colorchooser.pack(fill="both")
+
+        return text_colorchooser
+
+    def accessibility_submit(
+        self,
+        text_spinbox_font_size,
+        text_option_menu_theme,
+        text_foreground,
+        text_background,
+        text_activeback,
+    ):
+        try:
+            font_size_value = int(text_spinbox_font_size.get())
+            self.font_info.set_font_size(font_size_value)
+            self.set_widgets_font_size(font_size_value)
+        except Exception as error:
+            print("Error:", error)
+
+        foreground = text_foreground.get()
+        background = text_background.get()
+        activebackground = text_activeback.get()
+        self.themes.set_custom_theme(foreground, background, activebackground)
+
+        theme = text_option_menu_theme.get()
+        self.set_theme(theme)
+
     def accessibility_create_widgets(self):
-        self.accessibility_create_widgets_font_size()
-        self.accessibility_create_widgets_theme()
+        text_spinbox_font_size = self.accessibility_create_widgets_font_size()
+        text_option_menu_theme = self.accessibility_create_widgets_theme()
+        text_foreground = self.accessibility_create_widgets_colorchooser(
+            "Custom foreground: ",
+            self.themes.get_custom_theme().get_foreground(),
+        )
+        text_background = self.accessibility_create_widgets_colorchooser(
+            "Custom background: ",
+            self.themes.get_custom_theme().get_background(),
+        )
+        text_activeback = self.accessibility_create_widgets_colorchooser(
+            "Custom active background: ",
+            self.themes.get_custom_theme().get_activebackground(),
+        )
+        button_accessibility_submit = Button(
+            self.accessibility_window_frame,
+            image=self.images.get_submit_button_image(),
+            command=lambda: self.accessibility_submit(
+                text_spinbox_font_size,
+                text_option_menu_theme,
+                text_foreground,
+                text_background,
+                text_activeback,
+            ),
+        )
+        self.themes.get_current().configure_widget_theme(
+            button_accessibility_submit
+        )
+        button_accessibility_submit.pack(side=LEFT, anchor=W, pady=5)
 
 
 def main():
