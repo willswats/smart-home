@@ -16,7 +16,6 @@ from tkinter import (
     Toplevel,
     W,
 )
-from typing import Dict
 
 from backend import (
     CookingModes,
@@ -268,8 +267,8 @@ class SmartDevicesStateManager:
 class Themes:
     def __init__(self):
         self.themes = {
-            "light": Theme("#000", "#fff", "#EDEDED"),
-            "dark": Theme("#fff", "#1a1a1a", "#2C2C2C"),
+            "light": Theme("#000", "#fff", "#f4f4f4"),
+            "dark": Theme("#fff", "#3a3a3a", "#4a4a4a"),
         }
         self.current = self.themes["light"]
 
@@ -320,6 +319,82 @@ class Theme:
             activeforeground=self.foreground,
             activebackground=self.activebackground,
         )
+
+
+class Images:
+    def __init__(self):
+        theme_dir = "./assets/"
+        self.images = {
+            "smart_plug_image": PhotoImage(file=f"{theme_dir}plug.png"),
+            "smart_air_fryer_image": PhotoImage(file=f"{theme_dir}pot.png"),
+            "toggle_button_image": PhotoImage(file=f"{theme_dir}toggle.png"),
+            "edit_button_image": PhotoImage(file=f"{theme_dir}edit.png"),
+            "delete_button_image": PhotoImage(file=f"{theme_dir}delete.png"),
+            "add_button_image": PhotoImage(file=f"{theme_dir}add.png"),
+            "accessibility_button_image": PhotoImage(
+                file=f"{theme_dir}settings.png"
+            ),
+            "submit_button_image": PhotoImage(file=f"{theme_dir}check.png"),
+            "toggle_all_button_off": PhotoImage(
+                file=f"{theme_dir}toggle-off.png"
+            ),
+            "toggle_all_button_on": PhotoImage(
+                file=f"{theme_dir}toggle-on.png"
+            ),
+        }
+
+        for image in self.images:
+            self.images[image] = self.images[image].subsample(8, 8)
+
+    def get_smart_plug_image(self):
+        return self.images["smart_plug_image"]
+
+    def get_smart_air_fryer_image(self):
+        return self.images["smart_air_fryer_image"]
+
+    def get_toggle_button_image(self):
+        return self.images["toggle_button_image"]
+
+    def get_edit_button_image(self):
+        return self.images["edit_button_image"]
+
+    def get_delete_button_image(self):
+        return self.images["delete_button_image"]
+
+    def get_add_button_image(self):
+        return self.images["add_button_image"]
+
+    def get_accessibility_button_image(self):
+        return self.images["accessibility_button_image"]
+
+    def get_submit_button_image(self):
+        return self.images["submit_button_image"]
+
+    def get_toggle_all_button_off(self):
+        return self.images["toggle_all_button_off"]
+
+    def get_toggle_all_button_on(self):
+        return self.images["toggle_all_button_on"]
+
+
+class FontInfo:
+    def __init__(self):
+        self.family = "sans-serif"
+        self.size_title = 12
+        self.size_body = 10
+
+    def set_font_size(self, font_size):
+        self.size_title = font_size + 2
+        self.size_body = font_size
+
+    def get_size_title(self):
+        return self.size_title
+
+    def get_size_body(self):
+        return self.size_body
+
+    def get_family(self):
+        return self.family
 
 
 class Utilities:
@@ -420,7 +495,7 @@ class Utilities:
     def add_edit_create_widgets_smart_device(
         frame: Frame,
         smart_device_gui: SmartDeviceGui,
-        font_size: int,
+        font_info: FontInfo,
         themes: Themes,
     ) -> tuple[BooleanVar, list[Frame | Label | Checkbutton]]:
         frame_switched_on = Frame(frame)
@@ -429,7 +504,7 @@ class Utilities:
         label_switched_on = Label(
             frame_switched_on,
             text="Switched on: ",
-            font=("sans-serif", font_size),
+            font=(font_info.get_family(), font_info.get_size_body()),
             fg=themes.get_current().get_foreground(),
             bg=themes.get_current().get_background(),
         )
@@ -458,7 +533,7 @@ class Utilities:
     def add_edit_create_widgets_smart_plug(
         frame: Frame,
         smart_plug_gui: SmartPlugGui,
-        font_size: int,
+        font_info: FontInfo,
         themes: Themes,
     ) -> tuple[StringVar, list[Frame | Label | Spinbox]]:
         frame_consumption_rate = Frame(frame)
@@ -471,7 +546,7 @@ class Utilities:
             text="Consumption rate: ",
             fg=themes.get_current().get_foreground(),
             bg=themes.get_current().get_background(),
-            font=("sans-serif", font_size),
+            font=(font_info.get_family(), font_info.get_size_body()),
         )
 
         (
@@ -498,7 +573,7 @@ class Utilities:
     def add_edit_create_widgets_smart_air_fryer(
         frame: Frame,
         smart_air_fryer_gui: SmartAirFryerGui,
-        font_size: int,
+        font_info: FontInfo,
         themes: Themes,
     ) -> tuple[StringVar, list[Frame | Label | OptionMenu]]:
         frame_cooking_mode = Frame(frame)
@@ -507,7 +582,7 @@ class Utilities:
         label_cooking_modes = Label(
             frame_cooking_mode,
             text="Cooking modes: ",
-            font=("sans-serif", font_size),
+            font=(font_info.get_family(), font_info.get_size_body()),
             fg=themes.get_current().get_foreground(),
             bg=themes.get_current().get_background(),
         )
@@ -533,62 +608,6 @@ class Utilities:
         )
 
 
-class Images:
-    def __init__(self):
-        theme_dir = "./assets/"
-        self.images = {
-            "smart_plug_image": PhotoImage(file=f"{theme_dir}plug.png"),
-            "smart_air_fryer_image": PhotoImage(file=f"{theme_dir}pot.png"),
-            "toggle_button_image": PhotoImage(file=f"{theme_dir}toggle.png"),
-            "edit_button_image": PhotoImage(file=f"{theme_dir}edit.png"),
-            "delete_button_image": PhotoImage(file=f"{theme_dir}delete.png"),
-            "add_button_image": PhotoImage(file=f"{theme_dir}add.png"),
-            "accessibility_button_image": PhotoImage(
-                file=f"{theme_dir}settings.png"
-            ),
-            "submit_button_image": PhotoImage(file=f"{theme_dir}check.png"),
-            "toggle_all_button_off": PhotoImage(
-                file=f"{theme_dir}toggle-off.png"
-            ),
-            "toggle_all_button_on": PhotoImage(
-                file=f"{theme_dir}toggle-on.png"
-            ),
-        }
-
-        for image in self.images:
-            self.images[image] = self.images[image].subsample(8, 8)
-
-    def get_smart_plug_image(self):
-        return self.images["smart_plug_image"]
-
-    def get_smart_air_fryer_image(self):
-        return self.images["smart_air_fryer_image"]
-
-    def get_toggle_button_image(self):
-        return self.images["toggle_button_image"]
-
-    def get_edit_button_image(self):
-        return self.images["edit_button_image"]
-
-    def get_delete_button_image(self):
-        return self.images["delete_button_image"]
-
-    def get_add_button_image(self):
-        return self.images["add_button_image"]
-
-    def get_accessibility_button_image(self):
-        return self.images["accessibility_button_image"]
-
-    def get_submit_button_image(self):
-        return self.images["submit_button_image"]
-
-    def get_toggle_all_button_off(self):
-        return self.images["toggle_all_button_off"]
-
-    def get_toggle_all_button_on(self):
-        return self.images["toggle_all_button_on"]
-
-
 class SmartHomeSystem:
     def __init__(self, home: SmartHome):
         self.win = Tk()
@@ -607,10 +626,7 @@ class SmartHomeSystem:
 
         self.smart_devices_state_manager = SmartDevicesStateManager(home)
 
-        self.font_sizes = {
-            "title": 12,
-            "body": 10,
-        }
+        self.font_info = FontInfo()
 
         self.themes = Themes()
 
@@ -632,10 +648,6 @@ class SmartHomeSystem:
         self.win.mainloop()
 
     # Set methods
-    def set_font_size(self, font_size):
-        self.font_sizes["title"] = font_size + 2
-        self.font_sizes["body"] = font_size
-
     def set_theme(self, theme):
         self.themes.set_current(theme)
         self.set_theme_widgets()
@@ -669,8 +681,8 @@ class SmartHomeSystem:
                     current_theme.configure_options_menu_theme(widget)
                 else:
                     widget.configure(
-                        fg=self.themes.get_current().get_foreground(),
-                        bg=self.themes.get_current().get_background(),
+                        fg=current_theme.get_foreground(),
+                        bg=current_theme.get_background(),
                     )
 
     # Widget submit methods
@@ -689,7 +701,7 @@ class SmartHomeSystem:
 
     def button_edit(self, smart_device_gui: SmartDeviceGui):
         smart_home_system_edit = SmartHomeSystemEdit(
-            self.win, self.font_sizes, self.themes, self.images
+            self.win, self.font_info, self.themes, self.images
         )
         smart_home_system_edit.edit_create_widgets(smart_device_gui)
 
@@ -698,7 +710,7 @@ class SmartHomeSystem:
             self.win,
             self.smart_device_frames,
             self.smart_devices_state_manager,
-            self.font_sizes,
+            self.font_info,
             self.themes,
             self.images,
         )
@@ -712,7 +724,7 @@ class SmartHomeSystem:
             self.button_top_frame,
             self.non_smart_device_buttons,
             self.smart_devices_state_manager,
-            self.font_sizes,
+            self.font_info,
             self.themes,
             self.images,
         )
@@ -778,8 +790,8 @@ class SmartHomeSystem:
             smart_device_frame,
             text=smart_device_text_title,
             font=(
-                "sans-serif",
-                self.font_sizes["title"],
+                self.font_info.get_family(),
+                self.font_info.get_size_title(),
                 "bold",
             ),
             fg=self.themes.get_current().get_foreground(),
@@ -789,7 +801,7 @@ class SmartHomeSystem:
         label_smart_device_switched_on = Label(
             smart_device_frame,
             text="Switched on:",
-            font=("sans-serif", self.font_sizes["body"]),
+            font=(self.font_info.get_family(), self.font_info.get_size_body()),
             fg=self.themes.get_current().get_foreground(),
             bg=self.themes.get_current().get_background(),
         )
@@ -813,7 +825,10 @@ class SmartHomeSystem:
             label_smart_plug_consumption_rate = Label(
                 smart_device_frame,
                 text="Consumption rate:",
-                font=("sans-serif", self.font_sizes["body"]),
+                font=(
+                    self.font_info.get_family(),
+                    self.font_info.get_size_body(),
+                ),
                 fg=self.themes.get_current().get_foreground(),
                 bg=self.themes.get_current().get_background(),
             )
@@ -836,7 +851,10 @@ class SmartHomeSystem:
             label_smart_air_fryer_cooking_mode = Label(
                 smart_device_frame,
                 text="Cooking mode:",
-                font=("sans-serif", self.font_sizes["body"]),
+                font=(
+                    self.font_info.get_family(),
+                    self.font_info.get_size_body(),
+                ),
                 fg=self.themes.get_current().get_foreground(),
                 bg=self.themes.get_current().get_background(),
             )
@@ -941,7 +959,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
     def __init__(
         self,
         win: Tk,
-        font_sizes: dict[str, int],
+        font_info: FontInfo,
         themes: Themes,
         images: Images,
     ):
@@ -952,7 +970,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self.edit_window_frame = Frame(self.edit_window)
         self.edit_window_frame.pack(padx=10, pady=10, fill="both")
 
-        self.font_sizes = font_sizes
+        self.font_info = font_info
         self.themes = themes
         self.images = images
 
@@ -1002,7 +1020,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             Utilities.add_edit_create_widgets_smart_plug(
                 self.edit_window_frame,
                 smart_plug_gui,
-                self.font_sizes["body"],
+                self.font_info,
                 self.themes,
             )[0]
         )
@@ -1029,7 +1047,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             Utilities.add_edit_create_widgets_smart_air_fryer(
                 self.edit_window_frame,
                 smart_air_fryer_gui,
-                self.font_sizes["body"],
+                self.font_info,
                 self.themes,
             )
         )[0]
@@ -1052,7 +1070,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             Utilities.add_edit_create_widgets_smart_device(
                 self.edit_window_frame,
                 smart_device_gui,
-                self.font_sizes["body"],
+                self.font_info,
                 self.themes,
             )[0]
         )
@@ -1073,14 +1091,14 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         win: Tk,
         smart_device_frames: Frame,
         smart_devices_state_manager: SmartDevicesStateManager,
-        font_sizes: Dict[str, int],
+        font_info: FontInfo,
         themes: Themes,
         images: Images,
     ):
         self.win = win
         self.smart_device_frames = smart_device_frames
         self.smart_devices_state_manager = smart_devices_state_manager
-        self.font_sizes = font_sizes
+        self.font_info = font_info
         self.themes = themes
         self.images = images
 
@@ -1240,7 +1258,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         ) = Utilities.add_edit_create_widgets_smart_device(
             self.add_window_frame,
             smart_plug_gui,
-            self.font_sizes["body"],
+            self.font_info,
             self.themes,
         )
         (
@@ -1249,7 +1267,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         ) = Utilities.add_edit_create_widgets_smart_plug(
             self.add_window_frame,
             smart_plug_gui,
-            self.font_sizes["body"],
+            self.font_info,
             self.themes,
         )
 
@@ -1294,7 +1312,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         ) = Utilities.add_edit_create_widgets_smart_device(
             self.add_window_frame,
             smart_air_fryer_gui,
-            self.font_sizes["body"],
+            self.font_info,
             self.themes,
         )
 
@@ -1304,7 +1322,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         ) = Utilities.add_edit_create_widgets_smart_air_fryer(
             self.add_window_frame,
             smart_air_fryer_gui,
-            self.font_sizes["body"],
+            self.font_info,
             self.themes,
         )
 
@@ -1340,7 +1358,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         label_pick_smart_device = Label(
             frame_pick_smart_device,
             text="Pick device: ",
-            font=("sans-serif", self.font_sizes["body"]),
+            font=(self.font_info.get_family(), self.font_info.get_size_body()),
             fg=self.themes.get_current().get_foreground(),
             bg=self.themes.get_current().get_background(),
         )
@@ -1378,7 +1396,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         button_top_frame: Frame,
         non_smart_device_buttons: list[Button],
         smart_devices_state_manager: SmartDevicesStateManager,
-        font_sizes: dict[str, int],
+        font_info: FontInfo,
         themes: Themes,
         images: Images,
     ):
@@ -1388,7 +1406,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.button_top_frame = button_top_frame
         self.non_smart_device_buttons = non_smart_device_buttons
         self.smart_devices_state_manager = smart_devices_state_manager
-        self.font_sizes = font_sizes
+        self.font_info = font_info
         self.themes = themes
         self.images = images
 
@@ -1425,10 +1443,16 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
                     if isinstance(widget, Label):
                         if widget.cget("text") in smart_device_titles:
                             widget.config(
-                                font=("sans-serif", font_size + 2, "bold")
+                                font=(
+                                    self.font_info.get_family(),
+                                    font_size + 2,
+                                    "bold",
+                                )
                             )
                         else:
-                            widget.config(font=("sans-serif", font_size))
+                            widget.config(
+                                font=(self.font_info.get_family(), font_size)
+                            )
         else:
             print(
                 f"Error: font size must be >= {self.minimum_font_size} \
@@ -1442,7 +1466,7 @@ and <= {self.maximum_font_size}"
     def spinbox_font_size_submit(self, font_size):
         try:
             font_size_value = int(font_size.get())
-            self.set_font_size(font_size_value)
+            self.font_info.set_font_size(font_size_value)
             self.set_widgets_font_size(font_size_value)
         except Exception as error:
             print("Error:", error)
@@ -1453,13 +1477,13 @@ and <= {self.maximum_font_size}"
         label_font_size = Label(
             frame_font_size,
             text="Font size: ",
-            font=("sans-serif", self.font_sizes["body"]),
+            font=(self.font_info.get_family(), self.font_info.get_size_body()),
             fg=self.themes.get_current().get_foreground(),
             bg=self.themes.get_current().get_background(),
         )
 
         text_spinbox_font_size = StringVar(
-            frame_font_size, str(self.font_sizes["body"])
+            frame_font_size, str(self.font_info.get_size_body())
         )
 
         spinbox_font_size = Spinbox(
@@ -1497,7 +1521,7 @@ and <= {self.maximum_font_size}"
         label_theme = Label(
             frame_theme,
             text="Theme: ",
-            font=("sans-serif", self.font_sizes["body"]),
+            font=(self.font_info.get_family(), self.font_info.get_size_body()),
             fg=self.themes.get_current().get_foreground(),
             bg=self.themes.get_current().get_background(),
         )
