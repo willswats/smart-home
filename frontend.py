@@ -304,7 +304,7 @@ class Theme:
             fg=self.foreground,
             bg=self.background,
             activeforeground=self.foreground,
-            activebackground=self.background,
+            activebackground=self.activebackground,
         )
 
     def configure_options_menu_theme(self, option_menu: OptionMenu):
@@ -312,13 +312,13 @@ class Theme:
             fg=self.foreground,
             bg=self.background,
             activeforeground=self.foreground,
-            activebackground=self.background,
+            activebackground=self.activebackground,
         )
         option_menu["menu"].configure(
             fg=self.foreground,
             bg=self.background,
             activeforeground=self.foreground,
-            activebackground=self.background,
+            activebackground=self.activebackground,
         )
 
 
@@ -542,9 +542,12 @@ class SmartHomeSystem:
         self.main_frame = Frame(self.win)
         self.main_frame.pack(padx=10, pady=10)
 
+        self.smart_device_frames = Frame(self.main_frame)
+
         self.button_top_frame = Frame(self.main_frame)
 
-        self.smart_device_frames = Frame(self.main_frame)
+        # To access the widgets and set the theme for them
+        self.non_smart_device_buttons = []
 
         self.smart_devices_state_manager = SmartDevicesStateManager(home)
 
@@ -606,6 +609,9 @@ class SmartHomeSystem:
         self.smart_device_frames.configure(bg=current_theme.get_background())
         self.button_top_frame.configure(bg=current_theme.get_background())
 
+        for button in self.non_smart_device_buttons:
+            self.themes.get_current().configure_widget_theme(button)
+
         for device in self.smart_devices_state_manager.get_smart_devices_gui():
             for widget in device.get_widgets():
                 if isinstance(widget, Frame):
@@ -666,6 +672,7 @@ class SmartHomeSystem:
             self.main_frame,
             self.smart_device_frames,
             self.button_top_frame,
+            self.non_smart_device_buttons,
             self.smart_devices_state_manager,
             self.font_sizes,
             self.themes,
@@ -680,20 +687,27 @@ class SmartHomeSystem:
         button_toggle_smart_device = Button(
             frame,
             image=self.images["toggle_button_image"],
-            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_toggle(smart_device_gui),
         )
         button_edit_smart_device = Button(
             frame,
             image=self.images["edit_button_image"],
-            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_edit(smart_device_gui),
         )
         button_delete_smart_device = Button(
             frame,
             image=self.images["delete_button_image"],
-            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_delete(smart_device_gui),
+        )
+
+        self.themes.get_current().configure_widget_theme(
+            button_toggle_smart_device
+        )
+        self.themes.get_current().configure_widget_theme(
+            button_edit_smart_device
+        )
+        self.themes.get_current().configure_widget_theme(
+            button_delete_smart_device
         )
 
         button_delete_smart_device.pack(side=RIGHT, anchor=E, padx=(5, 0))
@@ -846,23 +860,28 @@ class SmartHomeSystem:
         button_toggle_all = Button(
             self.button_top_frame,
             image=self.images["toggle_all_button_off"],
-            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_toggle_all(button_toggle_all),
         )
 
         button_accessibility = Button(
             self.button_top_frame,
             image=self.images["accessibility_button_image"],
-            bg=self.themes.get_current().get_background(),
             command=lambda: self.button_accessibility(),
         )
 
         button_add = Button(
             self.main_frame,
             image=self.images["add_button_image"],
-            bg=self.themes.get_current().get_background(),
             command=self.button_add,
         )
+
+        self.themes.get_current().configure_widget_theme(button_toggle_all)
+        self.themes.get_current().configure_widget_theme(button_accessibility)
+        self.themes.get_current().configure_widget_theme(button_add)
+
+        self.non_smart_device_buttons.append(button_toggle_all)
+        self.non_smart_device_buttons.append(button_accessibility)
+        self.non_smart_device_buttons.append(button_add)
 
         button_toggle_all.pack(side=LEFT)
         button_accessibility.pack(side=RIGHT)
@@ -939,6 +958,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         self,
         smart_plug_gui: SmartPlugGui,
         bool_checkbutton_switched_on: BooleanVar,
+        themes: Themes,
     ):
         text_spinbox_consumption_rate = (
             Utilities.add_edit_create_widgets_smart_plug(
@@ -958,12 +978,14 @@ class SmartHomeSystemEdit(SmartHomeSystem):
                 text_spinbox_consumption_rate,
             ),
         )
+        themes.get_current().configure_widget_theme(edit_button_submit)
         edit_button_submit.pack(side=LEFT, anchor=W)
 
     def edit_create_widgets_smart_air_fryer(
         self,
         smart_air_fryer_gui: SmartAirFryerGui,
         bool_checkbutton_switched_on: BooleanVar,
+        themes: Themes,
     ):
         text_option_menu_cooking_mode = (
             Utilities.add_edit_create_widgets_smart_air_fryer(
@@ -983,6 +1005,8 @@ class SmartHomeSystemEdit(SmartHomeSystem):
                 text_option_menu_cooking_mode,
             ),
         )
+        themes.get_current().configure_widget_theme(edit_button_submit)
+
         edit_button_submit.pack(side=LEFT, anchor=W)
 
     def edit_create_widgets(self, smart_device_gui: SmartDeviceGui):
@@ -997,11 +1021,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
         if isinstance(smart_device_gui, SmartPlugGui):
             self.edit_create_widgets_smart_plug(
-                smart_device_gui, bool_checkbutton_switched_on
+                smart_device_gui, bool_checkbutton_switched_on, self.themes
             )
         elif isinstance(smart_device_gui, SmartAirFryerGui):
             self.edit_create_widgets_smart_air_fryer(
-                smart_device_gui, bool_checkbutton_switched_on
+                smart_device_gui, bool_checkbutton_switched_on, self.themes
             )
 
 
@@ -1194,12 +1218,14 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         button_add_submit_smart_plug = Button(
             self.add_window_frame,
             image=self.images["submit_button_image"],
-            bg=self.themes.get_current().get_background(),
             command=lambda: self.add_button_submit_smart_plug(
                 smart_plug_gui,
                 text_option_menu_switched_on,
                 text_spinbox_consumption_rate,
             ),
+        )
+        self.themes.get_current().configure_widget_theme(
+            button_add_submit_smart_plug
         )
         button_add_submit_smart_plug.pack(side=LEFT, anchor=W, pady=5)
 
@@ -1253,6 +1279,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 text_option_menu_switched_on,
                 text_option_menu_cooking_mode,
             ),
+        )
+        self.themes.get_current().configure_widget_theme(
+            button_add_submit_smart_air_fryer
         )
         button_add_submit_smart_air_fryer.pack(side=LEFT, anchor=W, pady=5)
 
@@ -1309,6 +1338,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         main_frame: Frame,
         smart_device_frames: Frame,
         button_top_frame: Frame,
+        non_smart_device_buttons: list[Button],
         smart_devices_state_manager: SmartDevicesStateManager,
         font_sizes: dict[str, int],
         themes: Themes,
@@ -1318,6 +1348,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.main_frame = main_frame
         self.smart_device_frames = smart_device_frames
         self.button_top_frame = button_top_frame
+        self.non_smart_device_buttons = non_smart_device_buttons
         self.smart_devices_state_manager = smart_devices_state_manager
         self.font_sizes = font_sizes
         self.themes = themes
