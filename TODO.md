@@ -1,12 +1,8 @@
 # TODO
 
-## Clean up
+## Clean Up
 
 - [ ] Remove noqa
-
-## Test
-
-- [ ] Test on Windows
 
 ## Challenge Features
 
