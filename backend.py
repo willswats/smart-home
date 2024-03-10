@@ -46,7 +46,7 @@ def test_smart_plug():
     print(smart_plug)
 
 
-# test_smart_plug()
+test_smart_plug()
 
 
 class CookingModes(Enum):
@@ -88,7 +88,7 @@ def test_smart_air_fryer():
     print(smart_air_fryer)
 
 
-# test_smart_air_fryer()
+test_smart_air_fryer()
 
 
 class SmartHome:
@@ -165,4 +165,4 @@ def test_smart_home():
     print(smart_home)
 
 
-# test_smart_home()
+test_smart_home()
