@@ -533,6 +533,62 @@ class Utilities:
         )
 
 
+class Images:
+    def __init__(self):
+        theme_dir = "./assets/"
+        self.images = {
+            "smart_plug_image": PhotoImage(file=f"{theme_dir}plug.png"),
+            "smart_air_fryer_image": PhotoImage(file=f"{theme_dir}pot.png"),
+            "toggle_button_image": PhotoImage(file=f"{theme_dir}toggle.png"),
+            "edit_button_image": PhotoImage(file=f"{theme_dir}edit.png"),
+            "delete_button_image": PhotoImage(file=f"{theme_dir}delete.png"),
+            "add_button_image": PhotoImage(file=f"{theme_dir}add.png"),
+            "accessibility_button_image": PhotoImage(
+                file=f"{theme_dir}settings.png"
+            ),
+            "submit_button_image": PhotoImage(file=f"{theme_dir}check.png"),
+            "toggle_all_button_off": PhotoImage(
+                file=f"{theme_dir}toggle-off.png"
+            ),
+            "toggle_all_button_on": PhotoImage(
+                file=f"{theme_dir}toggle-on.png"
+            ),
+        }
+
+        for image in self.images:
+            self.images[image] = self.images[image].subsample(8, 8)
+
+    def get_smart_plug_image(self):
+        return self.images["smart_plug_image"]
+
+    def get_smart_air_fryer_image(self):
+        return self.images["smart_air_fryer_image"]
+
+    def get_toggle_button_image(self):
+        return self.images["toggle_button_image"]
+
+    def get_edit_button_image(self):
+        return self.images["edit_button_image"]
+
+    def get_delete_button_image(self):
+        return self.images["delete_button_image"]
+
+    def get_add_button_image(self):
+        return self.images["add_button_image"]
+
+    def get_accessibility_button_image(self):
+        return self.images["accessibility_button_image"]
+
+    def get_submit_button_image(self):
+        return self.images["submit_button_image"]
+
+    def get_toggle_all_button_off(self):
+        return self.images["toggle_all_button_off"]
+
+    def get_toggle_all_button_on(self):
+        return self.images["toggle_all_button_on"]
+
+
 class SmartHomeSystem:
     def __init__(self, home: SmartHome):
         self.win = Tk()
@@ -569,25 +625,7 @@ class SmartHomeSystem:
             bg=self.themes.get_current().get_background()
         )
 
-        self.images = {
-            "smart_plug_image": PhotoImage(file="./assets/plug.png"),
-            "smart_air_fryer_image": PhotoImage(file="./assets/pot.png"),
-            "toggle_button_image": PhotoImage(file="./assets/toggle.png"),
-            "edit_button_image": PhotoImage(file="./assets/edit.png"),
-            "delete_button_image": PhotoImage(file="./assets/delete.png"),
-            "add_button_image": PhotoImage(file="./assets/add.png"),
-            "accessibility_button_image": PhotoImage(
-                file="./assets/settings.png"
-            ),
-            "submit_button_image": PhotoImage(file="./assets/check.png"),
-            "toggle_all_button_off": PhotoImage(
-                file="./assets/toggle-off.png"
-            ),
-            "toggle_all_button_on": PhotoImage(file="./assets/toggle-on.png"),
-        }
-
-        for image in self.images:
-            self.images[image] = self.images[image].subsample(8, 8)
+        self.images = Images()
 
     def run(self):
         self.create_widgets()
@@ -643,8 +681,8 @@ class SmartHomeSystem:
         self.smart_devices_state_manager.delete_smart_device(smart_device_gui)
 
     def button_toggle_all(self, button_toggle_all):
-        image_off = self.images["toggle_all_button_off"]
-        image_on = self.images["toggle_all_button_on"]
+        image_off = self.images.get_toggle_all_button_off()
+        image_on = self.images.get_toggle_all_button_on()
         self.smart_devices_state_manager.toggle_all_smart_devices(
             button_toggle_all, image_off, image_on
         )
@@ -686,17 +724,17 @@ class SmartHomeSystem:
     ):
         button_toggle_smart_device = Button(
             frame,
-            image=self.images["toggle_button_image"],
+            image=self.images.get_toggle_button_image(),
             command=lambda: self.button_toggle(smart_device_gui),
         )
         button_edit_smart_device = Button(
             frame,
-            image=self.images["edit_button_image"],
+            image=self.images.get_edit_button_image(),
             command=lambda: self.button_edit(smart_device_gui),
         )
         button_delete_smart_device = Button(
             frame,
-            image=self.images["delete_button_image"],
+            image=self.images.get_delete_button_image(),
             command=lambda: self.button_delete(smart_device_gui),
         )
 
@@ -841,7 +879,7 @@ class SmartHomeSystem:
         )
 
     def create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
-        smart_device_image = self.images["smart_plug_image"]
+        smart_device_image = self.images.get_smart_plug_image()
         smart_device_text_title = SmartDeviceTitles.SMART_PLUG.value
         self.create_widgets_smart_device(
             smart_plug_gui, smart_device_image, smart_device_text_title
@@ -850,7 +888,7 @@ class SmartHomeSystem:
     def create_widgets_smart_air_fryer(
         self, smart_air_fryer_gui: SmartAirFryerGui
     ):
-        smart_device_image = self.images["smart_air_fryer_image"]
+        smart_device_image = self.images.get_smart_air_fryer_image()
         smart_device_text_title = SmartDeviceTitles.SMART_AIR_FRYER.value
         self.create_widgets_smart_device(
             smart_air_fryer_gui, smart_device_image, smart_device_text_title
@@ -859,19 +897,19 @@ class SmartHomeSystem:
     def create_widgets(self):
         button_toggle_all = Button(
             self.button_top_frame,
-            image=self.images["toggle_all_button_off"],
+            image=self.images.get_toggle_all_button_off(),
             command=lambda: self.button_toggle_all(button_toggle_all),
         )
 
         button_accessibility = Button(
             self.button_top_frame,
-            image=self.images["accessibility_button_image"],
+            image=self.images.get_accessibility_button_image(),
             command=lambda: self.button_accessibility(),
         )
 
         button_add = Button(
             self.main_frame,
-            image=self.images["add_button_image"],
+            image=self.images.get_add_button_image(),
             command=self.button_add,
         )
 
@@ -905,7 +943,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         win: Tk,
         font_sizes: dict[str, int],
         themes: Themes,
-        images: dict[str, PhotoImage],
+        images: Images,
     ):
         self.edit_window = Toplevel(win)
         self.edit_window.title("Edit")
@@ -970,7 +1008,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         )
         edit_button_submit = Button(
             self.edit_window_frame,
-            image=self.images["submit_button_image"],
+            image=self.images.get_submit_button_image(),
             bg=self.themes.get_current().get_background(),
             command=lambda: self.edit_button_submit_smart_plug(
                 smart_plug_gui,
@@ -997,7 +1035,7 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         )[0]
         edit_button_submit = Button(
             self.edit_window_frame,
-            image=self.images["submit_button_image"],
+            image=self.images.get_submit_button_image(),
             bg=self.themes.get_current().get_background(),
             command=lambda: self.edit_button_submit_smart_air_fryer(
                 smart_air_fryer_gui,
@@ -1037,7 +1075,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         smart_devices_state_manager: SmartDevicesStateManager,
         font_sizes: Dict[str, int],
         themes: Themes,
-        images: Dict[str, PhotoImage],
+        images: Images,
     ):
         self.win = win
         self.smart_device_frames = smart_device_frames
@@ -1217,7 +1255,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         button_add_submit_smart_plug = Button(
             self.add_window_frame,
-            image=self.images["submit_button_image"],
+            image=self.images.get_submit_button_image(),
             command=lambda: self.add_button_submit_smart_plug(
                 smart_plug_gui,
                 text_option_menu_switched_on,
@@ -1272,7 +1310,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         button_add_submit_smart_air_fryer = Button(
             self.add_window_frame,
-            image=self.images["submit_button_image"],
+            image=self.images.get_submit_button_image(),
             bg=self.themes.get_current().get_background(),
             command=lambda: self.add_button_submit_smart_air_fryer(
                 smart_air_fryer_gui,
@@ -1342,7 +1380,7 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         smart_devices_state_manager: SmartDevicesStateManager,
         font_sizes: dict[str, int],
         themes: Themes,
-        images: dict[str, PhotoImage],
+        images: Images,
     ):
         self.win = win
         self.main_frame = main_frame
