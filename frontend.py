@@ -16,6 +16,7 @@ from tkinter import (
     Toplevel,
     W,
     colorchooser,
+    filedialog,
 )
 
 from backend import (
@@ -25,7 +26,7 @@ from backend import (
     SmartHome,
     SmartPlug,
 )
-from frontendChallenge import FontInfo, Images, Themes
+from frontendChallenge import FontInfo, Images, SmartDeviceFile, Themes
 
 
 class SmartDeviceNums(Enum):
@@ -265,6 +266,13 @@ class SmartDevicesStateManager:
         for smart_device_gui in self.smart_devices_gui:
             smart_device_gui.update_smart_device()
 
+    def delete_all_smart_devices(self):
+        for smart_device_gui in self.smart_devices_gui:
+            smart_device_gui.delete_widgets()
+
+        self.smart_devices_gui = []
+        self.home.delete_all_devices()
+
 
 class Utilities:
     # General create widget methods
@@ -490,6 +498,8 @@ class SmartHomeSystem:
 
         self.button_top_frame = Frame(self.main_frame)
 
+        self.home = home
+
         # To access the widgets and set the theme for them
         self.non_smart_device_buttons = []
 
@@ -598,6 +608,55 @@ class SmartHomeSystem:
             self.images,
         )
         smart_home_system_accessibility.accessibility_create_widgets()
+
+    def button_download(self):
+        smart_device_file = SmartDeviceFile(self.home.get_devices())
+        smart_device_file.create_csv()
+
+    def button_upload(self):
+        smart_device_file = SmartDeviceFile(self.home.get_devices())
+        file = filedialog.askopenfile()
+        if file is not None:
+            self.smart_devices_state_manager.delete_all_smart_devices()
+            smart_device_rows = smart_device_file.read_csv(file.name)
+
+            for smart_device_row in smart_device_rows:
+                device_type = smart_device_row[0]
+                if device_type == "smart_plug":
+                    switched_on = smart_device_row[1]
+                    consumption_rate = int(smart_device_row[2])
+
+                    smart_plug = SmartPlug(consumption_rate)
+                    if switched_on is True:
+                        smart_plug.toggle_switch()
+
+                    smart_plug_gui = SmartPlugGui(smart_plug)
+
+                    self.smart_devices_state_manager.add_smart_device(
+                        smart_plug_gui
+                    )
+                elif device_type == "smart_air_fryer":
+                    switched_on = smart_device_row[1]
+                    cooking_mode = smart_device_row[2]
+
+                    smart_air_fryer = SmartAirFryer()
+                    if switched_on is True:
+                        smart_air_fryer.toggle_switch()
+                    smart_air_fryer.set_cooking_mode(cooking_mode)
+
+                    smart_air_fryer_gui = SmartAirFryerGui(smart_air_fryer)
+
+                    self.smart_devices_state_manager.add_smart_device(
+                        smart_air_fryer_gui
+                    )
+
+        for (
+            smart_device_gui
+        ) in self.smart_devices_state_manager.get_smart_devices_gui():
+            if isinstance(smart_device_gui, SmartPlugGui):
+                self.create_widgets_smart_plug(smart_device_gui)
+            elif isinstance(smart_device_gui, SmartAirFryerGui):
+                self.create_widgets_smart_air_fryer(smart_device_gui)
 
     # Create widgets methods
     def create_widgets_buttons_smart_device(
@@ -800,9 +859,23 @@ class SmartHomeSystem:
             command=self.button_add,
         )
 
+        button_download = Button(
+            self.button_top_frame,
+            text="Download",
+            command=self.button_download,
+        )
+
+        button_upload = Button(
+            self.button_top_frame,
+            text="Upload",
+            command=self.button_upload,
+        )
+
         self.themes.get_current().configure_widget_theme(button_toggle_all)
         self.themes.get_current().configure_widget_theme(button_accessibility)
         self.themes.get_current().configure_widget_theme(button_add)
+        self.themes.get_current().configure_widget_theme(button_download)
+        self.themes.get_current().configure_widget_theme(button_upload)
 
         self.non_smart_device_buttons.append(button_toggle_all)
         self.non_smart_device_buttons.append(button_accessibility)
@@ -810,6 +883,8 @@ class SmartHomeSystem:
 
         button_toggle_all.pack(side=LEFT)
         button_accessibility.pack(side=RIGHT)
+        button_download.pack(side=RIGHT)
+        button_upload.pack(side=RIGHT)
         self.button_top_frame.pack(fill="both")
 
         for (
@@ -1008,9 +1083,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self, bool_checkbutton_switched_on, text_spinbox_consumption_rate
     ):
         self.smart_device_states["smart_device"] = "Smart Plug"
-        self.smart_device_states["smart_plug_switched_on"] = (
-            bool_checkbutton_switched_on.get()
-        )
+        self.smart_device_states[
+            "smart_plug_switched_on"
+        ] = bool_checkbutton_switched_on.get()
         self.smart_device_states["smart_plug_consumption_rate"] = int(
             text_spinbox_consumption_rate.get()
         )
@@ -1019,12 +1094,12 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         self, bool_checkbutton_switched_on, text_option_menu_cooking_mode
     ):
         self.smart_device_states["smart_device"] = "Smart Air Fryer"
-        self.smart_device_states["smart_air_fryer_switched_on"] = (
-            bool_checkbutton_switched_on.get()
-        )
-        self.smart_device_states["smart_air_fryer_cooking_mode"] = (
-            text_option_menu_cooking_mode.get()
-        )
+        self.smart_device_states[
+            "smart_air_fryer_switched_on"
+        ] = bool_checkbutton_switched_on.get()
+        self.smart_device_states[
+            "smart_air_fryer_cooking_mode"
+        ] = text_option_menu_cooking_mode.get()
 
     # Add widget submit methods
     def add_option_menu_submit(self, selected_smart_device: StringVar | str):

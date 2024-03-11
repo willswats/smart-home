@@ -144,6 +144,9 @@ class SmartHome:
             self.switch_all_state = False
             self.turn_off_all()
 
+    def delete_all_devices(self):
+        self.devices = []
+
 
 def test_smart_home():
     smart_home = SmartHome()

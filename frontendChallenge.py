@@ -1,4 +1,7 @@
+import csv
 from tkinter import OptionMenu, PhotoImage
+
+from backend import SmartAirFryer, SmartPlug
 
 
 class Themes:
@@ -141,3 +144,42 @@ class FontInfo:
 
     def get_family(self):
         return self.family
+
+
+class SmartDeviceFile:
+    def __init__(self, smart_devices):
+        self.smart_devices = smart_devices
+
+    def create_csv(self):
+        with open("storage.csv", mode="w") as smart_devices:
+            smart_devices_writer = csv.writer(
+                smart_devices,
+                delimiter=",",
+                quotechar='"',
+                quoting=csv.QUOTE_MINIMAL,
+            )
+            for smart_device in self.smart_devices:
+                if isinstance(smart_device, SmartPlug):
+                    smart_devices_writer.writerow(
+                        [
+                            "smart_plug",
+                            f"{smart_device.get_switched_on()}",
+                            f"{smart_device.get_consumption_rate()}",
+                        ]
+                    )
+                elif isinstance(smart_device, SmartAirFryer):
+                    smart_devices_writer.writerow(
+                        [
+                            "smart_air_fryer",
+                            f"{smart_device.get_switched_on()}",
+                            f"{smart_device.get_cooking_mode()}",
+                        ]
+                    )
+
+    def read_csv(self, file):
+        rows = []
+        with open(file, mode="r") as csv_file:
+            csv_reader = csv.reader(csv_file)
+            for row in csv_reader:
+                rows.append(row)
+        return rows
