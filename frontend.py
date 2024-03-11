@@ -543,26 +543,30 @@ class SmartHomeSystem:
 
         for device in self.smart_devices_state_manager.get_smart_devices_gui():
             for widget in device.get_widgets():
-                if isinstance(widget, Frame):
-                    widget.configure(
-                        bg=current_theme.get_background(),
-                    )
-                elif isinstance(widget, Checkbutton):
-                    current_theme.configure_widget_theme(widget)
-                    widget.configure(
-                        # Always keep fg as black as the checkbutton bg
-                        # doesn't fully change
-                        fg="black",
-                    )
-                elif isinstance(widget, Button):
-                    current_theme.configure_widget_theme(widget)
-                elif isinstance(widget, OptionMenu):
-                    current_theme.configure_options_menu_theme(widget)
-                else:
-                    widget.configure(
-                        fg=current_theme.get_foreground(),
-                        bg=current_theme.get_background(),
-                    )
+                self.set_widget_specific_theme(widget)
+
+    def set_widget_specific_theme(self, widget):
+        current_theme = self.themes.get_current()
+        if isinstance(widget, Frame):
+            widget.configure(
+                bg=current_theme.get_background(),
+            )
+        elif isinstance(widget, Checkbutton):
+            current_theme.configure_widget_theme(widget)
+            widget.configure(
+                # Always keep fg as black as the checkbutton bg
+                # doesn't fully change
+                fg="black",
+            )
+        elif isinstance(widget, Button):
+            current_theme.configure_widget_theme(widget)
+        elif isinstance(widget, OptionMenu):
+            current_theme.configure_options_menu_theme(widget)
+        else:
+            widget.configure(
+                fg=current_theme.get_foreground(),
+                bg=current_theme.get_background(),
+            )
 
     # Widget submit methods
     def button_toggle(self, smart_device_gui: SmartDeviceGui):
@@ -1374,6 +1378,12 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
         self.maximum_font_size = 32
         self.minimum_font_size = 10
 
+        self.widgets = []
+
+    def add_widgets(self, widgets):
+        for widget in widgets:
+            self.widgets.append(widget)
+
     def set_widgets_font_size(self, font_size):
         if (
             font_size >= self.minimum_font_size
@@ -1438,6 +1448,8 @@ and <= {self.maximum_font_size}"
         spinbox_font_size.pack(side=RIGHT)
         frame_font_size.pack(fill="both")
 
+        self.add_widgets([frame_font_size, label_font_size, spinbox_font_size])
+
         return text_spinbox_font_size
 
     def accessibility_create_widgets_theme(self):
@@ -1476,6 +1488,8 @@ and <= {self.maximum_font_size}"
         label_theme.pack(side=LEFT)
         option_menu_theme.pack(side=RIGHT)
         frame_theme.pack(fill="both")
+
+        self.add_widgets([frame_theme, label_theme, option_menu_theme])
 
         return text_option_menu_theme
 
@@ -1517,6 +1531,10 @@ and <= {self.maximum_font_size}"
         button_colorchooser.pack(side=RIGHT)
         frame_colorchooser.pack(fill="both")
 
+        self.add_widgets(
+            [frame_colorchooser, label_colorchooser, button_colorchooser]
+        )
+
         return text_colorchooser
 
     def accessibility_submit(
@@ -1541,6 +1559,16 @@ and <= {self.maximum_font_size}"
 
         theme = text_option_menu_theme.get()
         self.set_theme(theme)
+
+        # Change accessibility window theme
+        self.accessibility_window.configure(
+            bg=self.themes.get_current().get_background()
+        )
+        self.accessibility_window_frame.configure(
+            bg=self.themes.get_current().get_background()
+        )
+        for widget in self.widgets:
+            self.set_widget_specific_theme(widget)
 
     def accessibility_create_widgets(self):
         text_spinbox_font_size = self.accessibility_create_widgets_font_size()
@@ -1572,6 +1600,8 @@ and <= {self.maximum_font_size}"
             button_accessibility_submit
         )
         button_accessibility_submit.pack(side=LEFT, anchor=W, pady=5)
+
+        self.add_widgets([button_accessibility_submit])
 
 
 def main():
