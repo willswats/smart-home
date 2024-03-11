@@ -654,13 +654,13 @@ class SmartHomeSystem:
                         smart_air_fryer_gui
                     )
 
-        for (
-            smart_device_gui
-        ) in self.smart_devices_state_manager.get_smart_devices_gui():
-            if isinstance(smart_device_gui, SmartPlugGui):
-                self.create_widgets_smart_plug(smart_device_gui)
-            elif isinstance(smart_device_gui, SmartAirFryerGui):
-                self.create_widgets_smart_air_fryer(smart_device_gui)
+            for (
+                smart_device_gui
+            ) in self.smart_devices_state_manager.get_smart_devices_gui():
+                if isinstance(smart_device_gui, SmartPlugGui):
+                    self.create_widgets_smart_plug(smart_device_gui)
+                elif isinstance(smart_device_gui, SmartAirFryerGui):
+                    self.create_widgets_smart_air_fryer(smart_device_gui)
 
     # Create widgets methods
     def create_widgets_buttons_smart_device(
