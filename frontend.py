@@ -880,6 +880,8 @@ class SmartHomeSystem:
         self.non_smart_device_buttons.append(button_toggle_all)
         self.non_smart_device_buttons.append(button_accessibility)
         self.non_smart_device_buttons.append(button_add)
+        self.non_smart_device_buttons.append(button_download)
+        self.non_smart_device_buttons.append(button_upload)
 
         button_toggle_all.pack(side=LEFT)
 
@@ -1442,7 +1444,11 @@ and <= {self.maximum_font_size}"
         frame_theme = Frame(self.accessibility_window_frame)
         frame_theme.configure(bg=self.themes.get_current().get_background())
 
-        theme_options = ["Light", "Dark", "Custom"]
+        theme_options = [self.themes.get_current_name()]
+        theme_names = ["Light", "Dark", "Custom"]
+        for theme_name in theme_names:
+            if theme_name != self.themes.get_current_name():
+                theme_options.append(theme_name)
 
         text_option_menu_theme = StringVar(
             frame_theme,

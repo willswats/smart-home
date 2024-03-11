@@ -13,6 +13,16 @@ class Themes:
         }
         self.current = self.themes["light"]
 
+    def get_current_name(self) -> str:
+        if self.current == self.themes["light"]:
+            return "Light"
+        elif self.current == self.themes["dark"]:
+            return "Dark"
+        elif self.current == self.themes["custom"]:
+            return "Custom"
+        else:
+            return "Light"
+
     def get_current(self):
         return self.current
 
