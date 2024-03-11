@@ -749,9 +749,7 @@ class SmartHomeSystem:
         label_smart_device_title.pack(side=LEFT, anchor=W)
 
         if isinstance(smart_device_gui, SmartPlugGui):
-            label_smart_device_switched_on.pack(
-                side=LEFT, anchor=W, padx=(40, 0)
-            )
+            label_smart_device_switched_on.pack(side=LEFT, anchor=W)
             checkbutton_switched_on.pack(side=LEFT, anchor=W)
 
             label_smart_plug_consumption_rate = Label(
@@ -798,7 +796,8 @@ class SmartHomeSystem:
             )
             smart_device_gui.set_string_var(text_option_menu_cooking_mode)
             label_smart_air_fryer_cooking_mode.pack(
-                side=LEFT, anchor=W, padx=(0, 20)
+                side=LEFT,
+                anchor=W,
             )
             option_menu_cooking_mode.pack(side=LEFT, anchor=W)
             smart_device_gui.add_widgets(
