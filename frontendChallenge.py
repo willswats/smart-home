@@ -90,6 +90,10 @@ class Images:
             "toggle_all_button_on": PhotoImage(
                 file=f"{theme_dir}toggle-on.png"
             ),
+            "download_button_image": PhotoImage(
+                file=f"{theme_dir}download.png"
+            ),
+            "upload_button_image": PhotoImage(file=f"{theme_dir}upload.png"),
         }
 
         for image in self.images:
@@ -124,6 +128,12 @@ class Images:
 
     def get_toggle_all_button_on(self):
         return self.images["toggle_all_button_on"]
+
+    def get_download_button_image(self):
+        return self.images["download_button_image"]
+
+    def get_upload_button_image(self):
+        return self.images["upload_button_image"]
 
 
 class FontInfo:

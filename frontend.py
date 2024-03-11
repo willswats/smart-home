@@ -861,13 +861,13 @@ class SmartHomeSystem:
 
         button_download = Button(
             self.button_top_frame,
-            text="Download",
+            image=self.images.get_download_button_image(),
             command=self.button_download,
         )
 
         button_upload = Button(
             self.button_top_frame,
-            text="Upload",
+            image=self.images.get_upload_button_image(),
             command=self.button_upload,
         )
 
@@ -882,9 +882,10 @@ class SmartHomeSystem:
         self.non_smart_device_buttons.append(button_add)
 
         button_toggle_all.pack(side=LEFT)
-        button_accessibility.pack(side=RIGHT)
+
+        button_accessibility.pack(side=RIGHT, padx=(5, 0))
         button_download.pack(side=RIGHT)
-        button_upload.pack(side=RIGHT)
+        button_upload.pack(side=RIGHT, padx=(5, 0))
         self.button_top_frame.pack(fill="both")
 
         for (
