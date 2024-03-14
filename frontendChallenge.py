@@ -1,63 +1,30 @@
 import csv
-from tkinter import OptionMenu, PhotoImage
+from tkinter import Button, Checkbutton, OptionMenu, PhotoImage
+from typing import List, Self
 
-from backend import SmartAirFryer, SmartPlug
-
-
-class Themes:
-    def __init__(self):
-        self.themes = {
-            "light": Theme("#000", "#fff", "#f4f4f4"),
-            "dark": Theme("#fff", "#3a3a3a", "#4a4a4a"),
-            "custom": Theme("#000", "#fff", "#f4f4f4"),
-        }
-        self.current = self.themes["light"]
-
-    def get_current_name(self) -> str:
-        if self.current == self.themes["light"]:
-            return "Light"
-        elif self.current == self.themes["dark"]:
-            return "Dark"
-        elif self.current == self.themes["custom"]:
-            return "Custom"
-        else:
-            return "Light"
-
-    def get_current(self):
-        return self.current
-
-    def set_current(self, theme_name: str):
-        theme = theme_name.lower()
-        if theme == "light" or theme == "dark" or theme == "custom":
-            self.current = self.themes[theme]
-
-    def get_custom_theme(self):
-        return self.themes["custom"]
-
-    def set_custom_theme(
-        self, foreground: str, background: str, activebackground: str
-    ):
-        self.themes["custom"] = Theme(foreground, background, activebackground)
+from backend import SmartAirFryer, SmartDevice, SmartPlug
 
 
 class Theme:
     def __init__(
-        self, foreground: str, background: str, activebackground: str
-    ):
+        self: Self, foreground: str, background: str, activebackground: str
+    ) -> None:
         self.foreground = foreground
         self.background = background
         self.activebackground = activebackground
 
-    def get_foreground(self):
+    def get_foreground(self: Self) -> str:
         return self.foreground
 
-    def get_background(self):
+    def get_background(self: Self) -> str:
         return self.background
 
-    def get_activebackground(self):
+    def get_activebackground(self: Self) -> str:
         return self.activebackground
 
-    def configure_widget_theme(self, widget):
+    def configure_widget_theme(
+        self: Self, widget: Checkbutton | Button
+    ) -> None:
         widget.configure(
             fg=self.foreground,
             bg=self.background,
@@ -65,7 +32,9 @@ class Theme:
             activebackground=self.activebackground,
         )
 
-    def configure_options_menu_theme(self, option_menu: OptionMenu):
+    def configure_options_menu_theme(
+        self: Self, option_menu: OptionMenu
+    ) -> None:
         option_menu.configure(
             fg=self.foreground,
             bg=self.background,
@@ -80,8 +49,44 @@ class Theme:
         )
 
 
+class Themes:
+    def __init__(self: Self) -> None:
+        self.themes = {
+            "light": Theme("#000", "#fff", "#f4f4f4"),
+            "dark": Theme("#fff", "#3a3a3a", "#4a4a4a"),
+            "custom": Theme("#000", "#fff", "#f4f4f4"),
+        }
+        self.current = self.themes["light"]
+
+    def get_current_name(self: Self) -> str:
+        if self.current == self.themes["light"]:
+            return "Light"
+        elif self.current == self.themes["dark"]:
+            return "Dark"
+        elif self.current == self.themes["custom"]:
+            return "Custom"
+        else:
+            return "Light"
+
+    def get_current(self: Self) -> Theme:
+        return self.current
+
+    def set_current(self: Self, theme_name: str) -> None:
+        theme = theme_name.lower()
+        if theme == "light" or theme == "dark" or theme == "custom":
+            self.current = self.themes[theme]
+
+    def get_custom_theme(self: Self) -> Theme:
+        return self.themes["custom"]
+
+    def set_custom_theme(
+        self: Self, foreground: str, background: str, activebackground: str
+    ) -> None:
+        self.themes["custom"] = Theme(foreground, background, activebackground)
+
+
 class Images:
-    def __init__(self):
+    def __init__(self: Self) -> None:
         theme_dir = "./images/"
         self.images = {
             "smart_plug_image": PhotoImage(file=f"{theme_dir}plug.png"),
@@ -109,68 +114,68 @@ class Images:
         for image in self.images:
             self.images[image] = self.images[image].subsample(8, 8)
 
-    def get_smart_plug_image(self):
+    def get_smart_plug_image(self: Self) -> PhotoImage:
         return self.images["smart_plug_image"]
 
-    def get_smart_air_fryer_image(self):
+    def get_smart_air_fryer_image(self: Self) -> PhotoImage:
         return self.images["smart_air_fryer_image"]
 
-    def get_toggle_button_image(self):
+    def get_toggle_button_image(self: Self) -> PhotoImage:
         return self.images["toggle_button_image"]
 
-    def get_edit_button_image(self):
+    def get_edit_button_image(self: Self) -> PhotoImage:
         return self.images["edit_button_image"]
 
-    def get_delete_button_image(self):
+    def get_delete_button_image(self: Self) -> PhotoImage:
         return self.images["delete_button_image"]
 
-    def get_add_button_image(self):
+    def get_add_button_image(self: Self) -> PhotoImage:
         return self.images["add_button_image"]
 
-    def get_accessibility_button_image(self):
+    def get_accessibility_button_image(self: Self) -> PhotoImage:
         return self.images["accessibility_button_image"]
 
-    def get_submit_button_image(self):
+    def get_submit_button_image(self: Self) -> PhotoImage:
         return self.images["submit_button_image"]
 
-    def get_toggle_all_button_off(self):
+    def get_toggle_all_button_off(self: Self) -> PhotoImage:
         return self.images["toggle_all_button_off"]
 
-    def get_toggle_all_button_on(self):
+    def get_toggle_all_button_on(self: Self) -> PhotoImage:
         return self.images["toggle_all_button_on"]
 
-    def get_download_button_image(self):
+    def get_download_button_image(self: Self) -> PhotoImage:
         return self.images["download_button_image"]
 
-    def get_upload_button_image(self):
+    def get_upload_button_image(self: Self) -> PhotoImage:
         return self.images["upload_button_image"]
 
 
 class FontInfo:
-    def __init__(self):
+    def __init__(self: Self) -> None:
         self.family = "sans-serif"
         self.size_title = 12
         self.size_body = 10
 
-    def set_font_size(self, font_size):
+    def set_font_size(self: Self, font_size: int) -> None:
         self.size_title = font_size + 2
         self.size_body = font_size
 
-    def get_size_title(self):
+    def get_size_title(self: Self) -> int:
         return self.size_title
 
-    def get_size_body(self):
+    def get_size_body(self: Self) -> int:
         return self.size_body
 
-    def get_family(self):
+    def get_family(self: Self) -> str:
         return self.family
 
 
 class SmartDeviceFile:
-    def __init__(self, smart_devices):
-        self.smart_devices = smart_devices
+    def __init__(self: Self, smart_devices: List[SmartDevice]) -> None:
+        self.smart_devices: List[SmartDevice] = smart_devices
 
-    def create_csv(self):
+    def create_csv(self: Self) -> None:
         with open("storage.csv", mode="w") as smart_devices:
             smart_devices_writer = csv.writer(
                 smart_devices,
@@ -196,7 +201,7 @@ class SmartDeviceFile:
                         ]
                     )
 
-    def read_csv(self, file):
+    def read_csv(self: Self, file: str) -> list[str]:
         rows = []
         with open(file, mode="r") as csv_file:
             csv_reader = csv.reader(csv_file)

@@ -1,5 +1,4 @@
-smart_plug,False,2
-smart_air_fryer,False,Healthy
-smart_air_fryer,False,Healthy
-smart_air_fryer,False,Healthy
-smart_air_fryer,False,Healthy
+smart_air_fryer,True,Healthy
+smart_plug,True,150
+smart_plug,True,150
+smart_air_fryer,True,Healthy
