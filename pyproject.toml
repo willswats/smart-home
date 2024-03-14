@@ -6,6 +6,7 @@ select = [
   "I",   # isort
   "A",   # flake8-builtins
   "B",   # flake8-bugbear
+  "ANN", # flake8-annotations
   "RUF", # Ruf-specific rules
 ]
 line-length = 79
