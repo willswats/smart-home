@@ -18,6 +18,7 @@ from tkinter import (
     colorchooser,
     filedialog,
 )
+from typing import List, Self
 
 from backend import (
     CookingModes,
@@ -41,7 +42,7 @@ class SmartDeviceTitles(Enum):
     SMART_AIR_FRYER = "Smart Air Fryer:"
 
 
-def check_valid_device_num(smart_device_num: str):
+def check_valid_device_num(smart_device_num: str) -> bool:
     valid_smart_device_nums = [
         smart_device_num.value for smart_device_num in SmartDeviceNums
     ]
@@ -51,7 +52,7 @@ def check_valid_device_num(smart_device_num: str):
     return False
 
 
-def get_smart_device(smart_device_num: str):
+def get_smart_device(smart_device_num: str) -> SmartDevice | None:
     match smart_device_num:
         case SmartDeviceNums.SMART_PLUG.value:
             while True:
@@ -66,10 +67,12 @@ def get_smart_device(smart_device_num: str):
             smart_air_fryer = SmartAirFryer()
             print("Added Smart Air Fryer.")
             return smart_air_fryer
+        case _:
+            return None
 
 
-def get_smart_devices():
-    smart_devices = []
+def get_smart_devices() -> List[SmartDevice]:
+    smart_devices: List[SmartDevice] = []
     print("Add 5 smart devices to your smart home:")
     print(f"  {SmartDeviceNums.SMART_PLUG.value}. Smart Plug")
     print(f"  {SmartDeviceNums.SMART_AIR_FRYER.value}. Smart Air Fryer")
@@ -77,100 +80,106 @@ def get_smart_devices():
         smart_device_num = input("Enter smart device number: ")
         if check_valid_device_num(smart_device_num):
             smart_device = get_smart_device(smart_device_num)
-            smart_devices.append(smart_device)
+            if smart_device is not None:  # TODO: change this
+                smart_devices.append(smart_device)
         else:
             print("Error: invalid smart device number.")
     return smart_devices
 
 
-def set_up_home():
-    smart_home = SmartHome()
+def set_up_home() -> SmartHome:
+    smart_home: SmartHome = SmartHome()
     smart_devices = get_smart_devices()
     for smart_device in smart_devices:
         smart_home.add_device(smart_device)
     return smart_home
 
 
+WIDGETS_TYPE = Frame | Button | Checkbutton | Label | OptionMenu | Spinbox
+
+
 class SmartDeviceGui:
-    def __init__(self, smart_device: SmartDevice):
-        self.smart_device = smart_device
+    def __init__(self: Self, smart_device: SmartDevice) -> None:
+        self.smart_device: SmartDevice = smart_device
         # bool_var is used to set and get the switched_on Checkbox value
         # on the GUI
         self.bool_var: BooleanVar | None = None
         # string_var is used to set and get the consumption_rate Spinbox and
         # cooking_mode OptionMenu for a SmartPlug or SmartAirFryer on the GUI
         self.string_var: StringVar | None = None
-        self.widgets = []
+        self.widgets: list[WIDGETS_TYPE] = []  # TODO: type this
 
-    def get_smart_device(self):
+    def get_smart_device(self: Self) -> SmartDevice:
         return self.smart_device
 
-    def get_string_var(self):
+    def get_string_var(self: Self) -> StringVar | None:
         return self.string_var
 
-    def set_string_var(self, string_var):
+    def set_string_var(self: Self, string_var: StringVar) -> None:
         self.string_var = string_var
 
-    def set_string_var_value(self, value):
+    def set_string_var_value(self: Self, value: str) -> None:
         if self.string_var is not None:
             self.string_var.set(value)
 
-    def get_bool_var(self):
+    def get_bool_var(self: Self) -> BooleanVar | None:
         return self.bool_var
 
-    def set_bool_var(self, bool_var):
+    def set_bool_var(self: Self, bool_var: BooleanVar) -> None:
         self.bool_var = bool_var
 
-    def set_bool_var_value(self, value):
+    def set_bool_var_value(self: Self, value: bool) -> None:
         if self.bool_var is not None:
             self.bool_var.set(value)
 
-    def toggle_smart_device(self):
+    def toggle_smart_device(self: Self) -> None:
         self.smart_device.toggle_switch()
         self.update_smart_device()
 
     def set_smart_device_switched_on(
-        self,
+        self: Self,
         bool_checkbutton_switched_on: BooleanVar,
-    ):
+    ) -> None:
         switched_on = bool_checkbutton_switched_on.get()
         if switched_on != self.smart_device.get_switched_on():
             self.smart_device.toggle_switch()
 
-    def get_widgets(self):
+    def get_widgets(self: Self) -> list[WIDGETS_TYPE]:
         return self.widgets
 
-    def add_widgets(self, widgets):
+    def add_widgets(self: Self, widgets: List[WIDGETS_TYPE]) -> None:
         for widget in widgets:
             self.widgets.append(widget)
 
-    def delete_widgets(self):
+    def delete_widgets(self: Self) -> None:
         for widget in self.widgets:
             widget.destroy()
 
-    def update_smart_device(self):
+    def update_smart_device(self: Self) -> None:
         self.set_bool_var_value(self.smart_device.get_switched_on())
         if isinstance(self.smart_device, SmartPlug):
-            self.set_string_var_value(self.smart_device.get_consumption_rate())
+            self.set_string_var_value(
+                str(self.smart_device.get_consumption_rate())
+            )
         elif isinstance(self.smart_device, SmartAirFryer):
             self.set_string_var_value(self.smart_device.get_cooking_mode())
 
 
 class SmartPlugGui(SmartDeviceGui):
-    def __init__(self, smart_plug: SmartPlug):
+    def __init__(self: Self, smart_plug: SmartPlug) -> None:
         super().__init__(smart_plug)
-        self.smart_device = smart_plug
+        self.smart_plug: SmartPlug = smart_plug
 
-    def get_smart_device(self):
-        return self.smart_device
+    def get_smart_device(self: Self) -> SmartPlug:
+        return self.smart_plug
 
     def set_smart_plug_consumption_rate(
-        self,
+        self: Self,
         text_spinbox_consumption_rate: StringVar,
-    ):
+    ) -> None:
         text_consumption_rate = text_spinbox_consumption_rate.get()
         try:
-            self.smart_device.set_consumption_rate(int(text_consumption_rate))
+            self.smart_plug.set_consumption_rate(int(text_consumption_rate))
         except Exception as error:
             raise error
 
@@ -178,69 +187,73 @@ class SmartPlugGui(SmartDeviceGui):
     # I am raising an error in set_smart_plug_consumption_rate to ensure
     # that a device is not added, even when the validation fails
     def set_smart_plug_consumption_rate_validate(
-        self,
+        self: Self,
         text_spinbox_consumption_rate: StringVar,
-    ):
+    ) -> None:
         try:
             self.set_smart_plug_consumption_rate(text_spinbox_consumption_rate)
         except Exception as error:
             print("Error:", error)
 
     def set_smart_plug(
-        self,
+        self: Self,
         bool_checkbutton_switched_on: BooleanVar,
         text_spinbox_consumption_rate: StringVar,
-    ):
+    ) -> None:
         self.set_smart_device_switched_on(bool_checkbutton_switched_on)
         self.set_smart_plug_consumption_rate(text_spinbox_consumption_rate)
 
 
 class SmartAirFryerGui(SmartDeviceGui):
-    def __init__(self, smart_air_fryer: SmartAirFryer):
+    def __init__(self: Self, smart_air_fryer: SmartAirFryer) -> None:
         super().__init__(smart_air_fryer)
-        self.smart_device = smart_air_fryer
+        self.smart_air_fryer: SmartAirFryer = smart_air_fryer
 
-    def get_smart_device(self):
-        return self.smart_device
+    def get_smart_device(self: Self) -> SmartAirFryer:
+        return self.smart_air_fryer
 
     def set_smart_air_fryer_cooking_mode(
-        self,
+        self: Self,
         text_option_menu_cooking_mode: StringVar,
-    ):
+    ) -> None:
         text_cooking_mode = text_option_menu_cooking_mode.get()
-        self.smart_device.set_cooking_mode(text_cooking_mode)
+        self.smart_air_fryer.set_cooking_mode(text_cooking_mode)
 
     def set_smart_air_fryer(
-        self,
+        self: Self,
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
-    ):
+    ) -> None:
         self.set_smart_device_switched_on(bool_checkbutton_switched_on)
         self.set_smart_air_fryer_cooking_mode(text_option_menu_cooking_mode)
 
 
 class SmartDevicesStateManager:
-    def __init__(self, home):
-        self.home = home
-        self.smart_devices_gui = []
+    def __init__(self: Self, home: SmartHome) -> None:
+        self.home: SmartHome = home
+        self.smart_devices_gui: List[SmartDeviceGui] = []
 
         for smart_device in self.home.get_devices():
             if isinstance(smart_device, SmartPlug):
-                smart_plug_gui = SmartPlugGui(smart_device)
+                smart_plug_gui: SmartPlugGui = SmartPlugGui(smart_device)
                 self.smart_devices_gui.append(smart_plug_gui)
             elif isinstance(smart_device, SmartAirFryer):
-                smart_air_fryer_gui = SmartAirFryerGui(smart_device)
+                smart_air_fryer_gui: SmartAirFryerGui = SmartAirFryerGui(
+                    smart_device
+                )
                 self.smart_devices_gui.append(smart_air_fryer_gui)
 
-    def get_smart_devices_gui(self):
+    def get_smart_devices_gui(self: Self) -> List[SmartDeviceGui]:
         return self.smart_devices_gui
 
-    def add_smart_device(self, smart_device_gui: SmartDeviceGui):
+    def add_smart_device(self: Self, smart_device_gui: SmartDeviceGui) -> None:
         smart_device = smart_device_gui.get_smart_device()
         self.home.add_device(smart_device)
         self.smart_devices_gui.append(smart_device_gui)
 
-    def delete_smart_device(self, smart_device_gui: SmartDeviceGui):
+    def delete_smart_device(
+        self: Self, smart_device_gui: SmartDeviceGui
+    ) -> None:
         smart_device = smart_device_gui.get_smart_device()
         smart_device_index = self.home.get_devices().index(smart_device)
         self.home.remove_device_at(smart_device_index)
@@ -249,11 +262,11 @@ class SmartDevicesStateManager:
         smart_device_gui.delete_widgets()
 
     def toggle_all_smart_devices(
-        self,
+        self: Self,
         button_toggle_all: Button,
         image_off: PhotoImage,
         image_on: PhotoImage,
-    ):
+    ) -> None:
         self.home.toggle_switch_all()
         self.update_all_smart_devices_gui()
 
@@ -262,11 +275,11 @@ class SmartDevicesStateManager:
         elif self.home.get_switch_all_state() is True:
             button_toggle_all.config(image=image_on)
 
-    def update_all_smart_devices_gui(self):
+    def update_all_smart_devices_gui(self: Self) -> None:
         for smart_device_gui in self.smart_devices_gui:
             smart_device_gui.update_smart_device()
 
-    def delete_all_smart_devices(self):
+    def delete_all_smart_devices(self: Self) -> None:
         for smart_device_gui in self.smart_devices_gui:
             smart_device_gui.delete_widgets()
 
@@ -281,7 +294,7 @@ class Utilities:
         frame: Frame,
         smart_device_gui: SmartDeviceGui,
         themes: Themes,
-    ):
+    ) -> tuple[BooleanVar, Checkbutton]:
         smart_device = smart_device_gui.get_smart_device()
 
         bool_checkbutton_switched_on = BooleanVar(
@@ -310,7 +323,7 @@ class Utilities:
         frame: Frame,
         smart_plug_gui: SmartPlugGui,
         themes: Themes,
-    ):
+    ) -> tuple[StringVar, Spinbox]:
         smart_plug = smart_plug_gui.get_smart_device()
         text_spinbox_consumption_rate = StringVar(
             frame,
@@ -342,7 +355,7 @@ class Utilities:
         frame: Frame,
         smart_air_fryer_gui: SmartAirFryerGui,
         themes: Themes,
-    ):
+    ) -> tuple[StringVar, OptionMenu]:
         smart_air_fryer = smart_air_fryer_gui.get_smart_device()
 
         cooking_mode_options = [
@@ -486,56 +499,58 @@ class Utilities:
 
 
 class SmartHomeSystem:
-    def __init__(self, home: SmartHome):
-        self.win = Tk()
+    def __init__(self: Self, home: SmartHome) -> None:
+        self.win: Tk = Tk()
         self.win.title("Smart Home System")
         self.win.resizable(False, False)
 
-        self.main_frame = Frame(self.win)
+        self.main_frame: Frame = Frame(self.win)
         self.main_frame.pack(padx=10, pady=10)
 
-        self.smart_device_frames = Frame(self.main_frame)
+        self.smart_devices_frame: Frame = Frame(self.main_frame)
 
-        self.button_top_frame = Frame(self.main_frame)
+        self.button_top_frame: Frame = Frame(self.main_frame)
 
-        self.home = home
+        self.home: SmartHome = home
+
+        self.smart_devices_state_manager: SmartDevicesStateManager = (
+            SmartDevicesStateManager(home)
+        )
+
+        self.font_info: FontInfo = FontInfo()
+
+        self.themes: Themes = Themes()
+
+        self.images: Images = Images()
 
         # To access the widgets and set the theme for them
-        self.non_smart_device_buttons = []
-
-        self.smart_devices_state_manager = SmartDevicesStateManager(home)
-
-        self.font_info = FontInfo()
-
-        self.themes = Themes()
+        self.non_smart_device_buttons: List[Button] = []
 
         self.win.configure(bg=self.themes.get_current().get_background())
         self.main_frame.configure(
             bg=self.themes.get_current().get_background()
         )
-        self.smart_device_frames.configure(
+        self.smart_devices_frame.configure(
             bg=self.themes.get_current().get_background()
         )
         self.button_top_frame.configure(
             bg=self.themes.get_current().get_background()
         )
 
-        self.images = Images()
-
-    def run(self):
+    def run(self: Self) -> None:
         self.create_widgets()
         self.win.mainloop()
 
     # Set methods
-    def set_theme(self, theme):
-        self.themes.set_current(theme)
+    def set_theme(self: Self, theme_name: str) -> None:
+        self.themes.set_current(theme_name)
         self.set_theme_widgets()
 
-    def set_theme_widgets(self):
+    def set_theme_widgets(self: Self) -> None:
         current_theme = self.themes.get_current()
         self.win.configure(bg=current_theme.get_background())
         self.main_frame.configure(bg=current_theme.get_background())
-        self.smart_device_frames.configure(bg=current_theme.get_background())
+        self.smart_devices_frame.configure(bg=current_theme.get_background())
         self.button_top_frame.configure(bg=current_theme.get_background())
 
         for button in self.non_smart_device_buttons:
@@ -545,7 +560,7 @@ class SmartHomeSystem:
             for widget in device.get_widgets():
                 self.set_widget_specific_theme(widget)
 
-    def set_widget_specific_theme(self, widget):
+    def set_widget_specific_theme(self: Self, widget: WIDGETS_TYPE) -> None:
         current_theme = self.themes.get_current()
         if isinstance(widget, Frame):
             widget.configure(
@@ -569,29 +584,29 @@ class SmartHomeSystem:
             )
 
     # Widget submit methods
-    def button_toggle(self, smart_device_gui: SmartDeviceGui):
+    def button_toggle(self: Self, smart_device_gui: SmartDeviceGui) -> None:
         smart_device_gui.toggle_smart_device()
 
-    def button_delete(self, smart_device_gui: SmartDeviceGui):
+    def button_delete(self: Self, smart_device_gui: SmartDeviceGui) -> None:
         self.smart_devices_state_manager.delete_smart_device(smart_device_gui)
 
-    def button_toggle_all(self, button_toggle_all):
+    def button_toggle_all(self: Self, button_toggle_all: Button) -> None:
         image_off = self.images.get_toggle_all_button_off()
         image_on = self.images.get_toggle_all_button_on()
         self.smart_devices_state_manager.toggle_all_smart_devices(
             button_toggle_all, image_off, image_on
         )
 
-    def button_edit(self, smart_device_gui: SmartDeviceGui):
+    def button_edit(self: Self, smart_device_gui: SmartDeviceGui) -> None:
         smart_home_system_edit = SmartHomeSystemEdit(
             self.win, self.font_info, self.themes, self.images
         )
         smart_home_system_edit.edit_create_widgets(smart_device_gui)
 
-    def button_add(self):
+    def button_add(self: Self) -> None:
         smart_home_system_add = SmartHomeSystemAdd(
             self.win,
-            self.smart_device_frames,
+            self.smart_devices_frame,
             self.smart_devices_state_manager,
             self.font_info,
             self.themes,
@@ -599,11 +614,11 @@ class SmartHomeSystem:
         )
         smart_home_system_add.add_create_widgets()
 
-    def button_accessibility(self):
+    def button_accessibility(self: Self) -> None:
         smart_home_system_accessibility = SmartHomeSystemAccessibility(
             self.win,
             self.main_frame,
-            self.smart_device_frames,
+            self.smart_devices_frame,
             self.button_top_frame,
             self.non_smart_device_buttons,
             self.smart_devices_state_manager,
@@ -613,11 +628,11 @@ class SmartHomeSystem:
         )
         smart_home_system_accessibility.accessibility_create_widgets()
 
-    def button_download(self):
+    def button_download(self: Self) -> None:
         smart_device_file = SmartDeviceFile(self.home.get_devices())
         smart_device_file.create_csv()
 
-    def button_upload(self):
+    def button_upload(self: Self) -> None:
         smart_device_file = SmartDeviceFile(self.home.get_devices())
         file = filedialog.askopenfile()
         if file is not None:
@@ -664,8 +679,8 @@ class SmartHomeSystem:
 
     # Create widgets methods
     def create_widgets_buttons_smart_device(
-        self, frame: Frame, smart_device_gui: SmartDeviceGui
-    ):
+        self: Self, frame: Frame, smart_device_gui: SmartDeviceGui
+    ) -> tuple[Button, Button, Button]:
         button_toggle_smart_device = Button(
             frame,
             image=self.images.get_toggle_button_image(),
@@ -703,22 +718,22 @@ class SmartHomeSystem:
         )
 
     def create_widgets_smart_device(
-        self,
+        self: Self,
         smart_device_gui: SmartDeviceGui,
         smart_device_image: PhotoImage,
         smart_device_text_title: str,
-    ):
-        smart_device_frame = Frame(self.smart_device_frames)
+    ) -> None:
+        smart_device_frame: Frame = Frame(self.smart_devices_frame)
         smart_device_frame.configure(
             background=self.themes.get_current().get_background()
         )
 
-        label_smart_device_image = Label(
+        label_smart_device_image: Label = Label(
             smart_device_frame,
             image=smart_device_image,
             bg=self.themes.get_current().get_background(),
         )
-        label_smart_device_title = Label(
+        label_smart_device_title: Label = Label(
             smart_device_frame,
             text=smart_device_text_title,
             font=(
@@ -730,7 +745,7 @@ class SmartHomeSystem:
             bg=self.themes.get_current().get_background(),
         )
 
-        label_smart_device_switched_on = Label(
+        label_smart_device_switched_on: Label = Label(
             smart_device_frame,
             text="Switched on:",
             font=(self.font_info.get_family(), self.font_info.get_size_body()),
@@ -827,7 +842,9 @@ class SmartHomeSystem:
             ]
         )
 
-    def create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
+    def create_widgets_smart_plug(
+        self: Self, smart_plug_gui: SmartPlugGui
+    ) -> None:
         smart_device_image = self.images.get_smart_plug_image()
         smart_device_text_title = SmartDeviceTitles.SMART_PLUG.value
         self.create_widgets_smart_device(
@@ -835,15 +852,15 @@ class SmartHomeSystem:
         )
 
     def create_widgets_smart_air_fryer(
-        self, smart_air_fryer_gui: SmartAirFryerGui
-    ):
+        self: Self, smart_air_fryer_gui: SmartAirFryerGui
+    ) -> None:
         smart_device_image = self.images.get_smart_air_fryer_image()
         smart_device_text_title = SmartDeviceTitles.SMART_AIR_FRYER.value
         self.create_widgets_smart_device(
             smart_air_fryer_gui, smart_device_image, smart_device_text_title
         )
 
-    def create_widgets(self):
+    def create_widgets(self: Self) -> None:
         button_toggle_all = Button(
             self.button_top_frame,
             image=self.images.get_toggle_all_button_off(),
@@ -901,28 +918,28 @@ class SmartHomeSystem:
             elif isinstance(smart_device_gui, SmartAirFryerGui):
                 self.create_widgets_smart_air_fryer(smart_device_gui)
 
-        self.smart_device_frames.pack()
+        self.smart_devices_frame.pack()
         button_add.pack(side=LEFT)
 
 
 class SmartHomeSystemEdit(SmartHomeSystem):
     def __init__(
-        self,
+        self: Self,
         win: Tk,
         font_info: FontInfo,
         themes: Themes,
         images: Images,
-    ):
-        self.edit_window = Toplevel(win)
+    ) -> None:
+        self.edit_window: Toplevel = Toplevel(win)
         self.edit_window.title("Edit")
         self.edit_window.resizable(False, False)
 
-        self.edit_window_frame = Frame(self.edit_window)
+        self.edit_window_frame: Frame = Frame(self.edit_window)
         self.edit_window_frame.pack(padx=10, pady=10, fill="both")
 
-        self.font_info = font_info
-        self.themes = themes
-        self.images = images
+        self.font_info: FontInfo = font_info
+        self.themes: Themes = themes
+        self.images: Images = images
 
         self.edit_window.configure(
             bg=self.themes.get_current().get_background()
@@ -933,11 +950,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
     # Edit widget submit methods
     def edit_button_submit_smart_plug(
-        self,
+        self: Self,
         smart_plug_gui: SmartPlugGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_spinbox_consumption_rate: StringVar,
-    ):
+    ) -> None:
         try:
             smart_plug_gui.set_smart_plug(
                 bool_checkbutton_switched_on,
@@ -948,11 +965,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
             print("Error:", error)
 
     def edit_button_submit_smart_air_fryer(
-        self,
+        self: Self,
         smart_air_fryer_gui: SmartAirFryerGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
-    ):
+    ) -> None:
         smart_air_fryer_gui.set_smart_air_fryer(
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
@@ -961,11 +978,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
     # Edit create widgets methods
     def edit_create_widgets_smart_plug(
-        self,
+        self: Self,
         smart_plug_gui: SmartPlugGui,
         bool_checkbutton_switched_on: BooleanVar,
         themes: Themes,
-    ):
+    ) -> None:
         text_spinbox_consumption_rate = (
             Utilities.add_edit_create_widgets_smart_plug(
                 self.edit_window_frame,
@@ -988,11 +1005,11 @@ class SmartHomeSystemEdit(SmartHomeSystem):
         edit_button_submit.pack(side=LEFT, anchor=W)
 
     def edit_create_widgets_smart_air_fryer(
-        self,
+        self: Self,
         smart_air_fryer_gui: SmartAirFryerGui,
         bool_checkbutton_switched_on: BooleanVar,
         themes: Themes,
-    ):
+    ) -> None:
         text_option_menu_cooking_mode = (
             Utilities.add_edit_create_widgets_smart_air_fryer(
                 self.edit_window_frame,
@@ -1015,7 +1032,9 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
         edit_button_submit.pack(side=LEFT, anchor=W)
 
-    def edit_create_widgets(self, smart_device_gui: SmartDeviceGui):
+    def edit_create_widgets(
+        self: Self, smart_device_gui: SmartDeviceGui
+    ) -> None:
         bool_checkbutton_switched_on = (
             Utilities.add_edit_create_widgets_smart_device(
                 self.edit_window_frame,
@@ -1037,22 +1056,24 @@ class SmartHomeSystemEdit(SmartHomeSystem):
 
 class SmartHomeSystemAdd(SmartHomeSystem):
     def __init__(
-        self,
+        self: Self,
         win: Tk,
-        smart_device_frames: Frame,
+        smart_devices_frame: Frame,
         smart_devices_state_manager: SmartDevicesStateManager,
         font_info: FontInfo,
         themes: Themes,
         images: Images,
-    ):
-        self.win = win
-        self.smart_device_frames = smart_device_frames
-        self.smart_devices_state_manager = smart_devices_state_manager
-        self.font_info = font_info
-        self.themes = themes
-        self.images = images
+    ) -> None:
+        self.win: Tk = win
+        self.smart_devices_frame: Frame = smart_devices_frame
+        self.smart_devices_state_manager: SmartDevicesStateManager = (
+            smart_devices_state_manager
+        )
+        self.font_info: FontInfo = font_info
+        self.themes: Themes = themes
+        self.images: Images = images
 
-        self.add_window = Toplevel(win)
+        self.add_window: Toplevel = Toplevel(win)
         self.add_window.title("Add")
         self.add_window.resizable(False, False)
         self.add_window.configure(
@@ -1075,40 +1096,46 @@ class SmartHomeSystemAdd(SmartHomeSystem):
 
         self.widgets = []
 
-    def add_widgets(self, widgets):
+    def add_widgets(self: Self, widgets: List[WIDGETS_TYPE]) -> None:
         for widget in widgets:
             self.widgets.append(widget)
 
-    def delete_widgets(self):
+    def delete_widgets(self: Self) -> None:
         if len(self.widgets) > 0:
             for widget in self.widgets:
                 widget.destroy()
 
     # Set methods for the last selected device state
     def set_selected_smart_plug(
-        self, bool_checkbutton_switched_on, text_spinbox_consumption_rate
-    ):
+        self: Self,
+        bool_checkbutton_switched_on: BooleanVar,
+        text_spinbox_consumption_rate: StringVar,
+    ) -> None:
         self.smart_device_states["smart_device"] = "Smart Plug"
-        self.smart_device_states[
-            "smart_plug_switched_on"
-        ] = bool_checkbutton_switched_on.get()
+        self.smart_device_states["smart_plug_switched_on"] = (
+            bool_checkbutton_switched_on.get()
+        )
         self.smart_device_states["smart_plug_consumption_rate"] = int(
             text_spinbox_consumption_rate.get()
         )
 
     def set_selected_smart_air_fryer(
-        self, bool_checkbutton_switched_on, text_option_menu_cooking_mode
-    ):
+        self: Self,
+        bool_checkbutton_switched_on: BooleanVar,
+        text_option_menu_cooking_mode: StringVar,
+    ) -> None:
         self.smart_device_states["smart_device"] = "Smart Air Fryer"
-        self.smart_device_states[
-            "smart_air_fryer_switched_on"
-        ] = bool_checkbutton_switched_on.get()
-        self.smart_device_states[
-            "smart_air_fryer_cooking_mode"
-        ] = text_option_menu_cooking_mode.get()
+        self.smart_device_states["smart_air_fryer_switched_on"] = (
+            bool_checkbutton_switched_on.get()
+        )
+        self.smart_device_states["smart_air_fryer_cooking_mode"] = (
+            text_option_menu_cooking_mode.get()
+        )
 
     # Add widget submit methods
-    def add_option_menu_submit(self, selected_smart_device: StringVar | str):
+    def add_option_menu_submit(
+        self: Self, selected_smart_device: StringVar | str
+    ) -> None:
         # Delete existing objects if there are any (switch device)
         self.delete_widgets()
 
@@ -1130,11 +1157,11 @@ class SmartHomeSystemAdd(SmartHomeSystem):
                 self.add_create_widgets_smart_air_fryer(smart_air_fryer_gui)
 
     def add_button_submit_smart_plug(
-        self,
+        self: Self,
         smart_plug_gui: SmartPlugGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_spinbox_consumption_rate: StringVar,
-    ):
+    ) -> None:
         try:
             smart_plug_gui.set_smart_plug(
                 bool_checkbutton_switched_on,
@@ -1160,11 +1187,11 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             print("Error:", error)
 
     def add_button_submit_smart_air_fryer(
-        self,
+        self: Self,
         smart_air_fryer_gui: SmartAirFryerGui,
         bool_checkbutton_switched_on: BooleanVar,
         text_option_menu_cooking_mode: StringVar,
-    ):
+    ) -> None:
         smart_air_fryer_gui.set_smart_air_fryer(
             bool_checkbutton_switched_on,
             text_option_menu_cooking_mode,
@@ -1184,7 +1211,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
         )
 
     # Add create widgets methods
-    def add_create_widgets_smart_plug(self, smart_plug_gui: SmartPlugGui):
+    def add_create_widgets_smart_plug(
+        self: Self, smart_plug_gui: SmartPlugGui
+    ) -> None:
         # Set the options of the last selected smart device
         try:
             smart_plug_gui.set_smart_plug(
@@ -1243,7 +1272,9 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             ]
         )
 
-    def add_create_widgets_smart_air_fryer(self, smart_air_fryer_gui):
+    def add_create_widgets_smart_air_fryer(
+        self: Self, smart_air_fryer_gui: SmartAirFryerGui
+    ) -> None:
         # Set the options of the last selected smart device
         smart_air_fryer_gui.set_smart_air_fryer(
             BooleanVar(
@@ -1299,7 +1330,7 @@ class SmartHomeSystemAdd(SmartHomeSystem):
             ]
         )
 
-    def add_create_widgets(self):
+    def add_create_widgets(self: Self) -> None:
         frame_pick_smart_device = Frame(self.add_window_frame)
         frame_pick_smart_device.configure(
             bg=self.themes.get_current().get_background()
@@ -1339,32 +1370,36 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
     # Change between light and dark (toggle button)
     # Custom colour scheme (background and text colour) (tkColor)
     def __init__(
-        self,
+        self: Self,
         win: Tk,
         main_frame: Frame,
-        smart_device_frames: Frame,
+        smart_devices_frame: Frame,
         button_top_frame: Frame,
         non_smart_device_buttons: list[Button],
         smart_devices_state_manager: SmartDevicesStateManager,
         font_info: FontInfo,
         themes: Themes,
         images: Images,
-    ):
-        self.win = win
-        self.main_frame = main_frame
-        self.smart_device_frames = smart_device_frames
-        self.button_top_frame = button_top_frame
-        self.non_smart_device_buttons = non_smart_device_buttons
-        self.smart_devices_state_manager = smart_devices_state_manager
-        self.font_info = font_info
-        self.themes = themes
-        self.images = images
+    ) -> None:
+        self.win: Tk = win
+        self.main_frame: Frame = main_frame
+        self.smart_devices_frame: Frame = smart_devices_frame
+        self.button_top_frame: Frame = button_top_frame
+        self.non_smart_device_buttons: List[Button] = non_smart_device_buttons
+        self.smart_devices_state_manager: SmartDevicesStateManager = (
+            smart_devices_state_manager
+        )
+        self.font_info: FontInfo = font_info
+        self.themes: Themes = themes
+        self.images: Images = images
 
-        self.accessibility_window = Toplevel(win)
+        self.accessibility_window: Toplevel = Toplevel(win)
         self.accessibility_window.title("Accessibility")
         self.accessibility_window.resizable(False, False)
 
-        self.accessibility_window_frame = Frame(self.accessibility_window)
+        self.accessibility_window_frame: Frame = Frame(
+            self.accessibility_window
+        )
         self.accessibility_window_frame.pack(padx=10, pady=10, fill="both")
 
         self.accessibility_window.configure(
@@ -1374,16 +1409,16 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
             bg=self.themes.get_current().get_background()
         )
 
-        self.maximum_font_size = 32
-        self.minimum_font_size = 10
+        self.maximum_font_size: int = 32
+        self.minimum_font_size: int = 10
 
-        self.widgets = []
+        self.widgets: List[WIDGETS_TYPE] = []
 
-    def add_widgets(self, widgets):
+    def add_widgets(self: Self, widgets: List[WIDGETS_TYPE]) -> None:
         for widget in widgets:
             self.widgets.append(widget)
 
-    def set_widgets_font_size(self, font_size):
+    def set_widgets_font_size(self: Self, font_size: int) -> None:
         if (
             font_size >= self.minimum_font_size
             and font_size <= self.maximum_font_size
@@ -1415,13 +1450,13 @@ class SmartHomeSystemAccessibility(SmartHomeSystem):
 and <= {self.maximum_font_size}"
             )
 
-    def accessibility_create_widgets_font_size(self):
-        frame_font_size = Frame(self.accessibility_window_frame)
+    def accessibility_create_widgets_font_size(self: Self) -> StringVar:
+        frame_font_size: Frame = Frame(self.accessibility_window_frame)
         frame_font_size.configure(
             bg=self.themes.get_current().get_background()
         )
 
-        label_font_size = Label(
+        label_font_size: Label = Label(
             frame_font_size,
             text="Font size: ",
             font=(self.font_info.get_family(), self.font_info.get_size_body()),
@@ -1429,11 +1464,11 @@ and <= {self.maximum_font_size}"
             bg=self.themes.get_current().get_background(),
         )
 
-        text_spinbox_font_size = StringVar(
+        text_spinbox_font_size: StringVar = StringVar(
             frame_font_size, str(self.font_info.get_size_body())
         )
 
-        spinbox_font_size = Spinbox(
+        spinbox_font_size: Spinbox = Spinbox(
             frame_font_size,
             textvariable=text_spinbox_font_size,
             from_=self.minimum_font_size,
@@ -1451,7 +1486,7 @@ and <= {self.maximum_font_size}"
 
         return text_spinbox_font_size
 
-    def accessibility_create_widgets_theme(self):
+    def accessibility_create_widgets_theme(self: Self) -> StringVar:
         frame_theme = Frame(self.accessibility_window_frame)
         frame_theme.configure(bg=self.themes.get_current().get_background())
 
@@ -1493,8 +1528,10 @@ and <= {self.maximum_font_size}"
         return text_option_menu_theme
 
     def accessibility_create_widgets_colorchooser(
-        self, label_colorchooser_text, text_colorchooser_value
-    ):
+        self: Self,
+        label_colorchooser_value: str,
+        text_colorchooser_value: str,
+    ) -> StringVar:
         frame_colorchooser = Frame(self.accessibility_window_frame)
         frame_colorchooser.configure(
             bg=self.themes.get_current().get_background()
@@ -1506,7 +1543,7 @@ and <= {self.maximum_font_size}"
 
         label_colorchooser = Label(
             frame_colorchooser,
-            text=f"{label_colorchooser_text}",
+            text=f"{label_colorchooser_value}",
             font=(self.font_info.get_family(), self.font_info.get_size_body()),
             fg=self.themes.get_current().get_foreground(),
             bg=self.themes.get_current().get_background(),
@@ -1520,7 +1557,7 @@ and <= {self.maximum_font_size}"
 
         self.themes.get_current().configure_widget_theme(button_colorchooser)
 
-        def button_colorchooser_submit():
+        def button_colorchooser_submit() -> None:
             color = colorchooser.askcolor()
             hexa = color[1]
             if hexa is not None:
@@ -1537,13 +1574,13 @@ and <= {self.maximum_font_size}"
         return text_colorchooser
 
     def accessibility_submit(
-        self,
-        text_spinbox_font_size,
-        text_option_menu_theme,
-        text_foreground,
-        text_background,
-        text_activeback,
-    ):
+        self: Self,
+        text_spinbox_font_size: StringVar,
+        text_option_menu_theme: StringVar,
+        text_foreground: StringVar,
+        text_background: StringVar,
+        text_activeback: StringVar,
+    ) -> None:
         try:
             font_size_value = int(text_spinbox_font_size.get())
             self.font_info.set_font_size(font_size_value)
@@ -1569,7 +1606,7 @@ and <= {self.maximum_font_size}"
         for widget in self.widgets:
             self.set_widget_specific_theme(widget)
 
-    def accessibility_create_widgets(self):
+    def accessibility_create_widgets(self: Self) -> None:
         text_spinbox_font_size = self.accessibility_create_widgets_font_size()
         text_option_menu_theme = self.accessibility_create_widgets_theme()
         text_foreground = self.accessibility_create_widgets_colorchooser(
@@ -1603,7 +1640,7 @@ and <= {self.maximum_font_size}"
         self.add_widgets([button_accessibility_submit])
 
 
-def main():
+def main() -> None:
     home = set_up_home()
     smart_home_system = SmartHomeSystem(home)
     smart_home_system.run()
