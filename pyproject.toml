@@ -1,3 +1,21 @@
+[tool.poetry]
+name = "smart-home"
+version = "0.1.0"
+description = "A GUI that simulates controls for a smart home."
+authors = ["willswats <willswats@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.ruff]
 select = [
   "E",   # pycodestyle (Error)
