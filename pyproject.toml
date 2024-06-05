@@ -2,7 +2,7 @@
 name = "smart-home"
 version = "0.1.0"
 description = "A GUI that simulates controls for a smart home."
-authors = ["willswats <williamstuwatson@gmail.com>"]
+authors = ["willswats <william@williamwatson.dev>"]
 license = "MIT"
 readme = "README.md"
 package-mode = false
