@@ -13,7 +13,7 @@ A GUI that simulates controls for a smart home.
 Install the dependencies:
 
 ```bash
-poetry install --no-root
+poetry install
 ```
 
 ### Run
